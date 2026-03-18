@@ -1403,7 +1403,7 @@ function renderPatients(list) {
       + '<td>' + (p.phone||'—') + '</td>'
       + '<td>' + (p.updated_at ? new Date(p.updated_at*1000).toLocaleDateString('en-IN') : '—') + '</td>'
       + '<td><span class="badge badge-green">Active</span></td>'
-      + '<td style="display:flex;gap:6px"><button class="action-btn" onclick="viewPatient(\'' + p.patient_id + '\')">Edit</button><button class="action-btn" style="background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)" onclick="openPatientRecord(\'' + p.patient_id + '\',\'' + ((p.first_name||'')+'+'+(p.last_name||'')).trim() + '\',\'' + (p.phone||'') + '\')">Records</button></td>'
+      + '<td style="display:flex;gap:6px"><button class="action-btn" onclick="viewPatient(\'' + p.patient_id + '\')">View</button><button class="action-btn" style="background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)" onclick="openEMR(\'' + p.patient_id + '\',\'' + ((p.first_name||'')+'+'+(p.last_name||'')).trim() + '\',\'' + (p.phone||'') + '\')">Records</button></td>'
       + '</tr>';
   }
   el.innerHTML = '<table><thead><tr><th>MRN</th><th>Patient</th><th>Age</th><th>Phone</th><th>Last visit</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
@@ -1749,7 +1749,7 @@ var visitRadRows  = [];
 var editingVisitId = null;
 
 // Open patient record panel
-function openPatientRecord(patientId, patientName, patientPhone) {
+function openEMR(patientId, patientName, patientPhone) {
   activeVisitPatient = { id: patientId, name: patientName, phone: patientPhone };
   document.getElementById('prPanel').style.display = 'flex';
   document.getElementById('prPatientName').textContent = patientName;
