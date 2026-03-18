@@ -1387,34 +1387,38 @@ function loadPatients() {
 function renderPatients(list) {
   var el = document.getElementById('patients-list');
   if (!list.length) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">No patients yet. Register your first patient above.</div>';
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.5)">No patients yet.</div>';
     return;
   }
-  var rows = '';
+  var tbody = '';
   for (var i = 0; i < list.length; i++) {
     var p = list[i];
     var name = ((p.first_name||'') + ' ' + (p.last_name||'')).trim();
-    var age = p.age ? p.age + (p.gender ? p.gender[0].toUpperCase() : '') : '—';
+    var age = p.age ? (p.age + (p.gender ? p.gender[0].toUpperCase() : '')) : '-';
     var mrn = p.mrn || ('VH-' + new Date().getFullYear() + '-' + String(p.patient_id||'').slice(-5));
-    var lastVisit = p.last_visit_at ? new Date(p.last_visit_at).toLocaleDateString('en-IN') : '—';
-    var pid = String(p.patient_id);
-    var pname = name.replace(/'/g, '');
-    var pphone = (p.phone||'').replace(/'/g, '');
-    rows += '<tr>'
+    var lv = p.last_visit_at ? new Date(p.last_visit_at).toLocaleDateString('en-IN') : '-';
+    tbody += '<tr data-pid="' + p.patient_id + '">'
       + '<td style="color:var(--teal);font-weight:600">' + mrn + '</td>'
       + '<td class="td-name">' + name + '</td>'
       + '<td>' + age + '</td>'
-      + '<td>' + (p.phone||'—') + '</td>'
-      + '<td>' + lastVisit + '</td>'
+      + '<td>' + (p.phone||'-') + '</td>'
+      + '<td>' + lv + '</td>'
       + '<td><span class="badge badge-green">Active</span></td>'
       + '<td style="display:flex;gap:6px">'
-      + '<button class="action-btn" onclick="viewPatient('' + pid + '')">View</button>'
-      + '<button class="action-btn" style="background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)" onclick="openEMRById('' + pid + '')">+ Visit</button>'
-      + '</td>'
-      + '</tr>';
+      + '<button class="action-btn pt-view">View</button>'
+      + '<button class="action-btn pt-visit" style="background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">+ Visit</button>'
+      + '</td></tr>';
   }
-  el.innerHTML = '<table><thead><tr><th>MRN</th><th>Patient</th><th>Age</th><th>Phone</th><th>Last visit</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
+  el.innerHTML = '<table><thead><tr><th>MRN</th><th>Patient</th><th>Age</th><th>Phone</th><th>Last visit</th><th>Status</th><th>Action</th></tr></thead><tbody>' + tbody + '</tbody></table>';
+  el.querySelectorAll('tr[data-pid]').forEach(function(row) {
+    var pid = row.getAttribute('data-pid');
+    var vBtn = row.querySelector('.pt-view');
+    var rBtn = row.querySelector('.pt-visit');
+    if (vBtn) vBtn.addEventListener('click', function(){ viewPatient(pid); });
+    if (rBtn) rBtn.addEventListener('click', function(){ openEMRById(pid); });
+  });
 }
+
 // Search patients
 var patSearchEl = document.getElementById('patientSearch');
 if (patSearchEl) {
@@ -1755,12 +1759,10 @@ var visitRadRows  = [];
 var editingVisitId = null;
 
 // Open patient record panel
-
 function openEMRById(patientId) {
-  var patient = patientsData.find(function(p){ return String(p.patient_id) === String(patientId); });
-  if (patient) {
-    var name = ((patient.first_name||'') + ' ' + (patient.last_name||'')).trim();
-    openEMR(patientId, name, patient.phone||'');
+  var p = patientsData.find(function(x){ return String(x.patient_id) === String(patientId); });
+  if (p) {
+    openEMR(patientId, ((p.first_name||'') + ' ' + (p.last_name||'')).trim(), p.phone||'');
   } else {
     openEMR(patientId, 'Patient', '');
   }
@@ -2228,9 +2230,7 @@ function getDeptFields(dept) {
   return '';
 }
 
-var DRUG_LIST = ['Paracetamol','Dolo 650','Ibuprofen','Aspirin','Diclofenac','Amoxicillin','Azithromycin','Ciprofloxacin','Doxycycline','Metronidazole','Cefixime','Amoxicillin+Clavulanate','Metformin','Glimepiride','Sitagliptin','Amlodipine','Atenolol','Enalapril','Telmisartan','Losartan','Metoprolol','Ramipril','Atorvastatin','Rosuvastatin','Pantoprazole','Omeprazole','Ranitidine','Domperidone','Ondansetron','ORS','Cetirizine','Fexofenadine','Montelukast','Salbutamol','Prednisolone','Methylprednisolone','Vitamin D3','Vitamin B12','Calcium','Iron+Folic Acid','Multivitamin','Tramadol','Gabapentin','Pregabalin','Alprazolam','Sertraline','Escitalopram','Levothyroxine','Chlorhexidine Mouthwash','Mupirocin Ointment','Eye drops - Ciprofloxacin','Lubricating Eye drops','Ear drops - Ciprofloxacin','Nasal drops - Xylometazoline'];
 
-var LAB_TESTS = ['CBC (Complete Blood Count)','Haemoglobin','Blood Sugar Fasting','Blood Sugar PP','Blood Sugar Random','HbA1c','LFT (Liver Function Test)','KFT (Kidney Function Test)','Lipid Profile','Thyroid Profile (T3/T4/TSH)','TSH','Serum Electrolytes','Urine R/E','Urine Culture','Dengue NS1 Antigen','Dengue IgM/IgG','Malaria Antigen','Widal Test','CRP','ESR','PT/INR','Hepatitis B Surface Antigen','Anti-HCV','HIV 1&2','Pregnancy Test (urine beta-hCG)','Sputum AFB','ECG','2D Echo','X-Ray Chest','X-Ray KUB','USG Abdomen','USG Pelvis','USG Thyroid','CT Brain','MRI Brain','Pap Smear','Audiometry','Blood Culture','Stool R/E'];
 
 var visitPatientId = null;
 var visitPatientName = '';
@@ -2240,12 +2240,10 @@ var labRows = [];
 var radRows = [];
 var currentVisitId = null;
 
-
 function openEMRById(patientId) {
-  var patient = patientsData.find(function(p){ return String(p.patient_id) === String(patientId); });
-  if (patient) {
-    var name = ((patient.first_name||'') + ' ' + (patient.last_name||'')).trim();
-    openEMR(patientId, name, patient.phone||'');
+  var p = patientsData.find(function(x){ return String(x.patient_id) === String(patientId); });
+  if (p) {
+    openEMR(patientId, ((p.first_name||'') + ' ' + (p.last_name||'')).trim(), p.phone||'');
   } else {
     openEMR(patientId, 'Patient', '');
   }
