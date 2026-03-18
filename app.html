@@ -1384,6 +1384,15 @@ function loadPatients() {
   });
 }
 
+function openEMRById(patientId) {
+  var p = patientsData.find(function(x){ return String(x.patient_id) === String(patientId); });
+  if (p) {
+    openEMR(patientId, ((p.first_name||'') + ' ' + (p.last_name||'')).trim(), p.phone||'');
+  } else {
+    openEMR(patientId, 'Patient', '');
+  }
+}
+
 function renderPatients(list) {
   var el = document.getElementById('patients-list');
   if (!list.length) {
@@ -1396,7 +1405,7 @@ function renderPatients(list) {
     var name = ((p.first_name||'') + ' ' + (p.last_name||'')).trim();
     var age = p.age ? (p.age + (p.gender ? p.gender[0].toUpperCase() : '')) : '-';
     var mrn = p.mrn || ('VH-' + new Date().getFullYear() + '-' + String(p.patient_id||'').slice(-5));
-    var lv = p.last_visit_at ? new Date(p.last_visit_at).toLocaleDateString('en-IN') : '-';
+    var lv = p.last_visit_at ? new Date(Number(p.last_visit_at)).toLocaleDateString('en-IN') : '-';
     tbody += '<tr data-pid="' + p.patient_id + '">'
       + '<td style="color:var(--teal);font-weight:600">' + mrn + '</td>'
       + '<td class="td-name">' + name + '</td>'
@@ -1759,14 +1768,6 @@ var visitRadRows  = [];
 var editingVisitId = null;
 
 // Open patient record panel
-function openEMRById(patientId) {
-  var p = patientsData.find(function(x){ return String(x.patient_id) === String(patientId); });
-  if (p) {
-    openEMR(patientId, ((p.first_name||'') + ' ' + (p.last_name||'')).trim(), p.phone||'');
-  } else {
-    openEMR(patientId, 'Patient', '');
-  }
-}
 function openEMR(patientId, patientName, patientPhone) {
   activeVisitPatient = { id: patientId, name: patientName, phone: patientPhone };
   document.getElementById('prPanel').style.display = 'flex';
