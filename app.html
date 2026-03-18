@@ -270,7 +270,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
           Staff Management
         </div>
         <div class="nav-item" onclick="showScreen('teleconsult',this);loadTeleconsult()">
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.069A1 1 0 0121 8.876V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2v-1.876a1 1 0 00-.447-.832L15 14"/><rect x="2" y="8" width="13" height="10" rx="2"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>
           Teleconsult
         </div>
       </div>
@@ -605,115 +605,85 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   </div>
 </div>
 
-
-<!-- TELECONSULT SCREEN -->
+<!-- TELECONSULT -->
 <div class="screen" id="screen-teleconsult">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
     <div>
-      <div style="font-size:22px;font-weight:700;color:var(--color-text-primary);font-family:'Cabinet Grotesk',sans-serif">Teleconsultation</div>
-      <div style="font-size:13px;color:var(--color-text-secondary);margin-top:4px">Video consultations — patients join via WhatsApp link, no app needed</div>
+      <h2 style="font-size:22px;font-weight:700;font-family:'Cabinet Grotesk',sans-serif">Teleconsultation</h2>
+      <p style="font-size:13px;color:var(--color-text-secondary);margin-top:4px">Video consultations via WhatsApp link — no app needed</p>
     </div>
-    <button class="action-btn-primary" onclick="openNewConsultModal()" style="background:var(--teal);color:#000;border:none;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">+ New Consultation</button>
+    <button onclick="openTcModal()" style="background:var(--teal);color:#000;border:none;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;font-family:'Cabinet Grotesk',sans-serif">+ New Consultation</button>
   </div>
-
-  <!-- Stats -->
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">
-    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px">
-      <div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Today</div>
-      <div style="font-size:24px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="tc-today">0</div>
-    </div>
-    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px">
-      <div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Pending</div>
-      <div style="font-size:24px;font-weight:700;color:#F59E0B;font-family:'Cabinet Grotesk',sans-serif" id="tc-pending">0</div>
-    </div>
-    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px">
-      <div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Completed</div>
-      <div style="font-size:24px;font-weight:700;color:#22C55E;font-family:'Cabinet Grotesk',sans-serif" id="tc-completed">0</div>
-    </div>
-    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px">
-      <div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Revenue</div>
-      <div style="font-size:24px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="tc-revenue">₹0</div>
-    </div>
+    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px"><div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Today</div><div style="font-size:26px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="tc-today">0</div></div>
+    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px"><div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Pending</div><div style="font-size:26px;font-weight:700;color:#F59E0B;font-family:'Cabinet Grotesk',sans-serif" id="tc-pending">0</div></div>
+    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px"><div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Completed</div><div style="font-size:26px;font-weight:700;color:#22C55E;font-family:'Cabinet Grotesk',sans-serif" id="tc-completed">0</div></div>
+    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px"><div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Revenue</div><div style="font-size:26px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="tc-revenue">&#8377;0</div></div>
   </div>
-
-  <!-- List -->
   <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:16px;overflow:hidden">
     <div style="padding:16px 20px;border-bottom:0.5px solid var(--color-border);font-weight:600;font-size:14px">All Consultations</div>
-    <div id="tc-list" style="padding:20px"><div style="text-align:center;color:var(--color-text-secondary);font-size:14px;padding:40px">No consultations yet. Create your first one above.</div></div>
+    <div id="tc-list" style="padding:24px;text-align:center;color:var(--color-text-secondary);font-size:14px">Loading...</div>
   </div>
 </div>
 
-<!-- NEW CONSULT MODAL -->
-<div class="modal-overlay" id="newConsultModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;display:none;align-items:center;justify-content:center">
-  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:20px;width:100%;max-width:480px;overflow:hidden">
-    <div style="background:var(--teal);padding:20px 24px;display:flex;justify-content:space-between;align-items:center">
-      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:17px;font-weight:700;color:#000">New Teleconsultation</div>
-      <button onclick="closeNewConsultModal()" style="background:rgba(0,0,0,0.2);border:none;color:#000;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px">×</button>
+<!-- TC CREATE MODAL -->
+<div id="tcCreateModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:2000;align-items:center;justify-content:center">
+  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:20px;width:90%;max-width:460px">
+    <div style="background:var(--teal);padding:18px 22px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:700;color:#000">New Teleconsultation</span>
+      <button onclick="closeTcModal()" style="background:rgba(0,0,0,0.15);border:none;color:#000;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:15px;font-weight:700">&#215;</button>
     </div>
-    <div style="padding:24px">
-      <div id="nc-alert" style="display:none;padding:10px 13px;border-radius:8px;font-size:13px;margin-bottom:14px;background:#FEF2F2;color:#D44444;border:1px solid #FECACA"></div>
-      <div style="margin-bottom:16px">
-        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Patient Name *</label>
-        <input type="text" id="nc-name" placeholder="Ramu Krishna" class="form-input" style="width:100%"/>
-      </div>
-      <div style="margin-bottom:16px">
-        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Patient WhatsApp Number *</label>
-        <input type="text" id="nc-phone" placeholder="9876543210" class="form-input" style="width:100%"/>
-      </div>
-      <div style="margin-bottom:16px">
-        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Symptoms / Reason</label>
-        <textarea id="nc-symptoms" placeholder="Fever, headache, body pain..." rows="3" class="form-input" style="width:100%;resize:vertical"></textarea>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+    <div style="padding:22px">
+      <div id="tc-alert" style="display:none;padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;background:#FEF2F2;color:#D44444;border:1px solid #FECACA"></div>
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Patient Name *</label>
+      <input id="tc-name" type="text" placeholder="Ramu Krishna" class="form-input" style="width:100%;margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">WhatsApp Number *</label>
+      <input id="tc-phone" type="text" placeholder="9876543210" class="form-input" style="width:100%;margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Symptoms</label>
+      <input id="tc-symptoms" type="text" placeholder="Fever, headache..." class="form-input" style="width:100%;margin-bottom:14px">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div>
-          <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Fee (₹)</label>
-          <input type="number" id="nc-amount" placeholder="300" value="300" class="form-input" style="width:100%"/>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Fee (&#8377;)</label>
+          <input id="tc-amount" type="number" value="300" class="form-input" style="width:100%">
         </div>
         <div>
-          <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Schedule Time</label>
-          <input type="datetime-local" id="nc-time" class="form-input" style="width:100%"/>
+          <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Time</label>
+          <input id="tc-time" type="datetime-local" class="form-input" style="width:100%">
         </div>
       </div>
-      <div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--teal)">
-        📱 Patient gets WhatsApp link. Opens in phone browser — no app download needed.
+      <div style="margin-top:14px;padding:10px 12px;background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:8px;font-size:12px;color:var(--teal)">
+        &#128241; Patient gets WhatsApp link. No app download needed.
       </div>
     </div>
-    <div style="padding:16px 24px;border-top:0.5px solid var(--color-border);display:flex;gap:10px;justify-content:flex-end">
-      <button onclick="closeNewConsultModal()" style="padding:10px 20px;border:0.5px solid var(--color-border);border-radius:10px;background:none;color:var(--color-text-primary);cursor:pointer;font-size:13px">Cancel</button>
-      <button id="nc-create-btn" onclick="createConsultation()" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">Create & Send WhatsApp →</button>
+    <div style="padding:14px 22px;border-top:0.5px solid var(--color-border);display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="closeTcModal()" class="action-btn">Cancel</button>
+      <button id="tc-create-btn" onclick="createTcConsult()" style="background:var(--teal);color:#000;border:none;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">Create + Send WhatsApp</button>
     </div>
   </div>
 </div>
 
-<!-- COMPLETE CONSULT MODAL -->
-<div id="consultDetailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center">
-  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:20px;width:100%;max-width:520px;overflow:hidden">
-    <div style="background:var(--color-surface-2,#1a2822);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:0.5px solid var(--color-border)">
-      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:700" id="cd-title">Complete Consultation</div>
-      <button onclick="closeConsultDetailModal()" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:20px">×</button>
+<!-- TC COMPLETE MODAL -->
+<div id="tcCompleteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:2000;align-items:center;justify-content:center">
+  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:20px;width:90%;max-width:500px">
+    <div style="padding:18px 22px;border-bottom:0.5px solid var(--color-border);display:flex;justify-content:space-between;align-items:center">
+      <span style="font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:700" id="tc-complete-title">Complete Consultation</span>
+      <button onclick="closeTcCompleteModal()" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:20px">&#215;</button>
     </div>
-    <div style="padding:24px">
-      <div id="cd-info" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;font-size:13px"></div>
-      <div style="margin-bottom:14px">
-        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Diagnosis</label>
-        <input type="text" id="cd-diagnosis" placeholder="Viral fever, UTI, etc." class="form-input" style="width:100%"/>
-      </div>
-      <div style="margin-bottom:14px">
-        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Prescription *</label>
-        <textarea id="cd-prescription" rows="5" placeholder="Tab Paracetamol 500mg — 1 tab 3 times daily x 5 days" class="form-input" style="width:100%;resize:vertical;font-family:monospace;font-size:13px"></textarea>
-      </div>
-      <div style="margin-bottom:14px">
-        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Fee (₹)</label>
-        <input type="number" id="cd-amount" placeholder="300" class="form-input" style="width:200px"/>
-      </div>
+    <div style="padding:22px">
+      <div id="tc-complete-info" style="background:rgba(0,196,154,0.06);border:0.5px solid var(--teal);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--color-text-secondary)"></div>
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Diagnosis</label>
+      <input id="tc-comp-diagnosis" type="text" placeholder="Viral fever, UTI, etc." class="form-input" style="width:100%;margin-bottom:14px">
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Prescription *</label>
+      <textarea id="tc-comp-prescription" rows="5" placeholder="Tab Paracetamol 500mg — 1 tab 3x daily x 5 days" class="form-input" style="width:100%;resize:vertical;font-family:monospace;font-size:13px;margin-bottom:14px"></textarea>
+      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Fee (&#8377;)</label>
+      <input id="tc-comp-amount" type="number" placeholder="300" class="form-input" style="width:160px">
     </div>
-    <div style="padding:16px 24px;border-top:0.5px solid var(--color-border);display:flex;gap:10px;justify-content:flex-end">
-      <button onclick="closeConsultDetailModal()" style="padding:10px 20px;border:0.5px solid var(--color-border);border-radius:10px;background:none;color:var(--color-text-primary);cursor:pointer;font-size:13px">Cancel</button>
-      <button onclick="completeConsult()" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">✓ Complete & Send Prescription</button>
+    <div style="padding:14px 22px;border-top:0.5px solid var(--color-border);display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="closeTcCompleteModal()" class="action-btn">Cancel</button>
+      <button onclick="completeTcConsult()" style="background:var(--teal);color:#000;border:none;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">&#10003; Complete + Send Prescription</button>
     </div>
   </div>
 </div>
-
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
@@ -929,130 +899,144 @@ function updateRoleModules(roleId) {
   const hint = document.getElementById('roleModulesHint');
   if (hint) hint.textContent = 'Access: ' + (map[roleId] || 'Basic access');
 }
-// ═══ TELECONSULT ═══
-let tcConsults = [];
-let activeConsultId = null;
+// ===== TELECONSULT =====
+var tcData = [];
+var activeTcId = null;
 
-async function loadTeleconsult() {
-  try {
-    const data = await apiFetch('/hospitals/' + mwHospitalId + '/teleconsult');
+function loadTeleconsult() {
+  document.getElementById('tc-list').innerHTML = '<div style="padding:24px;text-align:center;color:var(--color-text-secondary)">Loading...</div>';
+  apiFetch('/hospitals/' + mwHospitalId + '/teleconsult').then(function(data) {
     if (!data.success) return;
-    tcConsults = data.data || [];
+    tcData = data.data || [];
     renderTcList();
-    updateTcStats();
-  } catch(e) { console.error('Teleconsult load error:', e); }
+    renderTcStats();
+  }).catch(function(e) { console.error('TC load error:', e); });
+}
+
+function renderTcStats() {
+  var today = new Date().toDateString();
+  document.getElementById('tc-today').textContent     = tcData.filter(function(c){ return new Date(c.created_at*1000).toDateString()===today; }).length;
+  document.getElementById('tc-pending').textContent   = tcData.filter(function(c){ return c.status==='pending'; }).length;
+  document.getElementById('tc-completed').textContent = tcData.filter(function(c){ return c.status==='completed'; }).length;
+  document.getElementById('tc-revenue').textContent   = String.fromCharCode(8377) + tcData.filter(function(c){ return c.status==='completed'; }).reduce(function(s,c){ return s+(c.amount||0); }, 0);
 }
 
 function renderTcList() {
-  const el = document.getElementById('tc-list');
-  if (!tcConsults.length) {
-    el.innerHTML = '<div style="text-align:center;color:var(--color-text-secondary);font-size:14px;padding:40px">No consultations yet.</div>';
+  var el = document.getElementById('tc-list');
+  if (!tcData.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary);font-size:14px">No consultations yet. Create your first one above.</div>';
     return;
   }
-  const sColor = { pending:'#F59E0B', active:'var(--teal)', completed:'#22C55E', cancelled:'#EF4444' };
-  let html = '<table style="width:100%;border-collapse:collapse"><thead><tr style="border-bottom:0.5px solid var(--color-border)"><th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Patient</th><th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Symptoms</th><th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Status</th><th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Fee</th><th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Action</th></tr></thead><tbody>';
-  tcConsults.forEach(function(c) {
-    const sc = sColor[c.status] || '#888';
-    html += '<tr style="border-bottom:0.5px solid var(--color-border)">' +
-      '<td style="padding:12px;font-weight:600;font-size:13px">' + (c.patient_name||'—') + '<div style="font-size:11px;color:var(--color-text-secondary);font-weight:400">' + (c.patient_phone||'') + '</div></td>' +
-      '<td style="padding:12px;font-size:12.5px;color:var(--color-text-secondary);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (c.symptoms||'—') + '</td>' +
-      '<td style="padding:12px"><span style="background:' + sc + '22;color:' + sc + ';border:1px solid ' + sc + '55;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">' + c.status + '</span></td>' +
-      '<td style="padding:12px;font-size:13px">' + (c.amount ? '₹'+c.amount : '—') + '</td>' +
-      '<td style="padding:12px"><div style="display:flex;gap:6px">' +
-      (c.status === 'pending' || c.status === 'active' ? '<button onclick="startConsult(''+c.id+'',''+c.doctor_url+'')" style="padding:6px 12px;background:var(--teal);color:#000;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">📹 Start</button>' : '') +
-      (c.status !== 'completed' && c.status !== 'cancelled' ? '<button onclick="openConsultDetail('+JSON.stringify(c).replace(/"/g,'"')+')" style="padding:6px 12px;background:none;border:0.5px solid var(--color-border);color:var(--color-text-primary);border-radius:8px;font-size:12px;cursor:pointer">Complete</button>' : '') +
-      (c.status === 'pending' ? '<button onclick="cancelConsult(\''+c.id+'\')" style="padding:6px 12px;background:none;border:0.5px solid #EF4444;color:#EF4444;border-radius:8px;font-size:12px;cursor:pointer">Cancel</button>' : '') +
-      '</div></td></tr>';
-  });
-  html += '</tbody></table>';
-  el.innerHTML = html;
+  var rows = '';
+  for (var i = 0; i < tcData.length; i++) {
+    var c = tcData[i];
+    var sc = c.status==='pending' ? '#F59E0B' : c.status==='active' ? '#00C49A' : c.status==='completed' ? '#22C55E' : '#EF4444';
+    var actions = '';
+    if (c.status==='pending' || c.status==='active') {
+      actions += '<button onclick="startTcCall(\'' + c.id + '\',\'' + c.doctor_url + '\')" style="padding:5px 10px;background:var(--teal);color:#000;border:none;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer;margin-right:5px">&#128249; Start</button>';
+    }
+    if (c.status!=='completed' && c.status!=='cancelled') {
+      var cdata = encodeURIComponent(JSON.stringify({id:c.id,patient_name:c.patient_name,patient_phone:c.patient_phone,symptoms:c.symptoms,diagnosis:c.diagnosis,prescription:c.prescription,amount:c.amount}));
+      actions += '<button onclick="openTcCompleteModal(decodeURIComponent(\'' + cdata + '\'))" style="padding:5px 10px;background:none;border:0.5px solid var(--color-border);color:var(--color-text-primary);border-radius:7px;font-size:11px;cursor:pointer;margin-right:5px">Complete</button>';
+    }
+    if (c.status==='pending') {
+      actions += '<button onclick="cancelTcConsult(\'' + c.id + '\')" style="padding:5px 10px;background:none;border:0.5px solid #EF4444;color:#EF4444;border-radius:7px;font-size:11px;cursor:pointer">Cancel</button>';
+    }
+    rows += '<tr style="border-bottom:0.5px solid var(--color-border)">'
+      + '<td style="padding:12px;font-weight:600;font-size:13px">' + (c.patient_name||'—') + '<div style="font-size:11px;color:var(--color-text-secondary);font-weight:400">' + (c.patient_phone||'') + '</div></td>'
+      + '<td style="padding:12px;font-size:12.5px;color:var(--color-text-secondary);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (c.symptoms||'—') + '</td>'
+      + '<td style="padding:12px"><span style="background:' + sc + '22;color:' + sc + ';border:1px solid ' + sc + '55;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">' + c.status + '</span></td>'
+      + '<td style="padding:12px;font-size:13px">' + (c.amount ? String.fromCharCode(8377)+c.amount : '—') + '</td>'
+      + '<td style="padding:12px">' + actions + '</td>'
+      + '</tr>';
+  }
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="border-bottom:0.5px solid var(--color-border)">'
+    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Patient</th>'
+    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Symptoms</th>'
+    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Status</th>'
+    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Fee</th>'
+    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Action</th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
-function updateTcStats() {
-  var today = new Date().toDateString();
-  var todayCount = tcConsults.filter(function(c){return new Date(c.created_at*1000).toDateString()===today}).length;
-  var pending = tcConsults.filter(function(c){return c.status==='pending'}).length;
-  var completed = tcConsults.filter(function(c){return c.status==='completed'}).length;
-  var revenue = tcConsults.filter(function(c){return c.status==='completed'}).reduce(function(s,c){return s+(c.amount||0)},0);
-  document.getElementById('tc-today').textContent = todayCount;
-  document.getElementById('tc-pending').textContent = pending;
-  document.getElementById('tc-completed').textContent = completed;
-  document.getElementById('tc-revenue').textContent = '₹'+revenue;
+function openTcModal() {
+  var dt = new Date(Date.now()+30*60*1000); dt.setSeconds(0); dt.setMilliseconds(0);
+  document.getElementById('tc-time').value = dt.toISOString().slice(0,16);
+  document.getElementById('tc-alert').style.display = 'none';
+  document.getElementById('tcCreateModal').style.display = 'flex';
 }
 
-function openNewConsultModal() {
-  document.getElementById('newConsultModal').style.display = 'flex';
-  var dt = new Date(Date.now() + 30*60*1000); dt.setSeconds(0); dt.setMilliseconds(0);
-  document.getElementById('nc-time').value = dt.toISOString().slice(0,16);
-  document.getElementById('nc-alert').style.display = 'none';
+function closeTcModal() {
+  document.getElementById('tcCreateModal').style.display = 'none';
+  document.getElementById('tc-name').value = '';
+  document.getElementById('tc-phone').value = '';
+  document.getElementById('tc-symptoms').value = '';
+  document.getElementById('tc-amount').value = '300';
 }
 
-function closeNewConsultModal() {
-  document.getElementById('newConsultModal').style.display = 'none';
-  ['nc-name','nc-phone','nc-symptoms'].forEach(function(id){document.getElementById(id).value=''});
-  document.getElementById('nc-amount').value = '300';
-}
-
-async function createConsultation() {
-  var name = document.getElementById('nc-name').value.trim();
-  var phone = document.getElementById('nc-phone').value.trim();
-  var symptoms = document.getElementById('nc-symptoms').value.trim();
-  var amount = document.getElementById('nc-amount').value;
-  var timeVal = document.getElementById('nc-time').value;
-  var alertEl = document.getElementById('nc-alert');
+function createTcConsult() {
+  var name = document.getElementById('tc-name').value.trim();
+  var phone = document.getElementById('tc-phone').value.trim();
+  var symptoms = document.getElementById('tc-symptoms').value.trim();
+  var amount = parseInt(document.getElementById('tc-amount').value)||0;
+  var timeVal = document.getElementById('tc-time').value;
+  var alertEl = document.getElementById('tc-alert');
   if (!name || !phone) { alertEl.textContent='Patient name and phone are required.'; alertEl.style.display='block'; return; }
-  var btn = document.getElementById('nc-create-btn');
+  var btn = document.getElementById('tc-create-btn');
   btn.disabled = true; btn.textContent = 'Creating...';
   alertEl.style.display = 'none';
-  try {
-    var data = await apiFetch('/hospitals/'+mwHospitalId+'/teleconsult', 'POST', {
-      patient_name: name, patient_phone: phone, symptoms: symptoms,
-      amount: parseInt(amount)||0, scheduled_at: timeVal ? new Date(timeVal).getTime() : Date.now()
-    });
-    if (data.success) { closeNewConsultModal(); showToast('Consultation created! WhatsApp link sent to '+name+' ✓', 'success'); loadTeleconsult(); }
-    else { alertEl.textContent = data.message||'Failed.'; alertEl.style.display='block'; }
-  } catch(e) { alertEl.textContent='Network error.'; alertEl.style.display='block'; }
-  btn.disabled = false; btn.textContent = 'Create & Send WhatsApp →';
+  apiFetch('/hospitals/'+mwHospitalId+'/teleconsult','POST',{
+    patient_name:name, patient_phone:phone, symptoms:symptoms,
+    amount:amount, scheduled_at: timeVal ? new Date(timeVal).getTime() : Date.now()
+  }).then(function(data) {
+    if (data.success) { closeTcModal(); showToast('Consultation created! WhatsApp link sent to '+name+' ✓','success'); loadTeleconsult(); }
+    else { alertEl.textContent=data.message||'Failed to create.'; alertEl.style.display='block'; }
+    btn.disabled=false; btn.textContent='Create + Send WhatsApp';
+  }).catch(function(e) { alertEl.textContent='Network error.'; alertEl.style.display='block'; btn.disabled=false; btn.textContent='Create + Send WhatsApp'; });
 }
 
-function startConsult(consultId, doctorUrl) {
-  apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+consultId, 'PUT', {status:'active'});
-  loadTeleconsult();
-  window.open(doctorUrl, '_blank');
+function startTcCall(id, url) {
+  apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+id,'PUT',{status:'active'}).then(function(){ loadTeleconsult(); });
+  window.open(url,'_blank');
 }
 
-function openConsultDetail(c) {
-  activeConsultId = c.id;
-  document.getElementById('cd-title').textContent = 'Complete — '+c.patient_name;
-  document.getElementById('cd-info').innerHTML = '<div style="background:var(--color-surface-2,#1a2822);border-radius:8px;padding:10px 12px"><div style="font-size:11px;color:var(--color-text-secondary)">Patient</div><div style="font-size:13px;font-weight:600">'+c.patient_name+'</div></div>'+'<div style="background:var(--color-surface-2,#1a2822);border-radius:8px;padding:10px 12px"><div style="font-size:11px;color:var(--color-text-secondary)">Phone</div><div style="font-size:13px;font-weight:600">'+c.patient_phone+'</div></div>'+'<div style="background:var(--color-surface-2,#1a2822);border-radius:8px;padding:10px 12px;grid-column:1/-1"><div style="font-size:11px;color:var(--color-text-secondary)">Symptoms</div><div style="font-size:13px">'+( c.symptoms||'—')+'</div></div>';
-  document.getElementById('cd-diagnosis').value = c.diagnosis||'';
-  document.getElementById('cd-prescription').value = c.prescription||'';
-  document.getElementById('cd-amount').value = c.amount||300;
-  document.getElementById('consultDetailModal').style.display = 'flex';
+function openTcCompleteModal(dataStr) {
+  var c = JSON.parse(dataStr);
+  activeTcId = c.id;
+  document.getElementById('tc-complete-title').textContent = 'Complete — ' + c.patient_name;
+  document.getElementById('tc-complete-info').innerHTML = '<strong>' + c.patient_name + '</strong> &middot; ' + c.patient_phone + (c.symptoms ? ' &middot; ' + c.symptoms : '');
+  document.getElementById('tc-comp-diagnosis').value = c.diagnosis||'';
+  document.getElementById('tc-comp-prescription').value = c.prescription||'';
+  document.getElementById('tc-comp-amount').value = c.amount||300;
+  document.getElementById('tcCompleteModal').style.display = 'flex';
 }
 
-function closeConsultDetailModal() {
-  document.getElementById('consultDetailModal').style.display = 'none';
-  activeConsultId = null;
+function closeTcCompleteModal() {
+  document.getElementById('tcCompleteModal').style.display = 'none';
+  activeTcId = null;
 }
 
-async function completeConsult() {
-  if (!activeConsultId) return;
-  var diagnosis = document.getElementById('cd-diagnosis').value.trim();
-  var prescription = document.getElementById('cd-prescription').value.trim();
-  var amount = parseInt(document.getElementById('cd-amount').value)||0;
-  if (!prescription) { showToast('Please enter a prescription.', 'error'); return; }
-  var data = await apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+activeConsultId, 'PUT', {
-    status:'completed', diagnosis:diagnosis, prescription:prescription, amount:amount
+function completeTcConsult() {
+  if (!activeTcId) return;
+  var prescription = document.getElementById('tc-comp-prescription').value.trim();
+  if (!prescription) { showToast('Please enter a prescription.','error'); return; }
+  apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+activeTcId,'PUT',{
+    status:'completed',
+    diagnosis: document.getElementById('tc-comp-diagnosis').value.trim(),
+    prescription: prescription,
+    amount: parseInt(document.getElementById('tc-comp-amount').value)||0
+  }).then(function(data) {
+    if (data.success) { closeTcCompleteModal(); showToast('Consultation completed! Prescription sent via WhatsApp ✓','success'); loadTeleconsult(); }
+    else { showToast('Error: '+data.message,'error'); }
   });
-  if (data.success) { closeConsultDetailModal(); showToast('Consultation completed! Prescription sent via WhatsApp ✓', 'success'); loadTeleconsult(); }
-  else { showToast('Error: '+data.message, 'error'); }
 }
 
-async function cancelConsult(consultId) {
+function cancelTcConsult(id) {
   if (!confirm('Cancel this consultation?')) return;
-  var data = await apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+consultId, 'DELETE');
-  if (data.success) { showToast('Consultation cancelled', 'error'); loadTeleconsult(); }
+  apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+id,'DELETE').then(function(data) {
+    if (data.success) { showToast('Consultation cancelled','error'); loadTeleconsult(); }
+  });
 }
 
 </script>
