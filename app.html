@@ -897,7 +897,7 @@ var patientsData = [];
 
 function loadPatients() {
   document.getElementById('patients-list').innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">Loading patients...</div>';
-  apiFetch('/hospitals/' + mwHospitalId + '/patients').then(function(data) {
+  apiCall('/hospitals/' + mwHospitalId + '/patients').then(function(data) {
     if (!data.success) {
       document.getElementById('patients-list').innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">No patients yet. Register your first patient above.</div>';
       return;
@@ -957,7 +957,7 @@ async function registerPatient() {
 
   if (!first_name || !phone) { showToast('Name and phone are required.', 'error'); return; }
 
-  var data = await apiFetch('/hospitals/' + mwHospitalId + '/patients', 'POST', {
+  var data = await apiCall('/hospitals/' + mwHospitalId + '/patients', 'POST', {
     first_name: first_name,
     phone_number: phone,
     age: parseInt(age)||0,
@@ -980,7 +980,7 @@ var activeTcId = null;
 
 function loadTeleconsult() {
   document.getElementById('tc-list').innerHTML = '<div style="padding:24px;text-align:center;color:var(--color-text-secondary)">Loading...</div>';
-  apiFetch('/hospitals/' + mwHospitalId + '/teleconsult').then(function(data) {
+  apiCall('/hospitals/' + mwHospitalId + '/teleconsult').then(function(data) {
     if (!data.success) return;
     tcData = data.data || [];
     renderTcList();
@@ -1061,7 +1061,7 @@ function createTcConsult() {
   var btn = document.getElementById('tc-create-btn');
   btn.disabled = true; btn.textContent = 'Creating...';
   alertEl.style.display = 'none';
-  apiFetch('/hospitals/'+mwHospitalId+'/teleconsult','POST',{
+  apiCall('/hospitals/'+mwHospitalId+'/teleconsult','POST',{
     patient_name:name, patient_phone:phone, symptoms:symptoms,
     amount:amount, scheduled_at: timeVal ? new Date(timeVal).getTime() : Date.now()
   }).then(function(data) {
@@ -1072,7 +1072,7 @@ function createTcConsult() {
 }
 
 function startTcCall(id, url) {
-  apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+id,'PUT',{status:'active'}).then(function(){ loadTeleconsult(); });
+  apiCall('/hospitals/'+mwHospitalId+'/teleconsult/'+id,'PUT',{status:'active'}).then(function(){ loadTeleconsult(); });
   window.open(url,'_blank');
 }
 
@@ -1096,7 +1096,7 @@ function completeTcConsult() {
   if (!activeTcId) return;
   var prescription = document.getElementById('tc-comp-prescription').value.trim();
   if (!prescription) { showToast('Please enter a prescription.','error'); return; }
-  apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+activeTcId,'PUT',{
+  apiCall('/hospitals/'+mwHospitalId+'/teleconsult/'+activeTcId,'PUT',{
     status:'completed',
     diagnosis: document.getElementById('tc-comp-diagnosis').value.trim(),
     prescription: prescription,
@@ -1109,7 +1109,7 @@ function completeTcConsult() {
 
 function cancelTcConsult(id) {
   if (!confirm('Cancel this consultation?')) return;
-  apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+id,'DELETE').then(function(data) {
+  apiCall('/hospitals/'+mwHospitalId+'/teleconsult/'+id,'DELETE').then(function(data) {
     if (data.success) { showToast('Consultation cancelled','error'); loadTeleconsult(); }
   });
 }
