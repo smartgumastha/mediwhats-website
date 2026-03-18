@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediWhats — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --teal:    #0A9E80;
+      --teal-dk: #077A62;
+      --teal-lt: #E5F6F2;
+      --teal-mid:#A8DED4;
+      --ink:     #0C1C18;
+      --muted:   #526860;
+      --border:  #D0E5DF;
+      --bg:      #F4F9F8;
+      --white:   #FFFFFF;
+      --red:     #D44444;
+      --red-bg:  #FEF2F2;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER */
+    header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .logo {
+      font-family: 'Sora', sans-serif;
+      font-size: 19px;
+      font-weight: 700;
+      color: var(--teal);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .logo-pulse {
+      width: 9px; height: 9px;
+      background: var(--teal);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.4);opacity:.7} }
+
+    /* MAIN */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 40px 20px;
+    }
+
+    .login-card {
+      background: var(--white);
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      width: 100%;
+      max-width: 420px;
+      overflow: hidden;
+    }
+    .card-hdr {
+      background: var(--teal);
+      padding: 24px 28px;
+      text-align: center;
+    }
+    .card-hdr h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 4px;
+    }
+    .card-hdr p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .card-body { padding: 28px; }
+
+    .field { margin-bottom: 18px; }
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+    input {
+      width: 100%;
+      padding: 11px 13px;
+      border: 1px solid var(--border);
+      border-radius: 9px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      color: var(--ink);
+      background: var(--white);
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    input:focus {
+      border-color: var(--teal);
+      box-shadow: 0 0 0 3px rgba(10,158,128,.1);
+    }
+    input.err { border-color: var(--red); }
+
+    .btn {
+      width: 100%;
+      padding: 13px;
+      background: var(--teal);
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 15px;
+      font-family: 'Sora', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background .2s, transform .1s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-top: 4px;
+    }
+    .btn:hover { background: var(--teal-dk); }
+    .btn:active { transform: scale(.99); }
+    .btn:disabled { background: var(--teal-mid); cursor: not-allowed; }
+
+    .spin {
+      width: 17px; height: 17px;
+      border: 2px solid rgba(255,255,255,.35);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: sp .7s linear infinite;
+      display: none;
+    }
+    @keyframes sp { to { transform: rotate(360deg); } }
+    .btn.loading .spin { display: block; }
+    .btn.loading .btxt { display: none; }
+
+    .alert {
+      padding: 11px 13px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+      line-height: 1.5;
+    }
+    .alert.error {
+      background: var(--red-bg);
+      color: var(--red);
+      border: 1px solid #FECACA;
+      display: block;
+    }
+
+    .forgot {
+      text-align: right;
+      margin-top: 6px;
+    }
+    .forgot a {
+      font-size: 12.5px;
+      color: var(--teal);
+      text-decoration: none;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--border);
+      margin: 22px 0;
+    }
+
+    .signup-link {
+      text-align: center;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+    .signup-link a {
+      color: var(--teal);
+      font-weight: 500;
+      text-decoration: none;
+    }
+
+    /* DASHBOARD (shown after login) */
+    #dashboard { display: none; }
+
+    .dash-header {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .dash-header .logo { font-size: 17px; }
+    .user-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13.5px;
+      color: var(--muted);
+    }
+    .user-avatar {
+      width: 34px; height: 34px;
+      background: var(--teal-lt);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 13px;
+      color: var(--teal);
+    }
+    .logout-btn {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 12.5px;
+      color: var(--muted);
+      cursor: pointer;
+    }
+    .logout-btn:hover { background: var(--bg); }
+
+    .dash-body { max-width: 900px; margin: 0 auto; padding: 36px 24px; }
+
+    .welcome-box {
+      background: var(--teal);
+      border-radius: 14px;
+      padding: 24px 28px;
+      color: white;
+      margin-bottom: 28px;
+    }
+    .welcome-box h2 {
+      font-family: 'Sora', sans-serif;
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+    .welcome-box p { font-size: 14px; opacity: .85; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-bottom: 28px;
+    }
+    .stat-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+    }
+    .stat-label {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 8px;
+    }
+    .stat-value {
+      font-family: 'Sora', sans-serif;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+    }
+    .stat-value.teal { color: var(--teal); }
+
+    .modules-box {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px 22px;
+      margin-bottom: 24px;
+    }
+    .modules-box h3 {
+      font-family: 'Sora', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 14px;
+    }
+    .module-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .chip {
+      background: var(--teal-lt);
+      color: var(--teal-dk);
+      border: 1px solid var(--teal-mid);
+      border-radius: 20px;
+      padding: 5px 13px;
+      font-size: 12.5px;
+      font-weight: 500;
+    }
+    .chip.none {
+      background: var(--bg);
+      color: var(--muted);
+      border-color: var(--border);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    @media(max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
+
+    .info-card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+    .info-card h4 {
+      font-size: 12px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .04em;
+      margin-bottom: 10px;
+    }
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      padding: 5px 0;
+      border-bottom: 1px solid var(--bg);
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-row span:first-child { color: var(--muted); }
+    .info-row span:last-child { font-weight: 500; color: var(--ink); }
+
+    .role-badge {
+      display: inline-block;
+      background: var(--teal-lt);
+      color: var(--teal-dk);
+      border: 1px solid var(--teal-mid);
+      border-radius: 6px;
+      padding: 3px 10px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<!-- LOGIN PAGE -->
+<div id="login-page">
+  <header>
+    <div class="logo"><div class="logo-pulse"></div>MediWhats</div>
+    <div style="font-size:13px;color:var(--muted)">AI Hospital Manager</div>
+  </header>
+
+  <main>
+    <div class="login-card">
+      <div class="card-hdr">
+        <h1>Welcome back</h1>
+        <p>Login to your MediWhats dashboard</p>
+      </div>
+      <div class="card-body">
+        <div id="alert" class="alert"></div>
+
+        <div class="field">
+          <label>Email Address</label>
+          <input type="email" id="email" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+
+        <div class="field">
+          <label>Password</label>
+          <input type="password" id="password" placeholder="Enter your password" autocomplete="current-password"/>
+          <div class="forgot"><a href="#">Forgot password?</a></div>
+        </div>
+
+        <button class="btn" id="login-btn" onclick="doLogin()">
+          <div class="spin"></div>
+          <span class="btxt">Login →</span>
+        </button>
+
+        <hr class="divider"/>
+
+        <div class="signup-link">
+          New clinic? <a href="clinic-signup.html">Create your account →</a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- DASHBOARD (shown after login) -->
+<div id="dashboard">
+  <div class="dash-header">
+    <div class="logo"><div class="logo-pulse"></div>MediWhats</div>
+    <div class="user-pill">
+      <div class="user-avatar" id="d-avatar">SC</div>
+      <div>
+        <div style="font-weight:500;color:var(--ink)" id="d-name">Dr. Name</div>
+        <div style="font-size:12px" id="d-hospital">Hospital</div>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="dash-body">
+
+    <div class="welcome-box">
+      <h2 id="d-welcome">Good morning!</h2>
+      <p id="d-subtitle">Here's your clinic overview</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">Role</div>
+        <div class="stat-value teal" id="d-role">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Hospital ID</div>
+        <div class="stat-value" id="d-hid">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Modules Active</div>
+        <div class="stat-value teal" id="d-mod-count">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Session</div>
+        <div class="stat-value" style="font-size:14px" id="d-session">12h</div>
+      </div>
+    </div>
+
+    <div class="modules-box">
+      <h3>Active Modules</h3>
+      <div class="module-chips" id="d-modules">
+        <span class="chip none">No modules assigned</span>
+      </div>
+    </div>
+
+    <div class="info-grid">
+      <div class="info-card">
+        <h4>Account Info</h4>
+        <div class="info-row"><span>Name</span><span id="i-name">—</span></div>
+        <div class="info-row"><span>Email</span><span id="i-email">—</span></div>
+        <div class="info-row"><span>Role</span><span id="i-role">—</span></div>
+        <div class="info-row"><span>Hospital</span><span id="i-hospital">—</span></div>
+      </div>
+      <div class="info-card">
+        <h4>Session Info</h4>
+        <div class="info-row"><span>Login time</span><span id="i-time">—</span></div>
+        <div class="info-row"><span>Expires</span><span id="i-exp">12h from now</span></div>
+        <div class="info-row"><span>Status</span><span style="color:var(--teal);font-weight:600">Active</span></div>
+        <div class="info-row"><span>User ID</span><span id="i-uid" style="font-size:11px">—</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // ── Config ────────────────────────────────────────────────
+  const API = 'https://smartgumastha-backend-production.up.railway.app/api';
+
+  // ── On page load: check if already logged in ─────────────
+  window.addEventListener('load', function() {
+    const token = localStorage.getItem('mw_token');
+    const user  = localStorage.getItem('mw_user');
+    if (token && user) {
+      try {
+        showDashboard(JSON.parse(user));
+      } catch(e) {
+        localStorage.clear();
+      }
+    }
+
+    // Pre-fill email if coming from signup WhatsApp link
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('email')) {
+      document.getElementById('email').value = params.get('email');
+      document.getElementById('password').focus();
+    }
+  });
+
+  // ── Login ─────────────────────────────────────────────────
+  async function doLogin() {
+    const email    = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const btn      = document.getElementById('login-btn');
+
+    clearAlert();
+
+    if (!email) { showAlert('Please enter your email address.'); return; }
+    if (!password) { showAlert('Please enter your password.'); return; }
+    if (password.length < 8) { showAlert('Password must be at least 8 characters.'); return; }
+
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    try {
+      const res = await fetch(API + '/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const json = await res.json();
+
+      if (json.success && json.data && json.data.token) {
+        // Save to localStorage
+        localStorage.setItem('mw_token', json.data.token);
+        localStorage.setItem('mw_user',  JSON.stringify(json.data));
+        showDashboard(json.data);
+      } else {
+        showAlert(json.message || 'Invalid email or password. Please try again.');
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+
+    } catch(e) {
+      showAlert('Network error. Please check your connection and try again.');
+      btn.classList.remove('loading');
+      btn.disabled = false;
+    }
+  }
+
+  // ── Show Dashboard ────────────────────────────────────────
+  function showDashboard(data) {
+    // Hide login, show dashboard
+    document.getElementById('login-page').style.display = 'none';
+    document.getElementById('dashboard').style.display  = 'block';
+
+    // Avatar initials
+    const initials = ((data.first_name || '')[0] || '') + ((data.last_name || '')[0] || '');
+    document.getElementById('d-avatar').textContent    = initials.toUpperCase() || 'U';
+
+    // Header
+    const fullName = (data.first_name || '') + ' ' + (data.last_name || '');
+    document.getElementById('d-name').textContent     = fullName.trim() || data.email;
+    document.getElementById('d-hospital').textContent = data.hospital_name || 'MediWhats';
+
+    // Welcome
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening';
+    document.getElementById('d-welcome').textContent  = greeting + ', ' + (data.first_name || 'Doctor') + '!';
+    document.getElementById('d-subtitle').textContent = 'Welcome to ' + (data.hospital_name || 'MediWhats') + ' dashboard';
+
+    // Stats
+    document.getElementById('d-role').textContent      = data.role || '—';
+    document.getElementById('d-hid').textContent       = data.hospital_id ? String(data.hospital_id).slice(-6) : '—';
+    document.getElementById('d-mod-count').textContent = (data.modules || []).length;
+    document.getElementById('d-session').textContent   = '12h';
+
+    // Modules
+    const modContainer = document.getElementById('d-modules');
+    if (data.modules && data.modules.length > 0) {
+      modContainer.innerHTML = data.modules.map(function(m) {
+        return '<span class="chip">' + m + '</span>';
+      }).join('');
+    } else {
+      modContainer.innerHTML = '<span class="chip none">No modules assigned yet</span>';
+    }
+
+    // Info cards
+    document.getElementById('i-name').textContent     = fullName.trim() || '—';
+    document.getElementById('i-email').textContent    = data.email || '—';
+    document.getElementById('i-role').innerHTML       = '<span class="role-badge">' + (data.role || '—') + '</span>';
+    document.getElementById('i-hospital').textContent = data.hospital_name || '—';
+    document.getElementById('i-time').textContent     = new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+    document.getElementById('i-uid').textContent      = String(data.userid || '—').slice(-8);
+  }
+
+  // ── Logout ────────────────────────────────────────────────
+  function doLogout() {
+    localStorage.removeItem('mw_token');
+    localStorage.removeItem('mw_user');
+    document.getElementById('dashboard').style.display  = 'none';
+    document.getElementById('login-page').style.display = 'block';
+    document.getElementById('email').value    = '';
+    document.getElementById('password').value = '';
+    clearAlert();
+  }
+
+  // ── Enter key support ─────────────────────────────────────
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter') {
+      const lp = document.getElementById('login-page');
+      if (lp.style.display !== 'none') doLogin();
+    }
+  });
+
+  // ── Helpers ───────────────────────────────────────────────
+  function showAlert(msg) {
+    const el = document.getElementById('alert');
+    el.textContent = msg;
+    el.className = 'alert error';
+  }
+  function clearAlert() {
+    document.getElementById('alert').className = 'alert';
+  }
+</script>
+
+</body>
+</html>

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MediWhats Clinic — Start Today</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <style>
+    :root {
+      --teal:       #0A9E80;
+      --teal-dk:    #077A62;
+      --teal-lt:    #E5F6F2;
+      --teal-mid:   #A8DED4;
+      --ink:        #0C1C18;
+      --muted:      #526860;
+      --border:     #D0E5DF;
+      --bg:         #F4F9F8;
+      --white:      #FFFFFF;
+      --red:        #D44;
+      --red-bg:     #FEF2F2;
+    }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+
+    /* TOP BAR */
+    .topbar{background:var(--teal);color:#fff;text-align:center;padding:8px 16px;font-size:13px;font-family:'Sora',sans-serif}
+
+    /* HEADER */
+    header{background:#fff;border-bottom:1px solid var(--border);padding:14px 40px;display:flex;align-items:center;justify-content:space-between}
+    .logo{font-family:'Sora',sans-serif;font-size:19px;font-weight:700;color:var(--teal);display:flex;align-items:center;gap:8px}
+    .logo-pulse{width:9px;height:9px;background:var(--teal);border-radius:50%;animation:pulse 2s ease-in-out infinite}
+    @keyframes pulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.4);opacity:.7}}
+    .hdr-right{font-size:13px;color:var(--muted)}
+    .hdr-right a{color:var(--teal);font-weight:500;text-decoration:none}
+
+    /* LAYOUT */
+    .page{max-width:1080px;margin:0 auto;padding:44px 20px 80px;display:grid;grid-template-columns:1fr 440px;gap:52px;align-items:start}
+    @media(max-width:800px){.page{grid-template-columns:1fr}.form-card{order:-1}}
+
+    /* LEFT */
+    h1{font-family:'Sora',sans-serif;font-size:32px;font-weight:700;line-height:1.22;margin-bottom:12px}
+    h1 .hl{color:var(--teal)}
+    .sub{font-size:15px;color:var(--muted);line-height:1.65;margin-bottom:32px;max-width:400px}
+    .features{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:32px}
+    .features li{display:flex;align-items:flex-start;gap:11px;font-size:14.5px}
+    .ck{width:22px;height:22px;min-width:22px;background:var(--teal-lt);border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:1px}
+    .ck svg{width:11px;height:11px}
+    .price-pill{display:inline-flex;align-items:baseline;gap:5px;background:#fff;border:1.5px solid var(--teal-mid);border-radius:12px;padding:13px 20px;margin-bottom:28px}
+    .price-pill .amt{font-family:'Sora',sans-serif;font-size:30px;font-weight:700;color:var(--teal-dk)}
+    .price-pill .per{font-size:14px;color:var(--muted)}
+    .price-pill .gst{font-size:11px;color:var(--muted);margin-top:2px}
+    .trust{display:flex;flex-wrap:wrap;gap:18px}
+    .trust-item{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+
+    /* FORM CARD */
+    .form-card{background:#fff;border-radius:18px;border:1px solid var(--border);overflow:hidden;position:sticky;top:20px}
+    .card-hdr{background:var(--teal);padding:20px 26px}
+    .card-hdr h2{font-family:'Sora',sans-serif;font-size:17px;font-weight:600;color:#fff;margin-bottom:3px}
+    .card-hdr p{font-size:13px;color:rgba(255,255,255,.8)}
+
+    /* STEPS */
+    .steps{display:flex;padding:16px 26px 0}
+    .step{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;position:relative}
+    .step:not(:last-child)::after{content:'';position:absolute;top:11px;left:50%;width:100%;height:2px;background:var(--border);z-index:0}
+    .step.done:not(:last-child)::after,.step.active:not(:last-child)::after{background:var(--teal-mid)}
+    .sdot{width:22px;height:22px;border-radius:50%;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;color:var(--muted);position:relative;z-index:1;transition:all .25s}
+    .step.active .sdot{background:var(--teal);color:#fff}
+    .step.done .sdot{background:var(--teal-lt);color:var(--teal)}
+    .slbl{font-size:11px;color:var(--muted);text-align:center}
+    .step.active .slbl{color:var(--teal);font-weight:500}
+
+    /* FORM BODY */
+    .fbody{padding:20px 26px 26px}
+    .fsec{display:none}
+    .fsec.on{display:block}
+    .frow{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+    .frow.one{grid-template-columns:1fr}
+    .field{margin-bottom:14px}
+    label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;text-transform:uppercase;letter-spacing:.04em}
+    label .req{color:var(--red);margin-left:2px}
+    input,select{width:100%;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px;font-family:'Inter',sans-serif;color:var(--ink);background:#fff;outline:none;transition:border-color .2s,box-shadow .2s}
+    input:focus,select:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(10,158,128,.1)}
+    input.err{border-color:var(--red)}
+    .ferr{font-size:12px;color:var(--red);margin-top:4px;display:none}
+    .ferr.on{display:block}
+
+    /* SUMMARY */
+    .summary{background:var(--teal-lt);border:1px solid var(--teal-mid);border-radius:10px;padding:15px;margin-bottom:18px}
+    .summary h4{font-family:'Sora',sans-serif;font-size:13.5px;font-weight:600;color:var(--teal-dk);margin-bottom:10px}
+    .srow{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:5px}
+    .srow span:last-child{color:var(--ink);font-weight:500}
+    .stotal{border-top:1px solid var(--teal-mid);margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font-size:15px;font-weight:700;color:var(--teal-dk);font-family:'Sora',sans-serif}
+
+    /* BUTTONS */
+    .btn{width:100%;padding:12px;background:var(--teal);color:#fff;border:none;border-radius:10px;font-size:15px;font-family:'Sora',sans-serif;font-weight:600;cursor:pointer;transition:background .2s,transform .1s;display:flex;align-items:center;justify-content:center;gap:8px}
+    .btn:hover{background:var(--teal-dk)}
+    .btn:active{transform:scale(.99)}
+    .btn:disabled{background:var(--teal-mid);cursor:not-allowed}
+    .back-btn{background:none;border:none;color:var(--muted);font-size:13px;cursor:pointer;padding:6px 0;margin-bottom:10px;display:flex;align-items:center;gap:4px}
+    .back-btn:hover{color:var(--ink)}
+
+    /* ALERTS */
+    .alert{padding:10px 13px;border-radius:8px;font-size:13px;margin-bottom:14px;display:none}
+    .alert.error{background:var(--red-bg);color:#c33;border:1px solid #fcc;display:block}
+    .alert.info{background:var(--teal-lt);color:var(--teal-dk);border:1px solid var(--teal-mid);display:block}
+
+    /* SUCCESS */
+    .success{text-align:center;padding:28px 16px;display:none}
+    .success.on{display:block}
+    .sico{width:60px;height:60px;background:var(--teal-lt);border-radius:50%;margin:0 auto 18px;display:flex;align-items:center;justify-content:center}
+    .success h3{font-family:'Sora',sans-serif;font-size:19px;font-weight:700;margin-bottom:8px}
+    .success p{font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:18px}
+    .success-whatsapp{background:var(--teal-lt);border:1px solid var(--teal-mid);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--teal-dk);margin-bottom:18px;text-align:left;line-height:1.6}
+
+    /* SPINNER */
+    .spin{width:17px;height:17px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:sp .7s linear infinite;display:none}
+    @keyframes sp{to{transform:rotate(360deg)}}
+    .btn.loading .spin{display:block}
+    .btn.loading .btxt{display:none}
+
+    .sec-note{display:flex;align-items:center;justify-content:center;gap:6px;font-size:12px;color:var(--muted);margin-top:12px}
+  </style>
+</head>
+<body>
+
+<div class="topbar">MediWhats Clinic &nbsp;·&nbsp; Manage your entire clinic from WhatsApp</div>
+
+<header>
+  <div class="logo"><div class="logo-pulse"></div>MediWhats</div>
+  <div class="hdr-right">Already a member? <a href="/login">Log in →</a></div>
+</header>
+
+<div class="page">
+
+  <!-- LEFT -->
+  <div>
+    <h1>Run your clinic on<br><span class="hl">WhatsApp. No app needed.</span></h1>
+    <p class="sub">Appointments, prescriptions, bills, and reports — all via WhatsApp. Your patients don't need to install anything.</p>
+
+    <ul class="features">
+      <li><span class="ck"><svg viewBox="0 0 11 11" fill="none"><path d="M1.5 5.5l3 3 5-5" stroke="#0A9E80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>WhatsApp appointment booking &amp; reminders</span></li>
+      <li><span class="ck"><svg viewBox="0 0 11 11" fill="none"><path d="M1.5 5.5l3 3 5-5" stroke="#0A9E80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Patient records, prescriptions &amp; lab reports</span></li>
+      <li><span class="ck"><svg viewBox="0 0 11 11" fill="none"><path d="M1.5 5.5l3 3 5-5" stroke="#0A9E80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Billing and payment tracking</span></li>
+      <li><span class="ck"><svg viewBox="0 0 11 11" fill="none"><path d="M1.5 5.5l3 3 5-5" stroke="#0A9E80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>AI-powered responses via Groq (already in your system)</span></li>
+      <li><span class="ck"><svg viewBox="0 0 11 11" fill="none"><path d="M1.5 5.5l3 3 5-5" stroke="#0A9E80" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span>Up to 5 staff · 500 patients</span></li>
+    </ul>
+
+    <div class="price-pill">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:5px"><span class="amt">₹999</span><span class="per">/ month</span></div>
+        <div class="gst">+ 18% GST &nbsp;·&nbsp; Cancel anytime</div>
+      </div>
+    </div>
+
+    <div class="trust">
+      <div class="trust-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1L2 4v5c0 3 2.2 5.8 6 7 3.8-1.2 6-4 6-7V4L8 1z" stroke="#0A9E80" stroke-width="1.3" fill="none"/></svg>
+        Secured by Razorpay
+      </div>
+      <div class="trust-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="#0A9E80" stroke-width="1.3"/><path d="M5 8l2.5 2.5L11 5" stroke="#0A9E80" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Instant activation
+      </div>
+      <div class="trust-item">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 11.5c0 .3-.07.58-.2.84a1.7 1.7 0 01-.55.65c-.27.17-.56.25-.87.25-.34 0-.72-.1-1.14-.3a10.8 10.8 0 01-1.14-.77 17.4 17.4 0 01-1.1-1.06 17 17 0 01-1.05-1.1 10.4 10.4 0 01-.76-1.12c-.2-.4-.3-.77-.3-1.1 0-.3.08-.58.22-.84.15-.26.35-.5.62-.67.27-.17.57-.25.88-.25.12 0 .24.02.35.08.12.05.22.13.3.25l1.04 1.47c.08.12.14.22.18.32.04.1.06.18.06.26 0 .1-.03.2-.08.3a1.3 1.3 0 01-.2.28l-.28.29c-.04.04-.06.09-.06.14s.02.1.04.15c.08.15.22.35.42.58.2.24.42.48.65.72.24.23.47.45.72.65.23.2.43.33.58.41.05.02.1.04.15.04.06 0 .1-.02.15-.06l.28-.28c.1-.1.2-.17.29-.2.1-.05.18-.07.28-.07.08 0 .16.01.25.05.1.04.2.1.32.17l1.49 1.06c.12.08.2.18.25.3.05.12.07.24.07.36z" stroke="#0A9E80" stroke-width="1.3" fill="none"/></svg>
+        Support on WhatsApp
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM CARD -->
+  <div class="form-card">
+    <div class="card-hdr">
+      <h2>Create your clinic account</h2>
+      <p>3 steps · Takes under 5 minutes</p>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step active" id="st1"><div class="sdot">1</div><div class="slbl">Clinic</div></div>
+      <div class="step" id="st2"><div class="sdot">2</div><div class="slbl">Your Info</div></div>
+      <div class="step" id="st3"><div class="sdot">3</div><div class="slbl">Payment</div></div>
+    </div>
+
+    <div class="fbody">
+      <div id="alert" class="alert"></div>
+
+      <!-- SECTION 1: CLINIC -->
+      <div class="fsec on" id="s1">
+        <div class="frow one field">
+          <label>Clinic Name <span class="req">*</span></label>
+          <input id="clinic_name" type="text" placeholder="e.g. Prasad Family Clinic" autocomplete="organization"/>
+          <div class="ferr" id="e-clinic_name">Please enter your clinic name.</div>
+        </div>
+        <div class="frow">
+          <div class="field">
+            <label>Clinic Type</label>
+            <select id="clinic_type">
+              <option value="General">General / Family</option>
+              <option value="Dental">Dental</option>
+              <option value="Eye">Eye / Ophthalmology</option>
+              <option value="Pediatric">Pediatric</option>
+              <option value="Gynecology">Gynecology</option>
+              <option value="Orthopedic">Orthopedic</option>
+              <option value="Dermatology">Dermatology</option>
+              <option value="ENT">ENT</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>City <span class="req">*</span></label>
+            <input id="city" type="text" placeholder="Hyderabad"/>
+            <div class="ferr" id="e-city">Please enter your city.</div>
+          </div>
+        </div>
+        <div class="frow">
+          <div class="field">
+            <label>State</label>
+            <select id="state">
+              <option value="Telangana" selected>Telangana</option>
+              <option value="Andhra Pradesh">Andhra Pradesh</option>
+              <option value="Karnataka">Karnataka</option>
+              <option value="Tamil Nadu">Tamil Nadu</option>
+              <option value="Kerala">Kerala</option>
+              <option value="Maharashtra">Maharashtra</option>
+              <option value="Delhi">Delhi</option>
+              <option value="Gujarat">Gujarat</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Pincode</label>
+            <input id="pincode" type="text" placeholder="500001" maxlength="6"/>
+          </div>
+        </div>
+        <button class="btn" onclick="step2()"><span class="btxt">Continue →</span></button>
+      </div>
+
+      <!-- SECTION 2: OWNER -->
+      <div class="fsec" id="s2">
+        <button class="back-btn" onclick="goStep(1)">← Back</button>
+        <div class="frow one field">
+          <label>Your Full Name <span class="req">*</span></label>
+          <input id="owner_name" type="text" placeholder="Dr. Sai Charan" autocomplete="name"/>
+          <div class="ferr" id="e-owner_name">Please enter your name.</div>
+        </div>
+        <div class="frow one field">
+          <label>Email Address <span class="req">*</span></label>
+          <input id="owner_email" type="email" placeholder="you@example.com" autocomplete="email"/>
+          <div class="ferr" id="e-owner_email">Please enter a valid email.</div>
+        </div>
+        <div class="frow one field">
+          <label>WhatsApp Number <span class="req">*</span></label>
+          <input id="owner_phone" type="tel" placeholder="9876543210" maxlength="10"/>
+          <div class="ferr" id="e-owner_phone">10-digit mobile number required.</div>
+        </div>
+        <button class="btn" onclick="step3()"><span class="btxt">Review &amp; Pay →</span></button>
+      </div>
+
+      <!-- SECTION 3: PAYMENT -->
+      <div class="fsec" id="s3">
+        <button class="back-btn" onclick="goStep(2)">← Back</button>
+        <div class="summary">
+          <h4>Order Summary</h4>
+          <div class="srow"><span>Clinic</span><span id="s-clinic">—</span></div>
+          <div class="srow"><span>Owner</span><span id="s-name">—</span></div>
+          <div class="srow"><span>Plan</span><span>MediWhats Clinic</span></div>
+          <div class="srow"><span>Billing</span><span>Monthly</span></div>
+          <div class="srow"><span>Amount</span><span>₹999</span></div>
+          <div class="srow"><span>GST (18%)</span><span>₹179.82</span></div>
+          <div class="stotal"><span>Total Today</span><span>₹1,178.82</span></div>
+        </div>
+        <p style="font-size:12.5px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+          Your clinic activates immediately after payment. Login credentials will be sent to your WhatsApp number.
+        </p>
+        <button class="btn" id="pay-btn" onclick="pay()">
+          <div class="spin"></div>
+          <span class="btxt">Pay ₹999 &amp; Activate Clinic</span>
+        </button>
+        <div class="sec-note">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none"><path d="M6.5 1L2 3.2v3.8c0 2.5 1.9 4.8 4.5 5.5C9.1 11.8 11 9.5 11 7V3.2L6.5 1z" stroke="#526860" stroke-width="1.2" fill="none"/></svg>
+          Secured by Razorpay · 256-bit SSL
+        </div>
+      </div>
+
+      <!-- SUCCESS -->
+      <div class="success" id="success">
+        <div class="sico">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M6 14l5.5 5.5L22 8" stroke="#0A9E80" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <h3>Your clinic is live! 🎉</h3>
+        <p>Payment confirmed. Your account is ready.</p>
+        <div class="success-whatsapp">
+          📱 <strong>Check your WhatsApp!</strong><br/>
+          We've sent your login details to <strong id="s-phone"></strong>.<br/>
+          The message contains your email, temporary password, and login link.
+        </div>
+        <a href="/login" class="btn" style="text-decoration:none">Go to Login →</a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── Config ── Change if your backend URL changes
+  const API = 'https://smartgumastha-backend-production.up.railway.app/api/signup';
+
+  let D = {}; // collected form data across steps
+
+  // ── Step navigation ──────────────────────────────────────
+  function goStep(n) {
+    [1,2,3].forEach(i => {
+      document.getElementById(`s${i}`).classList.toggle('on', i===n);
+      const t = document.getElementById(`st${i}`);
+      t.classList.remove('active','done');
+      if(i===n) t.classList.add('active');
+      else if(i<n) t.classList.add('done');
+    });
+    clearAlert();
+  }
+
+  function step2() {
+    const cn = v('clinic_name'), ct = v('city');
+    let ok = true;
+    if(!cn){showErr('clinic_name'); ok=false;} else hideErr('clinic_name');
+    if(!ct){showErr('city'); ok=false;} else hideErr('city');
+    if(!ok) return;
+    D.clinic_name = cn;
+    D.clinic_type = v('clinic_type') || 'General';
+    D.city = ct;
+    D.state = v('state') || 'Telangana';
+    D.pincode = v('pincode');
+    goStep(2);
+  }
+
+  function step3() {
+    const nm = v('owner_name'), em = v('owner_email'), ph = v('owner_phone');
+    let ok = true;
+    if(!nm){showErr('owner_name'); ok=false;} else hideErr('owner_name');
+    if(!em||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)){showErr('owner_email'); ok=false;} else hideErr('owner_email');
+    if(!ph||!/^\d{10}$/.test(ph)){showErr('owner_phone'); ok=false;} else hideErr('owner_phone');
+    if(!ok) return;
+    D.owner_name = nm; D.owner_email = em; D.owner_phone = ph;
+    document.getElementById('s-clinic').textContent = D.clinic_name;
+    document.getElementById('s-name').textContent = nm;
+    goStep(3);
+  }
+
+  // ── Payment ──────────────────────────────────────────────
+  async function pay() {
+    const btn = document.getElementById('pay-btn');
+    btn.classList.add('loading'); btn.disabled = true;
+    clearAlert();
+
+    try {
+      const r = await fetch(`${API}/clinic/initiate`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(D)
+      });
+      const d = await r.json();
+      if(!r.ok) {
+        showAlert(d.error || 'Something went wrong. Please try again.', 'error');
+        btn.classList.remove('loading'); btn.disabled = false;
+        return;
+      }
+
+      // Launch Razorpay
+      const rzp = new Razorpay({
+        key: d.razorpay_key_id,
+        amount: d.amount,
+        currency: 'INR',
+        name: 'MediWhats',
+        description: 'MediWhats Clinic – Monthly Plan',
+        order_id: d.razorpay_order_id,
+        prefill: d.prefill,
+        theme: {color: '#0A9E80'},
+        handler: async (resp) => {
+          await verify(d.request_uuid, resp);
+        },
+        modal: {
+          ondismiss: () => {
+            btn.classList.remove('loading'); btn.disabled = false;
+            showAlert('Payment cancelled. Click the button again when ready.', 'info');
+            fetch(`${API}/clinic/payment-failed`, {
+              method:'POST', headers:{'Content-Type':'application/json'},
+              body: JSON.stringify({request_uuid: d.request_uuid, razorpay_order_id: d.razorpay_order_id})
+            });
+          }
+        }
+      });
+      rzp.open();
+
+    } catch(e) {
+      showAlert('Network error. Check your connection and try again.', 'error');
+      btn.classList.remove('loading'); btn.disabled = false;
+    }
+  }
+
+  async function verify(request_uuid, rzp) {
+    try {
+      const r = await fetch(`${API}/clinic/verify-payment`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({
+          request_uuid,
+          razorpay_payment_id: rzp.razorpay_payment_id,
+          razorpay_order_id:   rzp.razorpay_order_id,
+          razorpay_signature:  rzp.razorpay_signature
+        })
+      });
+      const d = await r.json();
+      if(d.success) {
+        document.getElementById('s3').classList.remove('on');
+        document.getElementById('success').classList.add('on');
+        document.getElementById('s-phone').textContent = D.owner_phone;
+        // Mark step 3 done
+        ['st1','st2','st3'].forEach(id => {
+          document.getElementById(id).classList.remove('active');
+          document.getElementById(id).classList.add('done');
+        });
+      } else {
+        showAlert(d.error || 'Activation failed. Please contact support.', 'error');
+        const btn = document.getElementById('pay-btn');
+        btn.classList.remove('loading'); btn.disabled = false;
+      }
+    } catch(e) {
+      showAlert('Verification error. Payment may have gone through — contact support@smartgumastha.com with your payment ID.', 'error');
+      const btn = document.getElementById('pay-btn');
+      btn.classList.remove('loading'); btn.disabled = false;
+    }
+  }
+
+  // ── Helpers ──────────────────────────────────────────────
+  function v(id){ return document.getElementById(id)?.value?.trim()||''; }
+  function showErr(id){ document.getElementById(id)?.classList.add('err'); document.getElementById(`e-${id}`)?.classList.add('on'); }
+  function hideErr(id){ document.getElementById(id)?.classList.remove('err'); document.getElementById(`e-${id}`)?.classList.remove('on'); }
+  function showAlert(msg,type){ const el=document.getElementById('alert'); el.textContent=msg; el.className=`alert ${type}`; }
+  function clearAlert(){ document.getElementById('alert').className='alert'; }
+
+  // Phone: digits only
+  document.getElementById('owner_phone').addEventListener('input', function(){ this.value=this.value.replace(/\D/g,''); });
+  document.getElementById('pincode').addEventListener('input', function(){ this.value=this.value.replace(/\D/g,''); });
+</script>
+</body>
+</html>

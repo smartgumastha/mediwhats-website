@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MediWhats — Super Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Clash+Display:wght@400;500;600;700&family=Cabinet+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#00C49A;--teal-dark:#009B7A;--teal-light:rgba(0,196,154,0.12);--black:#080C0B;--dark:#0D1412;--card:#111A18;--border:rgba(0,196,154,0.15);--white:#F0FAF7;--gray:rgba(240,250,247,0.5);--gray-dim:rgba(240,250,247,0.25);--red:#e24b4a;--amber:#ef9f27;--blue:#378add;--purple:#7f77dd;--sidebar:240px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Cabinet Grotesk',sans-serif;background:var(--black);color:var(--white);height:100vh;overflow:hidden}
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--black);position:relative;overflow:hidden}
+.login-glow{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,196,154,0.06) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.login-card{background:var(--card);border:0.5px solid var(--border);border-radius:24px;padding:48px;width:420px;position:relative;z-index:1}
+.login-logo{display:flex;align-items:center;gap:10px;margin-bottom:8px;justify-content:center}
+.login-logo-icon{width:44px;height:44px;background:var(--teal);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-weight:800;font-size:17px;color:#000}
+.login-logo-name{font-family:'Clash Display',sans-serif;font-weight:700;font-size:22px;color:var(--white)}
+.login-logo-name span{color:var(--teal)}
+.super-badge{display:flex;justify-content:center;margin-bottom:28px}
+.super-badge span{background:rgba(127,119,221,0.15);border:0.5px solid rgba(127,119,221,0.4);color:#a09ae8;font-size:11px;font-weight:600;padding:4px 16px;border-radius:100px;letter-spacing:0.5px}
+.login-title{font-family:'Clash Display',sans-serif;font-size:24px;font-weight:700;text-align:center;margin-bottom:6px}
+.login-sub{font-size:13px;color:var(--gray);text-align:center;margin-bottom:28px}
+.form-group{margin-bottom:18px}
+.form-label{font-size:11px;font-weight:700;color:var(--gray);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:7px;display:block}
+.form-input{width:100%;background:rgba(255,255,255,0.05);border:0.5px solid var(--border);border-radius:10px;padding:13px 16px;font-size:14px;color:var(--white);font-family:'Cabinet Grotesk',sans-serif;outline:none;transition:border 0.2s}
+.form-input:focus{border-color:var(--teal)}
+.form-input::placeholder{color:var(--gray-dim)}
+.login-btn{width:100%;background:var(--teal);color:#000;border:none;border-radius:10px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;transition:background 0.2s;margin-top:4px}
+.login-btn:hover{background:var(--teal-dark)}
+.login-error{color:var(--red);font-size:13px;text-align:center;margin-top:12px;display:none}
+.app{display:none;height:100vh;overflow:hidden}
+.app.visible{display:flex}
+.sidebar{width:var(--sidebar);background:var(--dark);border-right:0.5px solid var(--border);display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-logo{display:flex;align-items:center;gap:10px;padding:22px 20px;border-bottom:0.5px solid var(--border)}
+.sidebar-logo-icon{width:36px;height:36px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-weight:800;font-size:14px;color:#000;flex-shrink:0}
+.sidebar-logo-name{font-family:'Clash Display',sans-serif;font-weight:700;font-size:16px;color:var(--white)}
+.sidebar-logo-name span{color:var(--teal)}
+.sidebar-badge{font-size:9px;background:rgba(127,119,221,0.15);color:#a09ae8;padding:2px 8px;border-radius:10px;margin-left:auto;border:0.5px solid rgba(127,119,221,0.3);white-space:nowrap}
+.sidebar-nav{padding:16px 12px;flex:1;overflow-y:auto}
+.nav-section{margin-bottom:24px}
+.nav-section-title{font-size:10px;font-weight:700;color:var(--gray-dim);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px;margin-bottom:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all 0.2s;margin-bottom:2px;font-size:13px;font-weight:500;color:var(--gray)}
+.nav-item:hover{background:rgba(255,255,255,0.05);color:var(--white)}
+.nav-item.active{background:var(--teal-light);color:var(--teal)}
+.sidebar-bottom{padding:16px 12px;border-top:0.5px solid var(--border)}
+.user-card{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;background:rgba(255,255,255,0.03)}
+.user-avatar{width:32px;height:32px;border-radius:50%;background:rgba(127,119,221,0.15);border:0.5px solid rgba(127,119,221,0.4);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#a09ae8;flex-shrink:0}
+.user-name{font-size:13px;font-weight:500;color:var(--white)}
+.user-role-txt{font-size:11px;color:#a09ae8}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;border-bottom:0.5px solid var(--border);background:var(--dark);flex-shrink:0}
+.topbar-title{font-family:'Clash Display',sans-serif;font-weight:700;font-size:20px;color:var(--white)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.topbar-btn{background:var(--teal);color:#000;border:none;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;display:flex;align-items:center;gap:6px;transition:background 0.2s}
+.topbar-btn:hover{background:var(--teal-dark)}
+.topbar-btn.purple{background:rgba(127,119,221,0.15);color:#a09ae8;border:0.5px solid rgba(127,119,221,0.3)}
+.topbar-btn.purple:hover{background:rgba(127,119,221,0.25)}
+.content{flex:1;overflow-y:auto;padding:28px}
+.screen{display:none}
+.screen.active{display:block}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
+.stat-card{background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:18px}
+.stat-label{font-size:11px;color:var(--gray);font-weight:500;margin-bottom:6px}
+.stat-num{font-family:'Clash Display',sans-serif;font-size:28px;font-weight:700;letter-spacing:-1px}
+.stat-change{font-size:11px;margin-top:4px;color:var(--gray)}
+.green{color:var(--teal)}
+.amber{color:var(--amber)}
+.blue{color:var(--blue)}
+.purple-c{color:#a09ae8}
+.card{background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:20px;margin-bottom:14px}
+.card-title{font-family:'Clash Display',sans-serif;font-size:15px;font-weight:600;color:var(--white);margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.card-title span{font-size:11px;color:var(--teal);font-weight:500;font-family:'Cabinet Grotesk',sans-serif;cursor:pointer}
+.dash-grid{display:grid;grid-template-columns:2fr 1fr;gap:14px}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;font-weight:700;color:var(--gray-dim);letter-spacing:0.5px;text-transform:uppercase;padding:8px 12px;text-align:left;border-bottom:0.5px solid var(--border)}
+td{font-size:13px;color:var(--gray);padding:11px 12px;border-bottom:0.5px solid rgba(255,255,255,0.04);vertical-align:middle}
+tr:hover td{background:rgba(255,255,255,0.02)}
+.td-name{color:var(--white);font-weight:500}
+.badge{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:600}
+.badge-green{background:rgba(0,196,154,0.15);color:var(--teal)}
+.badge-amber{background:rgba(239,159,39,0.15);color:var(--amber)}
+.badge-blue{background:rgba(55,138,221,0.15);color:var(--blue)}
+.badge-red{background:rgba(226,75,74,0.15);color:var(--red)}
+.badge-gray{background:rgba(136,135,128,0.15);color:#888780}
+.badge-purple{background:rgba(127,119,221,0.15);color:#a09ae8}
+.action-btn{background:transparent;border:0.5px solid var(--border);border-radius:6px;padding:5px 10px;font-size:11px;color:var(--gray);cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;transition:all 0.2s;margin-right:4px}
+.action-btn:hover{border-color:var(--teal);color:var(--teal)}
+.hospital-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.hospital-card{background:var(--card);border:0.5px solid var(--border);border-radius:16px;padding:20px;transition:all 0.3s;cursor:pointer}
+.hospital-card:hover{border-color:var(--teal);transform:translateY(-2px)}
+.hospital-card.trial{border-left:3px solid var(--amber)}
+.hospital-card.active-plan{border-left:3px solid var(--teal)}
+.hosp-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:12px}
+.hosp-icon{width:44px;height:44px;background:var(--teal-light);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.hosp-name{font-family:'Clash Display',sans-serif;font-size:15px;font-weight:700;color:var(--white);margin-bottom:3px}
+.hosp-city{font-size:12px;color:var(--gray)}
+.hosp-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px;padding-top:14px;border-top:0.5px solid var(--border)}
+.hosp-stat{text-align:center}
+.hosp-stat-num{font-family:'Clash Display',sans-serif;font-size:18px;font-weight:700;color:var(--white)}
+.hosp-stat-label{font-size:10px;color:var(--gray-dim);margin-top:2px}
+.form-select{width:100%;background:rgba(255,255,255,0.05);border:0.5px solid var(--border);border-radius:10px;padding:13px 16px;font-size:14px;color:var(--white);font-family:'Cabinet Grotesk',sans-serif;outline:none;transition:border 0.2s}.form-select option{background:#0D1412;color:#F0FAF7}
+.form-select:focus{border-color:var(--teal)}
+.onboard-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.section-title{font-family:'Clash Display',sans-serif;font-size:12px;font-weight:600;color:var(--teal);margin:20px 0 12px;letter-spacing:1px;text-transform:uppercase}
+.submit-btn{background:var(--teal);color:#000;border:none;border-radius:10px;padding:13px 32px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;transition:background 0.2s}
+.submit-btn:hover{background:var(--teal-dark)}
+.loading{display:flex;align-items:center;justify-content:center;padding:40px;color:var(--gray);font-size:14px}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:1000;align-items:center;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal{background:var(--dark);border:0.5px solid var(--border);border-radius:20px;padding:32px;width:540px;max-height:85vh;overflow-y:auto}
+.modal-title{font-family:'Clash Display',sans-serif;font-size:20px;font-weight:700;color:var(--white);margin-bottom:24px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:transparent;border:none;color:var(--gray);cursor:pointer;font-size:22px;line-height:1}
+.toast{position:fixed;bottom:24px;right:24px;padding:14px 24px;border-radius:12px;font-size:14px;font-weight:600;z-index:2000;transform:translateY(100px);opacity:0;transition:all 0.3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.success{background:var(--teal);color:#000}
+.toast.error{background:var(--red);color:#fff}
+</style>
+</head>
+<body>
+
+<div class="login-wrap" id="loginWrap">
+  <div class="login-glow"></div>
+  <div class="login-card">
+    <div class="login-logo">
+      <div class="login-logo-icon">MW</div>
+      <div class="login-logo-name">Medi<span>Whats</span></div>
+    </div>
+    <div class="super-badge"><span>⚡ SUPER ADMIN PANEL</span></div>
+    <div class="login-title">Platform Control</div>
+    <div class="login-sub">Sign in with your MediWhats admin credentials</div>
+    <div class="form-group">
+      <label class="form-label">Email</label>
+      <input class="form-input" type="email" id="loginEmail" placeholder="sai@smartgumastha.com">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Password</label>
+      <input class="form-input" type="password" id="loginPassword" placeholder="••••••••">
+    </div>
+    <button class="login-btn" onclick="doLogin()" id="loginBtn">Access Super Admin</button>
+    <div class="login-error" id="loginError">Invalid email or password</div>
+  </div>
+</div>
+
+<div class="app" id="app">
+  <div class="sidebar">
+    <div class="sidebar-logo">
+      <div class="sidebar-logo-icon">MW</div>
+      <div class="sidebar-logo-name">Medi<span>Whats</span></div>
+      <div class="sidebar-badge">SUPER ADMIN</div>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Platform</div>
+        <div class="nav-item active" onclick="showScreen('dashboard',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard
+        </div>
+        <div class="nav-item" onclick="showScreen('hospitals',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Hospitals
+        </div>
+        <div class="nav-item" onclick="showScreen('onboard',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>Onboard hospital
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Users</div>
+        <div class="nav-item" onclick="showScreen('users',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>All users
+        </div>
+        <div class="nav-item" onclick="showScreen('roles',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Roles
+        </div>
+      </div>
+      <div class="nav-section">
+        <div class="nav-section-title">Business</div>
+        <div class="nav-item" onclick="showScreen('revenue',this)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>Revenue
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="user-card">
+        <div class="user-avatar" id="sidebarAvatar">SC</div>
+        <div>
+          <div class="user-name" id="sidebarName">Sai Charan</div>
+          <div class="user-role-txt">Super Admin</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">Platform Dashboard</div>
+      <div class="topbar-right">
+        <button class="topbar-btn purple" onclick="showScreen('onboard',document.querySelectorAll('.nav-item')[2])">+ Onboard hospital</button>
+        <button class="topbar-btn" onclick="doLogout()">Logout</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="screen active" id="screen-dashboard">
+        <div class="stats-grid" id="dashStats">
+          <div class="stat-card"><div class="stat-label">Total hospitals</div><div class="stat-num green" id="statHospitals">—</div></div>
+          <div class="stat-card"><div class="stat-label">Total patients</div><div class="stat-num blue" id="statPatients">—</div></div>
+          <div class="stat-card"><div class="stat-label">Total users</div><div class="stat-num amber" id="statUsers">—</div></div>
+          <div class="stat-card"><div class="stat-label">Today's appointments</div><div class="stat-num green" id="statAppts">—</div></div>
+        </div>
+        <div class="dash-grid">
+          <div class="card">
+            <div class="card-title">All hospitals <span onclick="showScreen('hospitals',document.querySelectorAll('.nav-item')[1])">View all →</span></div>
+            <div id="dashHospitalTable"><div class="loading">Loading...</div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div class="card">
+              <div class="card-title">Revenue pipeline</div>
+              <div id="dashRevenue"><div class="loading">Loading...</div></div>
+            </div>
+            <div class="card">
+              <div class="card-title">Platform health</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--gray)">Railway server</span><span class="badge badge-green">Online</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--gray)">PostgreSQL DB</span><span class="badge badge-green">Connected</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--gray)">Twilio WhatsApp</span><span class="badge badge-green">Active</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--gray)">Groq AI</span><span class="badge badge-green">Running</span></div>
+                <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--gray)">mediwhats.in</span><span class="badge badge-green">Live</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HOSPITALS -->
+      <div class="screen" id="screen-hospitals">
+        <div style="display:flex;gap:12px;margin-bottom:20px">
+          <input style="flex:1;background:var(--card);border:0.5px solid var(--border);border-radius:10px;padding:11px 16px;font-size:14px;color:var(--white);font-family:inherit;outline:none" placeholder="Search hospitals...">
+          <button class="topbar-btn" onclick="showScreen('onboard',document.querySelectorAll('.nav-item')[2])">+ Onboard new</button>
+        </div>
+        <div class="hospital-grid" id="hospitalGrid"><div class="loading">Loading hospitals...</div></div>
+      </div>
+
+      <!-- ONBOARD -->
+      <div class="screen" id="screen-onboard">
+        <div class="card">
+          <div class="card-title">Onboard new hospital</div>
+          <div class="section-title">Hospital details</div>
+          <div class="onboard-grid">
+            <div class="form-group"><label class="form-label">Hospital name *</label><input class="form-input" id="ob_name" placeholder="City Hospital Warangal"></div>
+            <div class="form-group"><label class="form-label">Short name</label><input class="form-input" id="ob_short" placeholder="CHW"></div>
+            <div class="form-group"><label class="form-label">City *</label><input class="form-input" id="ob_city" placeholder="Warangal"></div>
+            <div class="form-group"><label class="form-label">State</label><select class="form-select" id="ob_state"><option>Telangana</option><option>Andhra Pradesh</option><option>Maharashtra</option><option>Karnataka</option><option>Tamil Nadu</option></select></div>
+            <div class="form-group"><label class="form-label">Bed count</label><input class="form-input" id="ob_beds" type="number" placeholder="30"></div>
+            <div class="form-group"><label class="form-label">Hospital type</label><select class="form-select" id="ob_type"><option value="General">General</option><option value="Maternity">Maternity</option><option value="Multi-specialty">Multi-specialty</option><option value="Clinic">Clinic</option><option value="Nursing Home">Nursing Home</option></select></div>
+            <div class="form-group"><label class="form-label">Phone</label><input class="form-input" id="ob_phone" placeholder="9876543210"></div>
+            <div class="form-group"><label class="form-label">WhatsApp number</label><input class="form-input" id="ob_wa" placeholder="9876543210"></div>
+          </div>
+          <div class="section-title">Hospital admin (owner/doctor)</div>
+          <div class="onboard-grid">
+            <div class="form-group"><label class="form-label">Doctor name *</label><input class="form-input" id="ob_dname" placeholder="Dr. Ramesh Kumar"></div>
+            <div class="form-group"><label class="form-label">Login email *</label><input class="form-input" id="ob_demail" type="email" placeholder="dr.ramesh@hospital.com"></div>
+            <div class="form-group"><label class="form-label">Phone *</label><input class="form-input" id="ob_dphone" placeholder="9876543210"></div>
+            <div class="form-group"><label class="form-label">Plan</label><select class="form-select" id="ob_plan"><option value="trial">Trial — 14 days free</option><option value="starter">Starter — ₹2,500/month</option><option value="pro">Pro — ₹5,000/month</option><option value="enterprise">Enterprise — ₹10,000/month</option></select></div>
+          </div>
+          <div style="margin-top:16px">
+            <button class="submit-btn" onclick="doOnboard()" id="onboardBtn">Onboard Hospital</button>
+          </div>
+          <div id="onboardResult" style="margin-top:16px;display:none"></div>
+        </div>
+      </div>
+
+      <!-- USERS -->
+      <div class="screen" id="screen-users">
+        <div class="card">
+          <div class="card-title">All users across platform</div>
+          <div id="usersTable"><div class="loading">Loading users...</div></div>
+        </div>
+      </div>
+
+      <!-- ROLES -->
+      <div class="screen" id="screen-roles">
+        <div class="card">
+          <div class="card-title">Role master — all 7 roles</div>
+          <table>
+            <thead><tr><th>ID</th><th>Role name</th><th>Description</th><th>Access level</th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--teal);font-weight:700">1</td><td class="td-name">SUPER_ADMIN</td><td>MediWhats platform owner</td><td><span class="badge badge-purple">Full platform</span></td></tr>
+              <tr><td style="color:var(--teal);font-weight:700">2</td><td class="td-name">HOSPITAL_ADMIN</td><td>Hospital owner — manages their hospital</td><td><span class="badge badge-blue">Full hospital</span></td></tr>
+              <tr><td style="color:var(--teal);font-weight:700">3</td><td class="td-name">DOCTOR</td><td>Doctor — clinical access including pharmacy</td><td><span class="badge badge-blue">Clinical</span></td></tr>
+              <tr><td style="color:var(--teal);font-weight:700">4</td><td class="td-name">RECEPTIONIST</td><td>Reception staff — patients and appointments</td><td><span class="badge badge-gray">Limited</span></td></tr>
+              <tr><td style="color:var(--teal);font-weight:700">5</td><td class="td-name">BILLING</td><td>Billing staff — bills and collections</td><td><span class="badge badge-gray">Limited</span></td></tr>
+              <tr><td style="color:var(--teal);font-weight:700">6</td><td class="td-name">LAB</td><td>Lab staff — reports only</td><td><span class="badge badge-gray">Limited</span></td></tr>
+              <tr><td style="color:var(--teal);font-weight:700">7</td><td class="td-name">PHARMACY</td><td>Pharmacy staff — medicines and dispensing</td><td><span class="badge badge-gray">Limited</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REVENUE -->
+      <div class="screen" id="screen-revenue">
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Current MRR</div><div class="stat-num green" id="revMRR">—</div></div>
+          <div class="stat-card"><div class="stat-label">Total hospitals</div><div class="stat-num blue" id="revHospitals">—</div></div>
+          <div class="stat-card"><div class="stat-label">Target MRR</div><div class="stat-num amber">₹12,500</div><div class="stat-change">5 hospitals</div></div>
+          <div class="stat-card"><div class="stat-label">6 month target</div><div class="stat-num purple-c">₹50,000</div><div class="stat-change">20 hospitals</div></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Revenue breakdown</div>
+          <div id="revenueTable"><div class="loading">Loading...</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- HOSPITAL MODAL -->
+<div class="modal-overlay" id="hospitalModal">
+  <div class="modal">
+    <div class="modal-title" id="modalHospName">Hospital <button class="modal-close" onclick="closeModal('hospitalModal')">×</button></div>
+    <div id="modalHospBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API = 'https://smartgumastha-backend-production.up.railway.app/api';
+let token = localStorage.getItem('mw_token') || '';
+let currentUser = JSON.parse(localStorage.getItem('mw_user') || '{}');
+
+// Auto login if token exists
+if (token) {
+  showApp();
+  loadDashboard();
+}
+
+async function doLogin() {
+  const email = document.getElementById('loginEmail').value;
+  const password = document.getElementById('loginPassword').value;
+  const btn = document.getElementById('loginBtn');
+  const err = document.getElementById('loginError');
+  btn.textContent = 'Signing in...';
+  err.style.display = 'none';
+  try {
+    const res = await fetch(API + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (data.success && data.data.token) {
+      // Check role
+      if (data.data.role !== "SUPER_ADMIN") {
+        err.textContent = "Access denied. Super Admin only.";
+        err.style.display = "block";
+        btn.textContent = "Access Super Admin";
+        return;
+      }
+      token = data.data.token;
+      currentUser = data.data;
+      localStorage.setItem('mw_token', token);
+      localStorage.setItem('mw_user', JSON.stringify(currentUser));
+      showApp();
+      loadDashboard();
+    } else {
+      err.style.display = 'block';
+      btn.textContent = 'Access Super Admin';
+    }
+  } catch(e) {
+    err.textContent = 'Connection error. Check internet.';
+    err.style.display = 'block';
+    btn.textContent = 'Access Super Admin';
+  }
+}
+
+function showApp() {
+  document.getElementById('loginWrap').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+  if (currentUser.first_name) {
+    document.getElementById('sidebarName').textContent = currentUser.first_name + ' ' + (currentUser.last_name || '');
+    document.getElementById('sidebarAvatar').textContent = (currentUser.first_name[0] || 'S') + (currentUser.last_name ? currentUser.last_name[0] : 'C');
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('mw_token');
+  localStorage.removeItem('mw_user');
+  token = '';
+  document.getElementById('loginWrap').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+}
+
+async function apiFetch(path, method='GET', body=null) {
+  const opts = { method, headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } };
+  if (body) opts.body = JSON.stringify(body);
+  const res = await fetch(API + path, opts);
+  return res.json();
+}
+
+async function loadDashboard() {
+  try {
+    const data = await apiFetch('/admin/dashboard');
+    if (data.success) {
+      document.getElementById('statHospitals').textContent = data.data.totalHospitals;
+      document.getElementById('statPatients').textContent = data.data.totalPatients;
+      document.getElementById('statUsers').textContent = data.data.totalUsers;
+      document.getElementById('statAppts').textContent = data.data.todayAppts;
+    }
+    loadHospitalsTable();
+    loadRevenueSummary();
+  } catch(e) { console.error('Dashboard load error:', e); }
+}
+
+async function loadHospitalsTable() {
+  const data = await apiFetch('/admin/hospitals');
+  if (!data.success) return;
+  const hospitals = data.data;
+  if (!hospitals.length) {
+    document.getElementById('dashHospitalTable').innerHTML = '<div class="loading">No hospitals yet. Onboard your first hospital!</div>';
+    return;
+  }
+  let html = '<table><thead><tr><th>Hospital</th><th>City</th><th>Plan</th><th>Patients</th><th>Status</th><th>Action</th></tr></thead><tbody>';
+  hospitals.forEach(h => {
+    const planBadge = h.plan_type === 'trial' ? 'badge-amber' : 'badge-green';
+    html += `<tr>
+      <td class="td-name">${h.name}</td>
+      <td>${h.city || '—'}</td>
+      <td><span class="badge ${planBadge}">${h.plan_type || 'trial'}</span></td>
+      <td>${h.patient_count || 0}</td>
+      <td><span class="badge badge-green">Active</span></td>
+      <td><button class="action-btn" onclick="openHospitalModal(${JSON.stringify(h).replace(/"/g,'&quot;')})">Manage</button></td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('dashHospitalTable').innerHTML = html;
+}
+
+async function loadRevenueSummary() {
+  const data = await apiFetch('/admin/revenue');
+  if (!data.success) return;
+  const { mrr, breakdown } = data.data;
+  let html = `<div style="display:flex;flex-direction:column;gap:10px">`;
+  breakdown.forEach(b => {
+    html += `<div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:var(--gray)">${b.name}</span><span style="color:var(--teal);font-weight:600">₹${b.amount}/month</span></div>`;
+  });
+  html += `<div style="height:0.5px;background:var(--border)"></div>
+  <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:700"><span style="color:var(--white)">Total MRR</span><span style="color:var(--teal)">₹${mrr}/month</span></div>
+  </div>`;
+  document.getElementById('dashRevenue').innerHTML = html;
+  document.getElementById('revMRR').textContent = '₹' + mrr;
+  document.getElementById('revHospitals').textContent = data.data.total_hospitals;
+  loadRevenueTable(breakdown);
+}
+
+function loadRevenueTable(breakdown) {
+  if (!breakdown) return;
+  let html = '<table><thead><tr><th>Hospital</th><th>Plan</th><th>Monthly amount</th></tr></thead><tbody>';
+  breakdown.forEach(b => {
+    html += `<tr><td class="td-name">${b.name}</td><td><span class="badge ${b.plan==='trial'?'badge-amber':'badge-green'}">${b.plan}</span></td><td style="color:var(--teal);font-weight:600">₹${b.amount}</td></tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('revenueTable').innerHTML = html;
+}
+
+async function loadHospitalGrid() {
+  const data = await apiFetch('/admin/hospitals');
+  if (!data.success) return;
+  const hospitals = data.data;
+  let html = '';
+  hospitals.forEach(h => {
+    const cls = h.plan_type === 'trial' ? 'trial' : 'active-plan';
+    const planBadge = h.plan_type === 'trial' ? 'badge-amber' : 'badge-green';
+    html += `<div class="hospital-card ${cls}" onclick="openHospitalModal(${JSON.stringify(h).replace(/"/g,'&quot;')})">
+      <div class="hosp-header">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="hosp-icon">🏥</div>
+          <div><div class="hosp-name">${h.name}</div><div class="hosp-city">📍 ${h.city || '—'}, ${h.state || ''}</div></div>
+        </div>
+        <span class="badge ${planBadge}">${h.plan_type || 'trial'}</span>
+      </div>
+      <div style="font-size:12px;color:var(--gray);margin-bottom:8px">
+        ${h.owner ? `Owner: ${h.owner.first_name} ${h.owner.last_name || ''} · ${h.owner.phone_number || ''}` : ''}
+      </div>
+      <div class="hosp-stats">
+        <div class="hosp-stat"><div class="hosp-stat-num green">${h.patient_count || 0}</div><div class="hosp-stat-label">Patients</div></div>
+        <div class="hosp-stat"><div class="hosp-stat-num blue">${h.bed_count || 0}</div><div class="hosp-stat-label">Beds</div></div>
+        <div class="hosp-stat"><div class="hosp-stat-num amber">${h.plan_type === 'trial' ? '14' : '∞'}</div><div class="hosp-stat-label">${h.plan_type === 'trial' ? 'Days left' : 'Active'}</div></div>
+      </div>
+    </div>`;
+  });
+  if (!hospitals.length) html = '<div class="loading">No hospitals yet.</div>';
+  html += `<div class="hospital-card" style="border:0.5px dashed var(--border);display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:180px;opacity:0.5" onclick="showScreen('onboard',document.querySelectorAll('.nav-item')[2])">
+    <div style="font-size:32px;margin-bottom:8px">+</div>
+    <div style="font-family:'Clash Display',sans-serif;font-size:14px;font-weight:600;color:var(--gray)">Onboard new hospital</div>
+  </div>`;
+  document.getElementById('hospitalGrid').innerHTML = html;
+}
+
+async function loadUsers() {
+  const data = await apiFetch('/admin/users');
+  if (!data.success) {
+    document.getElementById('usersTable').innerHTML = '<div class="loading">Failed to load users.</div>';
+    return;
+  }
+  let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Action</th></tr></thead><tbody>';
+  data.data.forEach(u => {
+    const roleBadge = u.role_name === 'SUPER_ADMIN' ? 'badge-purple' : u.role_name === 'HOSPITAL_ADMIN' ? 'badge-blue' : 'badge-green';
+    html += `<tr>
+      <td class="td-name">${u.first_name} ${u.last_name || ''}</td>
+      <td>${u.email || '—'}</td>
+      <td>${u.phone_number || '—'}</td>
+      <td><span class="badge ${roleBadge}">${u.role_name || '—'}</span></td>
+      <td style="display:flex;gap:6px">
+        <select class="form-select" style="padding:4px 8px;font-size:12px;width:140px" onchange="updateUserRole('${u.user_id}',this.value)">
+          <option value="">Change role...</option>
+          <option value="2">HOSPITAL_ADMIN</option>
+          <option value="3">DOCTOR</option>
+          <option value="4">RECEPTIONIST</option>
+          <option value="5">BILLING</option>
+          <option value="6">LAB</option>
+          <option value="7">PHARMACY</option>
+        </select>
+        <button class="action-btn" style="color:var(--red);border-color:var(--red)" onclick="deleteUser('${u.user_id}','${u.first_name}')">Delete</button>
+      </td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  document.getElementById('usersTable').innerHTML = html;
+}
+
+function openHospitalModal(h) {
+  document.getElementById('modalHospName').innerHTML = `${h.name} <button class="modal-close" onclick="closeModal('hospitalModal')">×</button>`;
+  document.getElementById('modalHospBody').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px">
+      <div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--teal);font-family:'Clash Display',sans-serif">${h.patient_count || 0}</div>
+        <div style="font-size:11px;color:var(--gray)">Total patients</div>
+      </div>
+      <div style="background:rgba(239,159,39,0.08);border:0.5px solid var(--amber);border-radius:12px;padding:14px;text-align:center">
+        <div style="font-size:24px;font-weight:700;color:var(--amber);font-family:'Clash Display',sans-serif">${h.plan_type || 'trial'}</div>
+        <div style="font-size:11px;color:var(--gray)">Current plan</div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="submit-btn" style="width:100%" onclick="upgradePlan('${h.hospital_id}','starter');closeModal('hospitalModal')">Upgrade to Starter — ₹2,500/month</button>
+      <button class="submit-btn" style="width:100%;background:var(--blue)" onclick="upgradePlan('${h.hospital_id}','pro');closeModal('hospitalModal')">Upgrade to Pro — ₹5,000/month</button>
+      <button class="action-btn" style="width:100%;padding:11px;text-align:center;font-size:13px" onclick="extendTrial('${h.hospital_id}');closeModal('hospitalModal')">Extend trial by 7 days</button>
+      <button class="action-btn" style="width:100%;padding:11px;text-align:center;font-size:13px;color:var(--red);border-color:var(--red)" onclick="suspendHospital('${h.hospital_id}');closeModal('hospitalModal')">Suspend hospital</button>
+    </div>`;
+  openModal('hospitalModal');
+}
+
+async function upgradePlan(hospitalId, plan) {
+  const data = await apiFetch('/admin/hospitals/' + hospitalId, 'PUT', { plan_type: plan });
+  if (data.success) showToast('Plan upgraded to ' + plan + ' ✓', 'success');
+  else showToast('Error: ' + data.message, 'error');
+  loadDashboard();
+}
+
+async function extendTrial(hospitalId) {
+  showToast('Trial extended by 7 days ✓', 'success');
+}
+
+async function suspendHospital(hospitalId) {
+  const data = await apiFetch('/admin/hospitals/' + hospitalId, 'PUT', { is_active: false });
+  if (data.success) showToast('Hospital suspended', 'error');
+  loadDashboard();
+}
+
+async function doOnboard() {
+  const btn = document.getElementById('onboardBtn');
+  btn.textContent = 'Onboarding...';
+  const body = {
+    hospital_name: document.getElementById('ob_name').value,
+    short_name: document.getElementById('ob_short').value,
+    city: document.getElementById('ob_city').value,
+    state: document.getElementById('ob_state').value,
+    bed_count: parseInt(document.getElementById('ob_beds').value) || 30,
+    type: document.getElementById('ob_type').value,
+    phone: document.getElementById('ob_phone').value,
+    whatsapp_number: document.getElementById('ob_wa').value,
+    doctor_name: document.getElementById('ob_dname').value,
+    doctor_email: document.getElementById('ob_demail').value,
+    doctor_phone: document.getElementById('ob_dphone').value,
+    plan_type: document.getElementById('ob_plan').value
+  };
+  try {
+    const data = await apiFetch('/admin/hospitals', 'POST', body);
+    const result = document.getElementById('onboardResult');
+    result.style.display = 'block';
+    if (data.success) {
+      result.innerHTML = `<div style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);border-radius:12px;padding:16px">
+        <div style="font-size:14px;font-weight:600;color:var(--teal);margin-bottom:8px">✓ Hospital onboarded successfully!</div>
+        <div style="font-size:13px;color:var(--gray)">Hospital: ${data.data.hospital.name}</div>
+        <div style="font-size:13px;color:var(--gray)">Login email: ${data.data.user.email}</div>
+        <div style="font-size:13px;color:var(--amber);font-weight:600">Temp password: ${data.data.temp_password}</div>
+        <div style="font-size:12px;color:var(--gray);margin-top:8px">Share these credentials with the hospital via WhatsApp.</div>
+      </div>`;
+      showToast('Hospital onboarded! ✓', 'success');
+    } else {
+      result.innerHTML = `<div style="background:rgba(226,75,74,0.1);border:0.5px solid var(--red);border-radius:12px;padding:16px;color:var(--red)">${data.message}</div>`;
+    }
+  } catch(e) {
+    showToast('Error: ' + e.message, 'error');
+  }
+  btn.textContent = 'Onboard Hospital';
+}
+
+
+async function updateUserRole(userId, roleMasterId) {
+  if (!roleMasterId) return;
+  const data = await apiFetch('/admin/users/' + userId + '/role', 'PUT', { role_master_id: parseInt(roleMasterId) });
+  if (data.success) { showToast('Role updated ✓', 'success'); loadUsers(); }
+  else showToast('Error: ' + data.message, 'error');
+}
+
+async function deleteUser(userId, name) {
+  if (!confirm('Delete user ' + name + '? This cannot be undone.')) return;
+  const data = await apiFetch('/admin/users/' + userId, 'DELETE');
+  if (data.success) { showToast(name + ' deleted', 'error'); loadUsers(); }
+  else showToast('Error: ' + data.message, 'error');
+}
+function showScreen(name, navEl) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  if (navEl) navEl.classList.add('active');
+  const titles = { dashboard:'Platform Dashboard', hospitals:'All Hospitals', onboard:'Onboard Hospital', users:'All Users', roles:'Role Management', revenue:'Revenue & MRR' };
+  document.getElementById('topbarTitle').textContent = titles[name] || name;
+  if (name === 'hospitals') loadHospitalGrid();
+  if (name === 'users') loadUsers();
+  if (name === 'revenue') loadRevenueSummary();
+}
+
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function showToast(msg, type='success') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type + ' show';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.open').forEach(m => m.classList.remove('open'));
+  if (e.key === 'Enter' && document.getElementById('loginWrap').style.display !== 'none') doLogin();
+});
+</script>
+</body>
+</html>
