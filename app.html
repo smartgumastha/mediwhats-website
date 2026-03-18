@@ -677,6 +677,24 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   </div>
 </div>
 
+<!-- PATIENT VIEW/EDIT MODAL -->
+<div id="patientModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:2000;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:20px;width:100%;max-width:600px;margin:auto">
+    <div style="background:var(--teal);padding:18px 22px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:17px;font-weight:700;color:#000" id="pm-title">Patient Details</div>
+        <div style="font-size:12px;color:rgba(0,0,0,0.6)" id="pm-mrn"></div>
+      </div>
+      <button onclick="closePatientModal()" style="background:rgba(0,0,0,0.15);border:none;color:#000;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;font-weight:700">&#215;</button>
+    </div>
+    <div style="padding:22px" id="pm-body">Loading...</div>
+    <div style="padding:14px 22px;border-top:0.5px solid var(--color-border);display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="closePatientModal()" class="action-btn">Close</button>
+      <button onclick="savePatient()" style="background:var(--teal);color:#000;border:none;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">Save Changes</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -758,6 +776,7 @@ function showScreen(name, navEl) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
   if (name === 'patients') loadPatients();
+  if (name === 'teleconsult') loadTeleconsult();
   if (navEl) navEl.classList.add('active');
   const titles = {dashboard:'Dashboard',patients:'Patients',appointments:'Appointments',ipd:'IPD & Bed Management',billing:'Billing',staff:'Staff Management'};
   const actions = {dashboard:'New appointment',patients:'Register patient',appointments:'Book appointment',ipd:'Admit patient',billing:'New bill',staff:'Add staff'};
@@ -928,7 +947,7 @@ function renderPatients(list) {
       + '<td>' + (p.phone||'—') + '</td>'
       + '<td>' + (p.updated_at ? new Date(p.updated_at*1000).toLocaleDateString('en-IN') : '—') + '</td>'
       + '<td><span class="badge badge-green">Active</span></td>'
-      + '<td><button class="action-btn">View</button></td>'
+      + '<td><button class="action-btn" onclick="viewPatient(\'' + p.patient_id + '\')">View</button></td>'
       + '</tr>';
   }
   el.innerHTML = '<table><thead><tr><th>MRN</th><th>Patient</th><th>Age</th><th>Phone</th><th>Last visit</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
@@ -976,6 +995,115 @@ async function registerPatient() {
   } else {
     showToast(data.message || 'Failed to register patient.', 'error');
   }
+}
+
+// ===== PATIENT VIEW/EDIT =====
+var activePatientId = null;
+
+function viewPatient(patientId) {
+  activePatientId = patientId;
+  document.getElementById('patientModal').style.display = 'flex';
+  document.getElementById('pm-body').innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">Loading...</div>';
+  
+  apiCall('/hospitals/' + mwHospitalId + '/patients/' + patientId).then(function(data) {
+    if (!data.success) { document.getElementById('pm-body').innerHTML = 'Failed to load patient.'; return; }
+    var p = data.data;
+    document.getElementById('pm-title').textContent = (p.first_name||'') + ' ' + (p.last_name||'');
+    document.getElementById('pm-mrn').textContent = p.mrn || '';
+    
+    document.getElementById('pm-body').innerHTML = 
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">' +
+      
+      // Personal details
+      '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:0.5px solid var(--color-border)">Personal Details</div>' +
+      
+      pmField('pm_first', 'First Name', p.first_name||'') +
+      pmField('pm_last', 'Last Name', p.last_name||'') +
+      pmField('pm_age', 'Age', p.age||'', 'number') +
+      pmSelectField('pm_gender', 'Gender', p.gender||'', ['Male','Female','Other']) +
+      pmSelectField('pm_blood', 'Blood Group', p.blood_group||'', ['—','A+','A-','B+','B-','O+','O-','AB+','AB-']) +
+      pmField('pm_dob', 'Date of Birth', p.dob||'') +
+      
+      // Contact
+      '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:0.5px solid var(--color-border);margin-top:8px">Contact</div>' +
+      
+      pmField('pm_phone', 'Phone *', p.phone||'') +
+      pmField('pm_phone_alt', 'Alt Phone', p.phone_alt||'') +
+      pmField('pm_email', 'Email', p.email||'') +
+      pmField('pm_city', 'City', p.city||'') +
+      pmField('pm_state', 'State', p.state||'') +
+      pmField('pm_address', 'Address', p.address||'') +
+      
+      // Medical
+      '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:0.5px solid var(--color-border);margin-top:8px">Medical</div>' +
+      
+      pmField('pm_pm_jay', 'PM-JAY ID', p.pm_jay_id||'') +
+      pmField('pm_aadhar', 'Aadhar Number', p.aadhar_number||'') +
+      pmField('pm_referred', 'Referred By', p.referred_by||'') +
+      
+      '<div style="grid-column:1/-1">' +
+      '<label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Notes</label>' +
+      '<textarea id="pm_notes" rows="3" class="form-input" style="width:100%;resize:vertical">' + (p.notes||'') + '</textarea>' +
+      '</div>' +
+      
+      // Stats row
+      '<div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px">' +
+      '<div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--teal)">' + (p.total_visits||1) + '</div><div style="font-size:11px;color:var(--color-text-secondary)">Total Visits</div></div>' +
+      '<div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:10px;padding:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--teal)">' + (p.mrn||'—') + '</div><div style="font-size:11px;color:var(--color-text-secondary)">MRN</div></div>' +
+      '<div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:10px;padding:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--teal)">' + (p.blood_group||'—') + '</div><div style="font-size:11px;color:var(--color-text-secondary)">Blood Group</div></div>' +
+      '</div>' +
+      
+      '</div>';
+  }).catch(function(e) {
+    document.getElementById('pm-body').innerHTML = 'Error loading patient.';
+  });
+}
+
+function pmField(id, label, value, type) {
+  return '<div><label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">' + label + '</label>' +
+    '<input id="' + id + '" type="' + (type||'text') + '" value="' + (value||'').toString().replace(/"/g,'&quot;') + '" class="form-input" style="width:100%"></div>';
+}
+
+function pmSelectField(id, label, value, options) {
+  var opts = options.map(function(o) { return '<option' + (o===value?' selected':'') + '>' + o + '</option>'; }).join('');
+  return '<div><label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">' + label + '</label>' +
+    '<select id="' + id + '" class="form-select" style="width:100%">' + opts + '</select></div>';
+}
+
+function closePatientModal() {
+  document.getElementById('patientModal').style.display = 'none';
+  activePatientId = null;
+}
+
+function savePatient() {
+  if (!activePatientId) return;
+  var updates = {
+    first_name:   document.getElementById('pm_first')?.value?.trim(),
+    last_name:    document.getElementById('pm_last')?.value?.trim(),
+    age:          parseInt(document.getElementById('pm_age')?.value)||0,
+    gender:       document.getElementById('pm_gender')?.value,
+    blood_group:  document.getElementById('pm_blood')?.value,
+    dob:          document.getElementById('pm_dob')?.value,
+    phone:        document.getElementById('pm_phone')?.value?.trim(),
+    phone_alt:    document.getElementById('pm_phone_alt')?.value?.trim(),
+    email:        document.getElementById('pm_email')?.value?.trim(),
+    city:         document.getElementById('pm_city')?.value?.trim(),
+    state:        document.getElementById('pm_state')?.value?.trim(),
+    address:      document.getElementById('pm_address')?.value?.trim(),
+    pm_jay_id:    document.getElementById('pm_pm_jay')?.value?.trim(),
+    aadhar_number:document.getElementById('pm_aadhar')?.value?.trim(),
+    referred_by:  document.getElementById('pm_referred')?.value?.trim(),
+    notes:        document.getElementById('pm_notes')?.value?.trim()
+  };
+  apiCall('/hospitals/' + mwHospitalId + '/patients/' + activePatientId, 'PUT', updates).then(function(data) {
+    if (data.success) {
+      closePatientModal();
+      showToast('Patient updated successfully ✓', 'success');
+      loadPatients();
+    } else {
+      showToast('Error: ' + data.message, 'error');
+    }
+  });
 }
 
 // ===== TELECONSULT =====
