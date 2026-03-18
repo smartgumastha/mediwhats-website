@@ -2120,141 +2120,8 @@ function confirmSend() {
 }
 
 // ===== COMPLETE EMR SYSTEM =====
-// Add this entire block before </script> in app.html
 
-const DRUG_LIST = [
-  'Paracetamol','Dolo 650','Ibuprofen','Aspirin','Diclofenac',
-  'Amoxicillin','Azithromycin','Ciprofloxacin','Doxycycline','Metronidazole','Cefixime','Amoxicillin+Clavulanate',
-  'Metformin','Glimepiride','Insulin Regular','Insulin NPH','Sitagliptin',
-  'Amlodipine','Atenolol','Enalapril','Telmisartan','Losartan','Metoprolol','Ramipril',
-  'Atorvastatin','Rosuvastatin',
-  'Pantoprazole','Omeprazole','Ranitidine','Domperidone','Ondansetron','ORS',
-  'Cetirizine','Fexofenadine','Montelukast','Salbutamol','Deriphylline',
-  'Prednisolone','Methylprednisolone','Hydrocortisone',
-  'Vitamin D3','Vitamin B12','Calcium','Iron+Folic Acid','Multivitamin',
-  'Tramadol','Codeine','Gabapentin','Pregabalin',
-  'Alprazolam','Clonazepam','Sertraline','Escitalopram',
-  'Levothyroxine','Medroxyprogesterone',
-  'Chlorhexidine Mouthwash','Betadine','Mupirocin Ointment',
-  'Eye drops - Ciprofloxacin','Eye drops - Timolol','Lubricating Eye drops',
-  'Ear drops - Ciprofloxacin','Nasal drops - Xylometazoline'
-];
-
-const LAB_TESTS = [
-  'CBC (Complete Blood Count)','Haemoglobin','Blood Group & Rh',
-  'Blood Sugar Fasting','Blood Sugar PP','Blood Sugar Random','HbA1c',
-  'LFT (Liver Function Test)','KFT (Kidney Function Test)',
-  'Lipid Profile','Thyroid Profile (T3/T4/TSH)','TSH',
-  'Serum Electrolytes','Serum Calcium','Serum Uric Acid',
-  'Urine R/E (Routine Examination)','Urine Culture',
-  'Dengue NS1 Antigen','Dengue IgM/IgG','Malaria Antigen',
-  'Widal Test','CRP (C-Reactive Protein)','ESR',
-  'PT/INR (Prothrombin Time)','APTT',
-  'Hepatitis B Surface Antigen','Anti-HCV','HIV 1&2',
-  'Pregnancy Test (urine beta-hCG)',
-  'Sputum AFB (for TB)','Mantoux Test',
-  'ECG','2D Echo','Holter Monitor',
-  'X-Ray Chest','X-Ray KUB','X-Ray Spine',
-  'USG Abdomen','USG Pelvis','USG Thyroid',
-  'FNAC','Biopsy',
-  'Pap Smear','Colposcopy',
-  'Audiometry','PFT (Pulmonary Function Test)',
-  'Blood Culture','Stool R/E'
-];
-
-const DEPT_FIELDS = {
-  'Ophthalmology': `
-    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#128065; Eye Examination</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;grid-column:1/-1">
-      <div>
-        <div style="font-size:12px;font-weight:700;color:rgba(240,250,247,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">RIGHT EYE (RE)</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          ${vfld('dept_re_va','Vision (VA)','6/6')}
-          ${vfld('dept_re_iop','IOP (mmHg)','14')}
-          ${vfld('dept_re_sph','Sph','0.00')}
-          ${vfld('dept_re_cyl','Cyl','0.00')}
-          ${vfld('dept_re_axis','Axis','0')}
-          ${vfld('dept_re_add','Add','')}
-        </div>
-      </div>
-      <div>
-        <div style="font-size:12px;font-weight:700;color:rgba(240,250,247,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">LEFT EYE (LE)</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
-          ${vfld('dept_le_va','Vision (VA)','6/6')}
-          ${vfld('dept_le_iop','IOP (mmHg)','14')}
-          ${vfld('dept_le_sph','Sph','0.00')}
-          ${vfld('dept_le_cyl','Cyl','0.00')}
-          ${vfld('dept_le_axis','Axis','0')}
-          ${vfld('dept_le_add','Add','')}
-        </div>
-      </div>
-      <div style="grid-column:1/-1">${vtxt('dept_fundus','Fundus Findings / Slit Lamp Findings','')}</div>
-      <div style="grid-column:1/-1">${vtxt('dept_glasses','Glasses Prescription / Advice','')}</div>
-    </div>`,
-  'Dental': `
-    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#129463; Dental Examination</div>
-    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      ${vfld('dept_chief_tooth','Chief Tooth / Location','')}
-      ${vsel('dept_gum','Gum Condition',['Normal','Gingivitis','Periodontitis','Recession'])}
-      ${vfld('dept_mobility','Tooth Mobility','')}
-      ${vsel('dept_treatment','Treatment Done',['Scaling','Extraction','RCT','Filling','Crown','Denture','Other'])}
-      <div style="grid-column:1/-1">${vtxt('dept_dental_notes','Dental Notes / Tooth Chart Description','')}</div>
-    </div>`,
-  'Gynaecology': `
-    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#9792; Gynaecology Examination</div>
-    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      ${vfld('dept_lmp','LMP (Last Menstrual Period)','')}
-      ${vfld('dept_cycle','Cycle (days)','28')}
-      ${vfld('dept_gravida','Gravida','')}
-      ${vfld('dept_para','Para','')}
-      ${vfld('dept_abortion','Abortions','')}
-      ${vfld('dept_living','Living Children','')}
-      ${vsel('dept_contraception','Contraception',['None','OCP','IUCD','Condom','Sterilisation','Other'])}
-      ${vfld('dept_edd','EDD (if pregnant)','')}
-      <div style="grid-column:1/-1">${vtxt('dept_gyn_exam','P/V and P/S Examination Findings','')}</div>
-    </div>`,
-  'Paediatrics': `
-    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#128102; Paediatrics Assessment</div>
-    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      ${vfld('dept_birth_weight','Birth Weight (kg)','')}
-      ${vfld('dept_gestational_age','Gestational Age (weeks)','')}
-      ${vsel('dept_immunization','Immunization Status',['Up to date','Incomplete','Not started'])}
-      ${vfld('dept_milestones','Developmental Milestones','')}
-      ${vfld('dept_feeding','Feeding (breast/formula/solids)','')}
-      ${vfld('dept_perc_weight','Weight Percentile','')}
-      ${vfld('dept_perc_height','Height Percentile','')}
-      ${vfld('dept_perc_hc','Head Circumference (cm)','')}
-      <div style="grid-column:1/-1">${vtxt('dept_peds_notes','Examination Notes','')}</div>
-    </div>`,
-  'ENT': `
-    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#128066; ENT Examination</div>
-    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      ${vtxt('dept_ear','Ear Examination (RE/LE)','')}
-      ${vtxt('dept_nose','Nose Examination (DNS/Polyp)','')}
-      ${vtxt('dept_throat','Throat / Tonsils','')}
-      ${vtxt('dept_neck','Neck / Lymph Nodes','')}
-    </div>`,
-  'Orthopaedics': `
-    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#129460; Orthopaedics Assessment</div>
-    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      ${vfld('dept_affected_joint','Affected Joint / Site','')}
-      ${vsel('dept_side','Side',['Right','Left','Bilateral'])}
-      ${vfld('dept_rom','Range of Motion (ROM)','')}
-      ${vsel('dept_fracture','Fracture',['None','Simple','Compound','Stress fracture','Other'])}
-      ${vfld('dept_xray','X-Ray Findings','')}
-      <div style="grid-column:1/-1">${vtxt('dept_ortho_notes','Examination Notes / Special Tests','')} </div>
-    </div>`,
-  'Dermatology': `
-    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#129504; Dermatology Examination</div>
-    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
-      ${vsel('dept_lesion_type','Lesion Type',['Macule','Papule','Plaque','Vesicle','Pustule','Nodule','Ulcer','Wheal','Other'])}
-      ${vfld('dept_lesion_site','Site / Location','')}
-      ${vsel('dept_distribution','Distribution',['Localised','Generalised','Bilateral','Unilateral','Symmetrical'])}
-      ${vsel('dept_morphology','Morphology',['Erythematous','Hyperpigmented','Hypopigmented','Scaly','Crusted','Weeping','Lichenified'])}
-      <div style="grid-column:1/-1">${vtxt('dept_derm_notes','Dermatology Notes','')} </div>
-    </div>`
-};
-
+// Helper functions MUST be defined first
 function vfld(id, label, placeholder) {
   return '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">'+label+'</label><input id="'+id+'" type="text" placeholder="'+placeholder+'" class="form-input" style="width:100%;padding:8px 10px;font-size:13px"></div>';
 }
@@ -2265,7 +2132,91 @@ function vsel(id, label, options) {
   return '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">'+label+'</label><select id="'+id+'" class="form-select" style="width:100%;padding:8px 10px;font-size:13px"><option value="">Select...</option>'+options.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select></div>';
 }
 
-var visitPatientId  = null;
+// Department fields - defined as functions, not template literals
+function getDeptFields(dept) {
+  if (dept === 'Ophthalmology') {
+    return '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">Eye Examination</div>'
+      + '<div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+      + '<div><div style="font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);margin-bottom:8px">RIGHT EYE (RE)</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+      + vfld('dept_re_va','Vision (VA)','6/6') + vfld('dept_re_iop','IOP (mmHg)','14')
+      + vfld('dept_re_sph','Sph','0.00') + vfld('dept_re_cyl','Cyl','0.00')
+      + vfld('dept_re_axis','Axis','0') + vfld('dept_re_add','Add','')
+      + '</div></div>'
+      + '<div><div style="font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);margin-bottom:8px">LEFT EYE (LE)</div>'
+      + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+      + vfld('dept_le_va','Vision (VA)','6/6') + vfld('dept_le_iop','IOP (mmHg)','14')
+      + vfld('dept_le_sph','Sph','0.00') + vfld('dept_le_cyl','Cyl','0.00')
+      + vfld('dept_le_axis','Axis','0') + vfld('dept_le_add','Add','')
+      + '</div></div>'
+      + '<div style="grid-column:1/-1">' + vtxt('dept_fundus','Fundus / Slit Lamp Findings','') + '</div>'
+      + '<div style="grid-column:1/-1">' + vtxt('dept_glasses','Glasses Prescription / Advice','') + '</div>'
+      + '</div>';
+  }
+  if (dept === 'Dental') {
+    return '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">Dental Examination</div>'
+      + '<div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+      + vfld('dept_chief_tooth','Chief Tooth / Location','') + vsel('dept_gum','Gum Condition',['Normal','Gingivitis','Periodontitis','Recession'])
+      + vfld('dept_mobility','Tooth Mobility','') + vsel('dept_treatment','Treatment Done',['Scaling','Extraction','RCT','Filling','Crown','Denture','Other'])
+      + '<div style="grid-column:1/-1">' + vtxt('dept_dental_notes','Dental Notes','') + '</div>'
+      + '</div>';
+  }
+  if (dept === 'Gynaecology') {
+    return '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">Gynaecology Examination</div>'
+      + '<div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+      + vfld('dept_lmp','LMP (Last Menstrual Period)','') + vfld('dept_cycle','Cycle (days)','28')
+      + vfld('dept_gravida','Gravida','') + vfld('dept_para','Para','')
+      + vfld('dept_abortion','Abortions','') + vfld('dept_living','Living Children','')
+      + vsel('dept_contraception','Contraception',['None','OCP','IUCD','Condom','Sterilisation','Other'])
+      + vfld('dept_edd','EDD (if pregnant)','')
+      + '<div style="grid-column:1/-1">' + vtxt('dept_gyn_exam','P/V and P/S Examination Findings','') + '</div>'
+      + '</div>';
+  }
+  if (dept === 'Paediatrics') {
+    return '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">Paediatrics Assessment</div>'
+      + '<div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+      + vfld('dept_birth_weight','Birth Weight (kg)','') + vfld('dept_gestational_age','Gestational Age (weeks)','')
+      + vsel('dept_immunization','Immunization Status',['Up to date','Incomplete','Not started'])
+      + vfld('dept_milestones','Developmental Milestones','')
+      + vfld('dept_feeding','Feeding Type','') + vfld('dept_perc_weight','Weight Percentile','')
+      + vfld('dept_perc_height','Height Percentile','') + vfld('dept_perc_hc','Head Circumference (cm)','')
+      + '<div style="grid-column:1/-1">' + vtxt('dept_peds_notes','Examination Notes','') + '</div>'
+      + '</div>';
+  }
+  if (dept === 'ENT') {
+    return '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">ENT Examination</div>'
+      + '<div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+      + vtxt('dept_ear','Ear Examination (RE/LE)','') + vtxt('dept_nose','Nose Examination','')
+      + vtxt('dept_throat','Throat / Tonsils','') + vtxt('dept_neck','Neck / Lymph Nodes','')
+      + '</div>';
+  }
+  if (dept === 'Orthopaedics') {
+    return '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">Orthopaedics Assessment</div>'
+      + '<div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+      + vfld('dept_affected_joint','Affected Joint / Site','') + vsel('dept_side','Side',['Right','Left','Bilateral'])
+      + vfld('dept_rom','Range of Motion (ROM)','') + vsel('dept_fracture','Fracture',['None','Simple','Compound','Stress fracture','Other'])
+      + vfld('dept_xray','X-Ray Findings','')
+      + '<div style="grid-column:1/-1">' + vtxt('dept_ortho_notes','Examination Notes / Special Tests','') + '</div>'
+      + '</div>';
+  }
+  if (dept === 'Dermatology') {
+    return '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">Dermatology Examination</div>'
+      + '<div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+      + vsel('dept_lesion_type','Lesion Type',['Macule','Papule','Plaque','Vesicle','Pustule','Nodule','Ulcer','Wheal','Other'])
+      + vfld('dept_lesion_site','Site / Location','')
+      + vsel('dept_distribution','Distribution',['Localised','Generalised','Bilateral','Unilateral','Symmetrical'])
+      + vsel('dept_morphology','Morphology',['Erythematous','Hyperpigmented','Hypopigmented','Scaly','Crusted','Weeping','Lichenified'])
+      + '<div style="grid-column:1/-1">' + vtxt('dept_derm_notes','Dermatology Notes','') + '</div>'
+      + '</div>';
+  }
+  return '';
+}
+
+var DRUG_LIST = ['Paracetamol','Dolo 650','Ibuprofen','Aspirin','Diclofenac','Amoxicillin','Azithromycin','Ciprofloxacin','Doxycycline','Metronidazole','Cefixime','Amoxicillin+Clavulanate','Metformin','Glimepiride','Sitagliptin','Amlodipine','Atenolol','Enalapril','Telmisartan','Losartan','Metoprolol','Ramipril','Atorvastatin','Rosuvastatin','Pantoprazole','Omeprazole','Ranitidine','Domperidone','Ondansetron','ORS','Cetirizine','Fexofenadine','Montelukast','Salbutamol','Prednisolone','Methylprednisolone','Vitamin D3','Vitamin B12','Calcium','Iron+Folic Acid','Multivitamin','Tramadol','Gabapentin','Pregabalin','Alprazolam','Sertraline','Escitalopram','Levothyroxine','Chlorhexidine Mouthwash','Mupirocin Ointment','Eye drops - Ciprofloxacin','Lubricating Eye drops','Ear drops - Ciprofloxacin','Nasal drops - Xylometazoline'];
+
+var LAB_TESTS = ['CBC (Complete Blood Count)','Haemoglobin','Blood Sugar Fasting','Blood Sugar PP','Blood Sugar Random','HbA1c','LFT (Liver Function Test)','KFT (Kidney Function Test)','Lipid Profile','Thyroid Profile (T3/T4/TSH)','TSH','Serum Electrolytes','Urine R/E','Urine Culture','Dengue NS1 Antigen','Dengue IgM/IgG','Malaria Antigen','Widal Test','CRP','ESR','PT/INR','Hepatitis B Surface Antigen','Anti-HCV','HIV 1&2','Pregnancy Test (urine beta-hCG)','Sputum AFB','ECG','2D Echo','X-Ray Chest','X-Ray KUB','USG Abdomen','USG Pelvis','USG Thyroid','CT Brain','MRI Brain','Pap Smear','Audiometry','Blood Culture','Stool R/E'];
+
+var visitPatientId = null;
 var visitPatientName = '';
 var visitPatientPhone = '';
 var rxRows = [];
@@ -2274,26 +2225,17 @@ var radRows = [];
 var currentVisitId = null;
 
 function openEMR(patientId, patientName, patientPhone) {
-  visitPatientId   = patientId;
+  visitPatientId    = patientId;
   visitPatientName  = patientName || 'Patient';
   visitPatientPhone = patientPhone || '';
-  rxRows   = [];
-  labRows  = [];
-  radRows  = [];
+  rxRows = []; labRows = []; radRows = [];
   currentVisitId = null;
-
   document.getElementById('emrModal').style.display = 'flex';
   document.getElementById('emr-patient-title').textContent = 'New Visit — ' + visitPatientName;
-
-  // Set today's date
   var today = new Date().toISOString().split('T')[0];
   document.getElementById('emr_visit_date').value = today;
-
-  // Reset all tabs
   showEMRTab('subjective');
-  renderRxTable();
-  renderLabTable();
-  renderRadTable();
+  renderRxTable(); renderLabTable(); renderRadTable();
   loadVisitHistory();
 }
 
@@ -2304,98 +2246,83 @@ function closeEMR() {
 
 function showEMRTab(tab) {
   document.querySelectorAll('.emr-tab-content').forEach(function(t){ t.style.display='none'; });
-  document.querySelectorAll('.emr-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.querySelectorAll('.emr-tab-btn').forEach(function(b){ b.style.background='transparent'; b.style.color='rgba(240,250,247,0.7)'; });
   document.getElementById('emr-tab-'+tab).style.display = 'block';
-  var btn = document.querySelector('[data-tab="'+tab+'"]');
-  if (btn) btn.classList.add('active');
+  var btn = document.querySelector('[data-emr-tab="'+tab+'"]');
+  if (btn) { btn.style.background='var(--teal)'; btn.style.color='#000'; }
 }
 
-// Auto-calculate BMI
 function calcBMI() {
   var w = parseFloat(document.getElementById('emr_weight').value)||0;
   var h = parseFloat(document.getElementById('emr_height').value)||0;
   if (w > 0 && h > 0) {
     var bmi = (w / ((h/100)*(h/100))).toFixed(1);
     document.getElementById('emr_bmi').value = bmi;
-    var status = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Overweight' : 'Obese';
-    document.getElementById('emr_bmi_status').textContent = status;
+    var s = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Overweight' : 'Obese';
+    document.getElementById('emr_bmi_status').textContent = s;
   }
 }
 
-// Department-specific fields
 function loadDeptFields() {
   var dept = document.getElementById('emr_department').value;
-  var el   = document.getElementById('emr_dept_fields');
-  el.innerHTML = DEPT_FIELDS[dept] || '';
+  document.getElementById('emr_dept_fields').innerHTML = getDeptFields(dept);
 }
 
-// Prescription table
-function addRxRow(drugName) {
-  rxRows.push({ drug: drugName||'', strength:'', frequency:'1-0-1', duration:'5 days', instructions:'' });
+function addRxRow(drug) {
+  rxRows.push({ drug: drug||'', strength:'', frequency:'1-0-1', duration:'5 days', instructions:'' });
   renderRxTable();
 }
 
 function renderRxTable() {
   var el = document.getElementById('rx-table');
-  if (!rxRows.length) {
-    el.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">No medicines added yet. Use the search above to add.</div>';
-    return;
-  }
+  if (!rxRows.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">No medicines added yet. Search above to add.</div>'; return; }
   var html = '<table style="width:100%;border-collapse:collapse"><thead><tr>';
-  ['Drug','Strength','Frequency','Duration','Instructions',''].forEach(function(h){
-    html += '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;border-bottom:0.5px solid rgba(0,196,154,0.15)">'+h+'</th>';
-  });
+  ['Drug','Strength','Frequency','Duration','Instructions',''].forEach(function(h){ html += '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;border-bottom:0.5px solid rgba(0,196,154,0.15)">'+h+'</th>'; });
   html += '</tr></thead><tbody>';
-  rxRows.forEach(function(r, i) {
+  rxRows.forEach(function(r,i) {
     html += '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.08)">'
-      + '<td style="padding:6px 8px"><input value="'+r.drug+'" onchange="rxRows['+i+'].drug=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%;min-width:120px"></td>'
+      + '<td style="padding:6px 8px"><input value="'+r.drug.replace(/"/g,'&quot;')+'" onchange="rxRows['+i+'].drug=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:130px"></td>'
       + '<td style="padding:6px 8px"><input value="'+r.strength+'" placeholder="500mg" onchange="rxRows['+i+'].strength=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:70px"></td>'
       + '<td style="padding:6px 8px"><select onchange="rxRows['+i+'].frequency=this.value" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px">'
-      + ['0-0-1','1-0-0','1-0-1','1-1-1','0-1-0','SOS','Once daily','Twice daily','Thrice daily','At bedtime'].map(function(f){return '<option'+(r.frequency===f?' selected':'')+'>'+f+'</option>';}).join('')
+      + ['0-0-1','1-0-0','1-0-1','1-1-1','SOS','Once daily','Twice daily','Thrice daily','At bedtime'].map(function(f){return '<option'+(r.frequency===f?' selected':'')+'>'+f+'</option>';}).join('')
       + '</select></td>'
       + '<td style="padding:6px 8px"><select onchange="rxRows['+i+'].duration=this.value" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px">'
-      + ['1 day','3 days','5 days','7 days','10 days','14 days','1 month','2 months','3 months','Ongoing'].map(function(d){return '<option'+(r.duration===d?' selected':'')+'>'+d+'</option>';}).join('')
+      + ['1 day','3 days','5 days','7 days','10 days','14 days','1 month','3 months','Ongoing'].map(function(d){return '<option'+(r.duration===d?' selected':'')+'>'+d+'</option>';}).join('')
       + '</select></td>'
       + '<td style="padding:6px 8px"><input value="'+r.instructions+'" placeholder="After food" onchange="rxRows['+i+'].instructions=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100px"></td>'
       + '<td style="padding:6px 8px"><button onclick="rxRows.splice('+i+',1);renderRxTable()" style="background:rgba(239,68,68,0.15);border:0.5px solid rgba(239,68,68,0.4);color:#EF4444;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">Remove</button></td>'
       + '</tr>';
   });
-  html += '</tbody></table>';
-  el.innerHTML = html;
+  el.innerHTML = html + '</tbody></table>';
 }
 
 function rxSearch(val) {
-  var suggestions = document.getElementById('rx-suggestions');
-  if (!val || val.length < 2) { suggestions.style.display='none'; return; }
-  var matches = DRUG_LIST.filter(function(d){ return d.toLowerCase().includes(val.toLowerCase()); }).slice(0,8);
-  if (!matches.length) { suggestions.style.display='none'; return; }
-  suggestions.innerHTML = matches.map(function(m){
-    return '<div onclick="addRxRow(\''+m+'\');document.getElementById(\'rx-search\').value=\'\';document.getElementById(\'rx-suggestions\').style.display=\'none\'" style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:0.5px solid rgba(0,196,154,0.1)" onmouseover="this.style.background=\'rgba(0,196,154,0.1)\'" onmouseout="this.style.background=\'none\'">'+m+'</div>';
+  var s = document.getElementById('rx-suggestions');
+  if (!val || val.length < 2) { s.style.display='none'; return; }
+  var m = DRUG_LIST.filter(function(d){ return d.toLowerCase().includes(val.toLowerCase()); }).slice(0,8);
+  if (!m.length) { s.style.display='none'; return; }
+  s.innerHTML = m.map(function(d){
+    return '<div onclick="addRxRow(\''+d.replace(/'/g,"\\'") +'\');document.getElementById(\'rx-search\').value=\'\';document.getElementById(\'rx-suggestions\').style.display=\'none\'" style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:0.5px solid rgba(0,196,154,0.1)" onmouseover="this.style.background=\'rgba(0,196,154,0.1)\'" onmouseout="this.style.background=\'none\'">'+d+'</div>';
   }).join('');
-  suggestions.style.display = 'block';
+  s.style.display='block';
 }
 
-// Lab table
-function addLabRow(testName) {
-  labRows.push({ test: testName||'', instructions:'' });
+function addLabRow(test) {
+  labRows.push({ test: test||'', instructions:'' });
   renderLabTable();
 }
 
 function renderLabTable() {
   var el = document.getElementById('lab-table');
-  if (!labRows.length) {
-    el.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">No tests added yet.</div>';
-    return;
-  }
+  if (!labRows.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">No tests added yet.</div>'; return; }
   var html = '<table style="width:100%;border-collapse:collapse"><thead><tr>'
     + '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;border-bottom:0.5px solid rgba(0,196,154,0.15)">Test</th>'
-    + '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;border-bottom:0.5px solid rgba(0,196,154,0.15)">Special Instructions</th>'
-    + '<th style="border-bottom:0.5px solid rgba(0,196,154,0.15)"></th>'
-    + '</tr></thead><tbody>';
+    + '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;border-bottom:0.5px solid rgba(0,196,154,0.15)">Instructions</th>'
+    + '<th style="border-bottom:0.5px solid rgba(0,196,154,0.15)"></th></tr></thead><tbody>';
   labRows.forEach(function(r,i) {
     html += '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.08)">'
-      + '<td style="padding:6px 8px"><input value="'+r.test+'" onchange="labRows['+i+'].test=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%;min-width:200px"></td>'
-      + '<td style="padding:6px 8px"><input value="'+r.instructions+'" placeholder="Fasting, urgent, etc." onchange="labRows['+i+'].instructions=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%;min-width:150px"></td>'
+      + '<td style="padding:6px 8px"><input value="'+r.test.replace(/"/g,'&quot;')+'" onchange="labRows['+i+'].test=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%;min-width:180px"></td>'
+      + '<td style="padding:6px 8px"><input value="'+r.instructions+'" placeholder="Fasting, urgent..." onchange="labRows['+i+'].instructions=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%"></td>'
       + '<td style="padding:6px 8px"><button onclick="labRows.splice('+i+',1);renderLabTable()" style="background:rgba(239,68,68,0.15);border:0.5px solid rgba(239,68,68,0.4);color:#EF4444;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">Remove</button></td>'
       + '</tr>';
   });
@@ -2403,17 +2330,16 @@ function renderLabTable() {
 }
 
 function labSearch(val) {
-  var suggestions = document.getElementById('lab-suggestions');
-  if (!val || val.length < 2) { suggestions.style.display='none'; return; }
-  var matches = LAB_TESTS.filter(function(t){ return t.toLowerCase().includes(val.toLowerCase()); }).slice(0,8);
-  if (!matches.length) { suggestions.style.display='none'; return; }
-  suggestions.innerHTML = matches.map(function(m){
-    return '<div onclick="addLabRow(\''+m.replace(/'/g,"\\'") +'\');document.getElementById(\'lab-search\').value=\'\';document.getElementById(\'lab-suggestions\').style.display=\'none\'" style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:0.5px solid rgba(0,196,154,0.1)" onmouseover="this.style.background=\'rgba(0,196,154,0.1)\'" onmouseout="this.style.background=\'none\'">'+m+'</div>';
+  var s = document.getElementById('lab-suggestions');
+  if (!val || val.length < 2) { s.style.display='none'; return; }
+  var m = LAB_TESTS.filter(function(t){ return t.toLowerCase().includes(val.toLowerCase()); }).slice(0,8);
+  if (!m.length) { s.style.display='none'; return; }
+  s.innerHTML = m.map(function(t){
+    return '<div onclick="addLabRow(\''+t.replace(/'/g,"\\'").replace(/&/g,'and')+'\');document.getElementById(\'lab-search\').value=\'\';document.getElementById(\'lab-suggestions\').style.display=\'none\'" style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:0.5px solid rgba(0,196,154,0.1)" onmouseover="this.style.background=\'rgba(0,196,154,0.1)\'" onmouseout="this.style.background=\'none\'">'+t+'</div>';
   }).join('');
-  suggestions.style.display = 'block';
+  s.style.display='block';
 }
 
-// Radiology table
 function addRadRow() {
   radRows.push({ test:'', instructions:'' });
   renderRadTable();
@@ -2421,21 +2347,18 @@ function addRadRow() {
 
 function renderRadTable() {
   var el = document.getElementById('rad-table');
-  if (!radRows.length) {
-    el.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">No radiology requests added yet.</div>';
-    return;
-  }
+  if (!radRows.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">No radiology requests added yet.</div>'; return; }
+  var radOptions = ['X-Ray Chest PA','X-Ray KUB','X-Ray Spine','X-Ray Hand/Wrist','X-Ray Knee','X-Ray Hip','USG Abdomen & Pelvis','USG Thyroid','USG Breast','2D Echo','CT Brain Plain','CT Chest','CT Abdomen','MRI Brain','MRI Spine','MRI Knee','Mammography','OPG (Dental)'];
   var html = '<table style="width:100%;border-collapse:collapse"><thead><tr>'
     + '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;border-bottom:0.5px solid rgba(0,196,154,0.15)">Investigation</th>'
     + '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;border-bottom:0.5px solid rgba(0,196,154,0.15)">Clinical Indication</th>'
     + '<th style="border-bottom:0.5px solid rgba(0,196,154,0.15)"></th></tr></thead><tbody>';
   radRows.forEach(function(r,i) {
     html += '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.08)">'
-      + '<td style="padding:6px 8px"><select onchange="radRows['+i+'].test=this.value" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%">'
-      + '<option value="">Select investigation...</option>'
-      + ['X-Ray Chest PA','X-Ray KUB','X-Ray Spine AP/Lat','X-Ray Hand/Wrist','X-Ray Knee','X-Ray Hip','X-Ray Pelvis','USG Abdomen & Pelvis','USG Thyroid','USG Breast','2D Echo','CT Brain Plain','CT Chest','CT Abdomen','MRI Brain','MRI Spine','MRI Knee','Mammography','Bone Scan (DEXA)','OPG (Dental)'].map(function(t){return '<option'+(r.test===t?' selected':'')+'>'+t+'</option>';}).join('')
+      + '<td style="padding:6px 8px"><select onchange="radRows['+i+'].test=this.value" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%"><option value="">Select...</option>'
+      + radOptions.map(function(t){return '<option'+(r.test===t?' selected':'')+'>'+t+'</option>';}).join('')
       + '</select></td>'
-      + '<td style="padding:6px 8px"><input value="'+r.instructions+'" placeholder="Reason / clinical details" onchange="radRows['+i+'].instructions=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%"></td>'
+      + '<td style="padding:6px 8px"><input value="'+r.instructions+'" placeholder="Reason..." onchange="radRows['+i+'].instructions=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%"></td>'
       + '<td style="padding:6px 8px"><button onclick="radRows.splice('+i+',1);renderRadTable()" style="background:rgba(239,68,68,0.15);border:0.5px solid rgba(239,68,68,0.4);color:#EF4444;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">Remove</button></td>'
       + '</tr>';
   });
@@ -2443,13 +2366,19 @@ function renderRadTable() {
 }
 
 function collectDeptData() {
-  var dept   = document.getElementById('emr_department').value;
-  var data   = {};
-  var fields = DEPT_FIELDS[dept];
-  if (!fields) return data;
-  var matches = fields.match(/id="(dept_[^"]+)"/g)||[];
-  matches.forEach(function(m) {
-    var id = m.replace(/id="|"/g,'');
+  var dept = document.getElementById('emr_department').value;
+  var data = {};
+  var fieldIds = {
+    'Ophthalmology': ['dept_re_va','dept_re_iop','dept_re_sph','dept_re_cyl','dept_re_axis','dept_re_add','dept_le_va','dept_le_iop','dept_le_sph','dept_le_cyl','dept_le_axis','dept_le_add','dept_fundus','dept_glasses'],
+    'Dental': ['dept_chief_tooth','dept_gum','dept_mobility','dept_treatment','dept_dental_notes'],
+    'Gynaecology': ['dept_lmp','dept_cycle','dept_gravida','dept_para','dept_abortion','dept_living','dept_contraception','dept_edd','dept_gyn_exam'],
+    'Paediatrics': ['dept_birth_weight','dept_gestational_age','dept_immunization','dept_milestones','dept_feeding','dept_perc_weight','dept_perc_height','dept_perc_hc','dept_peds_notes'],
+    'ENT': ['dept_ear','dept_nose','dept_throat','dept_neck'],
+    'Orthopaedics': ['dept_affected_joint','dept_side','dept_rom','dept_fracture','dept_xray','dept_ortho_notes'],
+    'Dermatology': ['dept_lesion_type','dept_lesion_site','dept_distribution','dept_morphology','dept_derm_notes']
+  };
+  var ids = fieldIds[dept] || [];
+  ids.forEach(function(id) {
     var el = document.getElementById(id);
     if (el) data[id] = el.value;
   });
@@ -2458,42 +2387,40 @@ function collectDeptData() {
 
 async function saveVisitRecord(status) {
   if (!visitPatientId) return;
-
   var payload = {
-    department:          document.getElementById('emr_department').value,
-    visit_date:          document.getElementById('emr_visit_date').value,
-    visit_type:          document.getElementById('emr_visit_type').value,
-    chief_complaint:     document.getElementById('emr_cc').value,
-    duration:            document.getElementById('emr_duration').value,
-    history:             document.getElementById('emr_history').value,
-    allergies:           document.getElementById('emr_allergies').value,
-    family_history:      document.getElementById('emr_family_hx').value,
-    surgical_history:    document.getElementById('emr_surgical_hx').value,
-    bp_systolic:         document.getElementById('emr_bp_sys').value,
-    bp_diastolic:        document.getElementById('emr_bp_dia').value,
-    temperature:         document.getElementById('emr_temp').value,
-    pulse:               document.getElementById('emr_pulse').value,
-    spo2:                document.getElementById('emr_spo2').value,
-    weight:              document.getElementById('emr_weight').value,
-    height:              document.getElementById('emr_height').value,
-    bmi:                 document.getElementById('emr_bmi').value,
-    examination_notes:   document.getElementById('emr_exam').value,
-    diagnosis_primary:   document.getElementById('emr_dx1').value,
+    department: document.getElementById('emr_department').value,
+    visit_date: document.getElementById('emr_visit_date').value,
+    visit_type: document.getElementById('emr_visit_type').value,
+    chief_complaint: document.getElementById('emr_cc').value,
+    duration: document.getElementById('emr_duration').value,
+    history: document.getElementById('emr_history').value,
+    allergies: document.getElementById('emr_allergies').value,
+    family_history: document.getElementById('emr_family_hx').value,
+    surgical_history: document.getElementById('emr_surgical_hx').value,
+    bp_systolic: document.getElementById('emr_bp_sys').value,
+    bp_diastolic: document.getElementById('emr_bp_dia').value,
+    temperature: document.getElementById('emr_temp').value,
+    pulse: document.getElementById('emr_pulse').value,
+    spo2: document.getElementById('emr_spo2').value,
+    weight: document.getElementById('emr_weight').value,
+    height: document.getElementById('emr_height').value,
+    bmi: document.getElementById('emr_bmi').value,
+    examination_notes: document.getElementById('emr_exam').value,
+    diagnosis_primary: document.getElementById('emr_dx1').value,
     diagnosis_secondary: document.getElementById('emr_dx2').value,
-    icd_code:            document.getElementById('emr_icd').value,
-    severity:            document.getElementById('emr_severity').value,
-    prescription:        rxRows,
-    lab_requests:        labRows,
-    radiology_requests:  radRows,
-    referral_to:         document.getElementById('emr_referral').value,
-    referral_notes:      document.getElementById('emr_referral_notes').value,
-    followup_date:       document.getElementById('emr_followup').value,
+    icd_code: document.getElementById('emr_icd').value,
+    severity: document.getElementById('emr_severity').value,
+    prescription: rxRows,
+    lab_requests: labRows,
+    radiology_requests: radRows,
+    referral_to: document.getElementById('emr_referral').value,
+    referral_notes: document.getElementById('emr_referral_notes').value,
+    followup_date: document.getElementById('emr_followup').value,
     followup_instructions: document.getElementById('emr_followup_notes').value,
-    advice:              document.getElementById('emr_advice').value,
-    dept_data:           collectDeptData(),
-    status:              status
+    advice: document.getElementById('emr_advice').value,
+    dept_data: collectDeptData(),
+    status: status
   };
-
   try {
     var data;
     if (currentVisitId) {
@@ -2502,56 +2429,36 @@ async function saveVisitRecord(status) {
       data = await apiCall('/hospitals/'+mwHospitalId+'/patients/'+visitPatientId+'/visits', 'POST', payload);
       if (data.success) currentVisitId = data.data.id;
     }
-
-    if (!data.success) { showToast('Error: '+data.message,'error'); return; }
-
+    if (!data.success) { showToast('Error: '+data.message, 'error'); return; }
     if (status === 'final') {
-      // Show dispatch confirmation modal
       document.getElementById('dispatchModal').style.display = 'flex';
       document.getElementById('dispatch_patient_phone').value = visitPatientPhone;
     } else {
-      showToast('Draft saved ✓','success');
+      showToast('Draft saved successfully ✓', 'success');
     }
-  } catch(e) {
-    showToast('Network error: '+e.message,'error');
-  }
+  } catch(e) { showToast('Network error: '+e.message, 'error'); }
 }
 
 async function dispatchRecord() {
   if (!currentVisitId) return;
-  var patPhone  = document.getElementById('dispatch_patient_phone').value.trim();
-  var labPhone  = document.getElementById('dispatch_lab_phone').value.trim();
-  var sendRx    = document.getElementById('dispatch_send_rx').checked;
-  var sendLab   = document.getElementById('dispatch_send_lab').checked;
-
   var data = await apiCall('/hospitals/'+mwHospitalId+'/patients/'+visitPatientId+'/visits/'+currentVisitId+'/dispatch','POST',{
-    patient_phone:   patPhone,
-    lab_staff_phone: labPhone,
-    send_prescription: sendRx,
-    send_lab:          sendLab
+    patient_phone: document.getElementById('dispatch_patient_phone').value.trim(),
+    lab_staff_phone: document.getElementById('dispatch_lab_phone').value.trim(),
+    send_prescription: document.getElementById('dispatch_send_rx').checked,
+    send_lab: document.getElementById('dispatch_send_lab').checked
   });
-
   document.getElementById('dispatchModal').style.display = 'none';
-
-  if (data.success) {
-    showToast(data.message || 'Sent successfully ✓','success');
-    closeEMR();
-    loadPatients();
-  } else {
-    showToast('Dispatch error: '+data.message,'error');
-  }
+  if (data.success) { showToast(data.message || 'Sent ✓', 'success'); closeEMR(); loadPatients(); }
+  else { showToast('Error: '+data.message, 'error'); }
 }
 
 async function loadVisitHistory() {
   if (!visitPatientId) return;
   var el = document.getElementById('emr-history-list');
-  el.innerHTML = '<div style="padding:16px;color:rgba(240,250,247,0.4);font-size:13px">Loading...</div>';
+  el.innerHTML = '<div style="padding:12px;color:rgba(240,250,247,0.4);font-size:12px">Loading...</div>';
   try {
     var data = await apiCall('/hospitals/'+mwHospitalId+'/patients/'+visitPatientId+'/visits');
-    if (!data.success || !data.data.length) {
-      el.innerHTML = '<div style="padding:16px;color:rgba(240,250,247,0.4);font-size:13px">No previous visits</div>';
-      return;
-    }
+    if (!data.success || !data.data.length) { el.innerHTML = '<div style="padding:12px;color:rgba(240,250,247,0.4);font-size:12px">No previous visits</div>'; return; }
     el.innerHTML = data.data.map(function(v) {
       return '<div style="padding:10px 14px;border-bottom:0.5px solid rgba(0,196,154,0.1);cursor:pointer" onclick="loadVisit(\''+v.id+'\')" onmouseover="this.style.background=\'rgba(0,196,154,0.05)\'" onmouseout="this.style.background=\'none\'">'
         + '<div style="font-size:12px;font-weight:600;color:#F0FAF7">'+v.visit_date+' — '+v.department+'</div>'
@@ -2559,9 +2466,7 @@ async function loadVisitHistory() {
         + '<div style="font-size:10px;color:var(--teal);margin-top:2px">'+v.visit_type+' · '+v.status+'</div>'
         + '</div>';
     }).join('');
-  } catch(e) {
-    el.innerHTML = '<div style="padding:16px;color:rgba(240,250,247,0.4);font-size:13px">Failed to load</div>';
-  }
+  } catch(e) { el.innerHTML = '<div style="padding:12px;color:rgba(240,250,247,0.4);font-size:12px">Failed to load</div>'; }
 }
 
 async function loadVisit(visitId) {
@@ -2569,52 +2474,26 @@ async function loadVisit(visitId) {
   if (!data.success) return;
   var v = data.data;
   currentVisitId = visitId;
-
-  // Populate all fields
-  document.getElementById('emr_department').value   = v.department||'General Medicine';
-  document.getElementById('emr_visit_date').value   = v.visit_date||'';
-  document.getElementById('emr_visit_type').value   = v.visit_type||'OPD';
-  document.getElementById('emr_cc').value           = v.chief_complaint||'';
-  document.getElementById('emr_duration').value     = v.duration||'';
-  document.getElementById('emr_history').value      = v.history||'';
-  document.getElementById('emr_allergies').value    = v.allergies||'';
-  document.getElementById('emr_family_hx').value    = v.family_history||'';
-  document.getElementById('emr_surgical_hx').value  = v.surgical_history||'';
-  document.getElementById('emr_bp_sys').value       = v.bp_systolic||'';
-  document.getElementById('emr_bp_dia').value       = v.bp_diastolic||'';
-  document.getElementById('emr_temp').value         = v.temperature||'';
-  document.getElementById('emr_pulse').value        = v.pulse||'';
-  document.getElementById('emr_spo2').value         = v.spo2||'';
-  document.getElementById('emr_weight').value       = v.weight||'';
-  document.getElementById('emr_height').value       = v.height||'';
-  document.getElementById('emr_bmi').value          = v.bmi||'';
-  document.getElementById('emr_exam').value         = v.examination_notes||'';
-  document.getElementById('emr_dx1').value          = v.diagnosis_primary||'';
-  document.getElementById('emr_dx2').value          = v.diagnosis_secondary||'';
-  document.getElementById('emr_icd').value          = v.icd_code||'';
-  document.getElementById('emr_severity').value     = v.severity||'';
-  document.getElementById('emr_referral').value     = v.referral_to||'';
-  document.getElementById('emr_referral_notes').value = v.referral_notes||'';
-  document.getElementById('emr_followup').value     = v.followup_date||'';
-  document.getElementById('emr_followup_notes').value = v.followup_instructions||'';
-  document.getElementById('emr_advice').value       = v.advice||'';
-
-  rxRows  = Array.isArray(v.prescription)     ? v.prescription     : JSON.parse(v.prescription||'[]');
-  labRows = Array.isArray(v.lab_requests)     ? v.lab_requests     : JSON.parse(v.lab_requests||'[]');
+  var flds = {
+    'emr_department':v.department,'emr_visit_date':v.visit_date,'emr_visit_type':v.visit_type,
+    'emr_cc':v.chief_complaint,'emr_duration':v.duration,'emr_history':v.history,
+    'emr_allergies':v.allergies,'emr_family_hx':v.family_history,'emr_surgical_hx':v.surgical_history,
+    'emr_bp_sys':v.bp_systolic,'emr_bp_dia':v.bp_diastolic,'emr_temp':v.temperature,
+    'emr_pulse':v.pulse,'emr_spo2':v.spo2,'emr_weight':v.weight,
+    'emr_height':v.height,'emr_bmi':v.bmi,'emr_exam':v.examination_notes,
+    'emr_dx1':v.diagnosis_primary,'emr_dx2':v.diagnosis_secondary,
+    'emr_icd':v.icd_code,'emr_severity':v.severity,
+    'emr_referral':v.referral_to,'emr_referral_notes':v.referral_notes,
+    'emr_followup':v.followup_date,'emr_followup_notes':v.followup_instructions,'emr_advice':v.advice
+  };
+  Object.keys(flds).forEach(function(id){ var el=document.getElementById(id); if(el && flds[id]!=null) el.value=flds[id]; });
+  rxRows  = Array.isArray(v.prescription) ? v.prescription : JSON.parse(v.prescription||'[]');
+  labRows = Array.isArray(v.lab_requests) ? v.lab_requests : JSON.parse(v.lab_requests||'[]');
   radRows = Array.isArray(v.radiology_requests) ? v.radiology_requests : JSON.parse(v.radiology_requests||'[]');
-
-  renderRxTable();
-  renderLabTable();
-  renderRadTable();
+  renderRxTable(); renderLabTable(); renderRadTable();
   loadDeptFields();
-
-  // Populate dept data
-  var deptData = typeof v.dept_data === 'object' ? v.dept_data : JSON.parse(v.dept_data||'{}');
-  Object.keys(deptData).forEach(function(key) {
-    var el = document.getElementById(key);
-    if (el) el.value = deptData[key];
-  });
-
+  var dd = typeof v.dept_data==='object' ? v.dept_data : JSON.parse(v.dept_data||'{}');
+  Object.keys(dd).forEach(function(k){ var el=document.getElementById(k); if(el) el.value=dd[k]; });
   document.getElementById('emr-patient-title').textContent = 'Visit: '+v.visit_date+' — '+v.department;
   showEMRTab('subjective');
 }
