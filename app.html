@@ -1387,28 +1387,34 @@ function loadPatients() {
 function renderPatients(list) {
   var el = document.getElementById('patients-list');
   if (!list.length) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.55)">No patients yet. Register your first patient above.</div>';
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">No patients yet. Register your first patient above.</div>';
     return;
   }
   var rows = '';
   for (var i = 0; i < list.length; i++) {
     var p = list[i];
-    var name = (p.first_name||'') + ' ' + (p.last_name||'');
+    var name = ((p.first_name||'') + ' ' + (p.last_name||'')).trim();
     var age = p.age ? p.age + (p.gender ? p.gender[0].toUpperCase() : '') : '—';
     var mrn = p.mrn || ('VH-' + new Date().getFullYear() + '-' + String(p.patient_id||'').slice(-5));
+    var lastVisit = p.last_visit_at ? new Date(p.last_visit_at).toLocaleDateString('en-IN') : '—';
+    var pid = String(p.patient_id);
+    var pname = name.replace(/'/g, '');
+    var pphone = (p.phone||'').replace(/'/g, '');
     rows += '<tr>'
       + '<td style="color:var(--teal);font-weight:600">' + mrn + '</td>'
-      + '<td class="td-name">' + name.trim() + '</td>'
+      + '<td class="td-name">' + name + '</td>'
       + '<td>' + age + '</td>'
       + '<td>' + (p.phone||'—') + '</td>'
-      + '<td>' + (p.updated_at ? new Date(p.updated_at*1000).toLocaleDateString('en-IN') : '—') + '</td>'
+      + '<td>' + lastVisit + '</td>'
       + '<td><span class="badge badge-green">Active</span></td>'
-      + '<td style="display:flex;gap:6px"><button class="action-btn" onclick="viewPatient(\'' + p.patient_id + '\')">View</button><button class="action-btn" style="background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)" onclick="openEMR(\'' + p.patient_id + '\',\'' + ((p.first_name||'')+'+'+(p.last_name||'')).trim() + '\',\'' + (p.phone||'') + '\')">Records</button></td>'
+      + '<td style="display:flex;gap:6px">'
+      + '<button class="action-btn" onclick="viewPatient('' + pid + '')">View</button>'
+      + '<button class="action-btn" style="background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)" onclick="openEMRById('' + pid + '')">+ Visit</button>'
+      + '</td>'
       + '</tr>';
   }
   el.innerHTML = '<table><thead><tr><th>MRN</th><th>Patient</th><th>Age</th><th>Phone</th><th>Last visit</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
 }
-
 // Search patients
 var patSearchEl = document.getElementById('patientSearch');
 if (patSearchEl) {
@@ -1749,6 +1755,16 @@ var visitRadRows  = [];
 var editingVisitId = null;
 
 // Open patient record panel
+
+function openEMRById(patientId) {
+  var patient = patientsData.find(function(p){ return String(p.patient_id) === String(patientId); });
+  if (patient) {
+    var name = ((patient.first_name||'') + ' ' + (patient.last_name||'')).trim();
+    openEMR(patientId, name, patient.phone||'');
+  } else {
+    openEMR(patientId, 'Patient', '');
+  }
+}
 function openEMR(patientId, patientName, patientPhone) {
   activeVisitPatient = { id: patientId, name: patientName, phone: patientPhone };
   document.getElementById('prPanel').style.display = 'flex';
@@ -2224,6 +2240,16 @@ var labRows = [];
 var radRows = [];
 var currentVisitId = null;
 
+
+function openEMRById(patientId) {
+  var patient = patientsData.find(function(p){ return String(p.patient_id) === String(patientId); });
+  if (patient) {
+    var name = ((patient.first_name||'') + ' ' + (patient.last_name||'')).trim();
+    openEMR(patientId, name, patient.phone||'');
+  } else {
+    openEMR(patientId, 'Patient', '');
+  }
+}
 function openEMR(patientId, patientName, patientPhone) {
   visitPatientId    = patientId;
   visitPatientName  = patientName || 'Patient';
