@@ -925,7 +925,7 @@ function renderPatients(list) {
       + '<td style="color:var(--teal);font-weight:600">' + mrn + '</td>'
       + '<td class="td-name">' + name.trim() + '</td>'
       + '<td>' + age + '</td>'
-      + '<td>' + (p.phone_number||'—') + '</td>'
+      + '<td>' + (p.phone||'—') + '</td>'
       + '<td>' + (p.updated_at ? new Date(p.updated_at*1000).toLocaleDateString('en-IN') : '—') + '</td>'
       + '<td><span class="badge badge-green">Active</span></td>'
       + '<td><button class="action-btn">View</button></td>'
@@ -942,7 +942,7 @@ if (patSearchEl) {
     if (!q) { renderPatients(patientsData); return; }
     renderPatients(patientsData.filter(function(p) {
       var n = ((p.first_name||'') + ' ' + (p.last_name||'')).toLowerCase();
-      var ph = (p.phone_number||'').toLowerCase();
+      var ph = (p.phone||'').toLowerCase();
       return n.includes(q) || ph.includes(q);
     }));
   });
@@ -958,11 +958,15 @@ async function registerPatient() {
   if (!first_name || !phone) { showToast('Name and phone are required.', 'error'); return; }
 
   var data = await apiCall('/hospitals/' + mwHospitalId + '/patients', 'POST', {
-    first_name: first_name,
-    phone_number: phone,
-    age: parseInt(age)||0,
-    gender: gender,
-    blood_group: blood_group
+    first_name:  first_name,
+    last_name:   document.getElementById('reg_last')?.value?.trim() || '',
+    phone:       phone,
+    age:         parseInt(age)||0,
+    gender:      gender,
+    blood_group: blood_group,
+    city:        document.getElementById('reg_city')?.value?.trim() || '',
+    referred_by: document.getElementById('reg_referred')?.value?.trim() || '',
+    notes:       document.getElementById('reg_complaint')?.value?.trim() || ''
   });
 
   if (data.success) {
