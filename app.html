@@ -120,7 +120,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .form-grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px}
 .form-section-title{font-family:'Clash Display',sans-serif;font-size:14px;font-weight:600;color:var(--teal);margin:20px 0 12px;letter-spacing:0.3px}
-.form-select{width:100%;background:rgba(255,255,255,0.05);border:0.5px solid var(--border);border-radius:10px;padding:13px 16px;font-size:14px;color:var(--white);font-family:'Cabinet Grotesk',sans-serif;outline:none;transition:border 0.2s;-webkit-appearance:none}
+.form-select{width:100%;background:rgba(255,255,255,0.05);border:0.5px solid var(--border);border-radius:10px;padding:13px 16px;font-size:14px;color:var(--white);font-family:'Cabinet Grotesk',sans-serif;outline:none;transition:border 0.2s;-webkit-appearance:none}.form-select option{background:#1a2420;color:#F0FAF7}
 .form-select:focus{border-color:var(--teal)}
 .submit-btn{background:var(--teal);color:#000;border:none;border-radius:10px;padding:13px 32px;font-size:14px;font-weight:700;cursor:pointer;font-family:'Cabinet Grotesk',sans-serif;transition:background 0.2s;margin-top:8px}
 .submit-btn:hover{background:var(--teal-dark)}
@@ -268,6 +268,10 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         <div class="nav-item" onclick="showScreen('staff',this)">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/><line x1="20" y1="8" x2="20" y2="14"/></svg>
           Staff Management
+        </div>
+        <div class="nav-item" onclick="showScreen('teleconsult',this);loadTeleconsult()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l4.553-2.069A1 1 0 0121 8.876V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h14a2 2 0 002-2v-1.876a1 1 0 00-.447-.832L15 14"/><rect x="2" y="8" width="13" height="10" rx="2"/></svg>
+          Teleconsult
         </div>
       </div>
     </div>
@@ -601,6 +605,116 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   </div>
 </div>
 
+
+<!-- TELECONSULT SCREEN -->
+<div class="screen" id="screen-teleconsult">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div>
+      <div style="font-size:22px;font-weight:700;color:var(--color-text-primary);font-family:'Cabinet Grotesk',sans-serif">Teleconsultation</div>
+      <div style="font-size:13px;color:var(--color-text-secondary);margin-top:4px">Video consultations — patients join via WhatsApp link, no app needed</div>
+    </div>
+    <button class="action-btn-primary" onclick="openNewConsultModal()" style="background:var(--teal);color:#000;border:none;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">+ New Consultation</button>
+  </div>
+
+  <!-- Stats -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">
+    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Today</div>
+      <div style="font-size:24px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="tc-today">0</div>
+    </div>
+    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Pending</div>
+      <div style="font-size:24px;font-weight:700;color:#F59E0B;font-family:'Cabinet Grotesk',sans-serif" id="tc-pending">0</div>
+    </div>
+    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Completed</div>
+      <div style="font-size:24px;font-weight:700;color:#22C55E;font-family:'Cabinet Grotesk',sans-serif" id="tc-completed">0</div>
+    </div>
+    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Revenue</div>
+      <div style="font-size:24px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="tc-revenue">₹0</div>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:16px;overflow:hidden">
+    <div style="padding:16px 20px;border-bottom:0.5px solid var(--color-border);font-weight:600;font-size:14px">All Consultations</div>
+    <div id="tc-list" style="padding:20px"><div style="text-align:center;color:var(--color-text-secondary);font-size:14px;padding:40px">No consultations yet. Create your first one above.</div></div>
+  </div>
+</div>
+
+<!-- NEW CONSULT MODAL -->
+<div class="modal-overlay" id="newConsultModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;display:none;align-items:center;justify-content:center">
+  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:20px;width:100%;max-width:480px;overflow:hidden">
+    <div style="background:var(--teal);padding:20px 24px;display:flex;justify-content:space-between;align-items:center">
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:17px;font-weight:700;color:#000">New Teleconsultation</div>
+      <button onclick="closeNewConsultModal()" style="background:rgba(0,0,0,0.2);border:none;color:#000;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px">×</button>
+    </div>
+    <div style="padding:24px">
+      <div id="nc-alert" style="display:none;padding:10px 13px;border-radius:8px;font-size:13px;margin-bottom:14px;background:#FEF2F2;color:#D44444;border:1px solid #FECACA"></div>
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Patient Name *</label>
+        <input type="text" id="nc-name" placeholder="Ramu Krishna" class="form-input" style="width:100%"/>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Patient WhatsApp Number *</label>
+        <input type="text" id="nc-phone" placeholder="9876543210" class="form-input" style="width:100%"/>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Symptoms / Reason</label>
+        <textarea id="nc-symptoms" placeholder="Fever, headache, body pain..." rows="3" class="form-input" style="width:100%;resize:vertical"></textarea>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Fee (₹)</label>
+          <input type="number" id="nc-amount" placeholder="300" value="300" class="form-input" style="width:100%"/>
+        </div>
+        <div>
+          <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Schedule Time</label>
+          <input type="datetime-local" id="nc-time" class="form-input" style="width:100%"/>
+        </div>
+      </div>
+      <div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:10px;padding:12px 14px;font-size:12.5px;color:var(--teal)">
+        📱 Patient gets WhatsApp link. Opens in phone browser — no app download needed.
+      </div>
+    </div>
+    <div style="padding:16px 24px;border-top:0.5px solid var(--color-border);display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="closeNewConsultModal()" style="padding:10px 20px;border:0.5px solid var(--color-border);border-radius:10px;background:none;color:var(--color-text-primary);cursor:pointer;font-size:13px">Cancel</button>
+      <button id="nc-create-btn" onclick="createConsultation()" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">Create & Send WhatsApp →</button>
+    </div>
+  </div>
+</div>
+
+<!-- COMPLETE CONSULT MODAL -->
+<div id="consultDetailModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:1000;align-items:center;justify-content:center">
+  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:20px;width:100%;max-width:520px;overflow:hidden">
+    <div style="background:var(--color-surface-2,#1a2822);padding:18px 24px;display:flex;justify-content:space-between;align-items:center;border-bottom:0.5px solid var(--color-border)">
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:700" id="cd-title">Complete Consultation</div>
+      <button onclick="closeConsultDetailModal()" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:20px">×</button>
+    </div>
+    <div style="padding:24px">
+      <div id="cd-info" style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;font-size:13px"></div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Diagnosis</label>
+        <input type="text" id="cd-diagnosis" placeholder="Viral fever, UTI, etc." class="form-input" style="width:100%"/>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Prescription *</label>
+        <textarea id="cd-prescription" rows="5" placeholder="Tab Paracetamol 500mg — 1 tab 3 times daily x 5 days" class="form-input" style="width:100%;resize:vertical;font-family:monospace;font-size:13px"></textarea>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="display:block;font-size:12px;font-weight:600;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em">Fee (₹)</label>
+        <input type="number" id="cd-amount" placeholder="300" class="form-input" style="width:200px"/>
+      </div>
+    </div>
+    <div style="padding:16px 24px;border-top:0.5px solid var(--color-border);display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="closeConsultDetailModal()" style="padding:10px 20px;border:0.5px solid var(--color-border);border-radius:10px;background:none;color:var(--color-text-primary);cursor:pointer;font-size:13px">Cancel</button>
+      <button onclick="completeConsult()" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">✓ Complete & Send Prescription</button>
+    </div>
+  </div>
+</div>
+
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -815,6 +929,132 @@ function updateRoleModules(roleId) {
   const hint = document.getElementById('roleModulesHint');
   if (hint) hint.textContent = 'Access: ' + (map[roleId] || 'Basic access');
 }
+// ═══ TELECONSULT ═══
+let tcConsults = [];
+let activeConsultId = null;
+
+async function loadTeleconsult() {
+  try {
+    const data = await apiFetch('/hospitals/' + mwHospitalId + '/teleconsult');
+    if (!data.success) return;
+    tcConsults = data.data || [];
+    renderTcList();
+    updateTcStats();
+  } catch(e) { console.error('Teleconsult load error:', e); }
+}
+
+function renderTcList() {
+  const el = document.getElementById('tc-list');
+  if (!tcConsults.length) {
+    el.innerHTML = '<div style="text-align:center;color:var(--color-text-secondary);font-size:14px;padding:40px">No consultations yet.</div>';
+    return;
+  }
+  const sColor = { pending:'#F59E0B', active:'var(--teal)', completed:'#22C55E', cancelled:'#EF4444' };
+  let html = '<table style="width:100%;border-collapse:collapse"><thead><tr style="border-bottom:0.5px solid var(--color-border)"><th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Patient</th><th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Symptoms</th><th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Status</th><th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Fee</th><th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Action</th></tr></thead><tbody>';
+  tcConsults.forEach(function(c) {
+    const sc = sColor[c.status] || '#888';
+    html += '<tr style="border-bottom:0.5px solid var(--color-border)">' +
+      '<td style="padding:12px;font-weight:600;font-size:13px">' + (c.patient_name||'—') + '<div style="font-size:11px;color:var(--color-text-secondary);font-weight:400">' + (c.patient_phone||'') + '</div></td>' +
+      '<td style="padding:12px;font-size:12.5px;color:var(--color-text-secondary);max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (c.symptoms||'—') + '</td>' +
+      '<td style="padding:12px"><span style="background:' + sc + '22;color:' + sc + ';border:1px solid ' + sc + '55;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">' + c.status + '</span></td>' +
+      '<td style="padding:12px;font-size:13px">' + (c.amount ? '₹'+c.amount : '—') + '</td>' +
+      '<td style="padding:12px"><div style="display:flex;gap:6px">' +
+      (c.status === 'pending' || c.status === 'active' ? '<button onclick="startConsult(''+c.id+'',''+c.doctor_url+'')" style="padding:6px 12px;background:var(--teal);color:#000;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer">📹 Start</button>' : '') +
+      (c.status !== 'completed' && c.status !== 'cancelled' ? '<button onclick="openConsultDetail('+JSON.stringify(c).replace(/"/g,'"')+')" style="padding:6px 12px;background:none;border:0.5px solid var(--color-border);color:var(--color-text-primary);border-radius:8px;font-size:12px;cursor:pointer">Complete</button>' : '') +
+      (c.status === 'pending' ? '<button onclick="cancelConsult(\''+c.id+'\')" style="padding:6px 12px;background:none;border:0.5px solid #EF4444;color:#EF4444;border-radius:8px;font-size:12px;cursor:pointer">Cancel</button>' : '') +
+      '</div></td></tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function updateTcStats() {
+  var today = new Date().toDateString();
+  var todayCount = tcConsults.filter(function(c){return new Date(c.created_at*1000).toDateString()===today}).length;
+  var pending = tcConsults.filter(function(c){return c.status==='pending'}).length;
+  var completed = tcConsults.filter(function(c){return c.status==='completed'}).length;
+  var revenue = tcConsults.filter(function(c){return c.status==='completed'}).reduce(function(s,c){return s+(c.amount||0)},0);
+  document.getElementById('tc-today').textContent = todayCount;
+  document.getElementById('tc-pending').textContent = pending;
+  document.getElementById('tc-completed').textContent = completed;
+  document.getElementById('tc-revenue').textContent = '₹'+revenue;
+}
+
+function openNewConsultModal() {
+  document.getElementById('newConsultModal').style.display = 'flex';
+  var dt = new Date(Date.now() + 30*60*1000); dt.setSeconds(0); dt.setMilliseconds(0);
+  document.getElementById('nc-time').value = dt.toISOString().slice(0,16);
+  document.getElementById('nc-alert').style.display = 'none';
+}
+
+function closeNewConsultModal() {
+  document.getElementById('newConsultModal').style.display = 'none';
+  ['nc-name','nc-phone','nc-symptoms'].forEach(function(id){document.getElementById(id).value=''});
+  document.getElementById('nc-amount').value = '300';
+}
+
+async function createConsultation() {
+  var name = document.getElementById('nc-name').value.trim();
+  var phone = document.getElementById('nc-phone').value.trim();
+  var symptoms = document.getElementById('nc-symptoms').value.trim();
+  var amount = document.getElementById('nc-amount').value;
+  var timeVal = document.getElementById('nc-time').value;
+  var alertEl = document.getElementById('nc-alert');
+  if (!name || !phone) { alertEl.textContent='Patient name and phone are required.'; alertEl.style.display='block'; return; }
+  var btn = document.getElementById('nc-create-btn');
+  btn.disabled = true; btn.textContent = 'Creating...';
+  alertEl.style.display = 'none';
+  try {
+    var data = await apiFetch('/hospitals/'+mwHospitalId+'/teleconsult', 'POST', {
+      patient_name: name, patient_phone: phone, symptoms: symptoms,
+      amount: parseInt(amount)||0, scheduled_at: timeVal ? new Date(timeVal).getTime() : Date.now()
+    });
+    if (data.success) { closeNewConsultModal(); showToast('Consultation created! WhatsApp link sent to '+name+' ✓', 'success'); loadTeleconsult(); }
+    else { alertEl.textContent = data.message||'Failed.'; alertEl.style.display='block'; }
+  } catch(e) { alertEl.textContent='Network error.'; alertEl.style.display='block'; }
+  btn.disabled = false; btn.textContent = 'Create & Send WhatsApp →';
+}
+
+function startConsult(consultId, doctorUrl) {
+  apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+consultId, 'PUT', {status:'active'});
+  loadTeleconsult();
+  window.open(doctorUrl, '_blank');
+}
+
+function openConsultDetail(c) {
+  activeConsultId = c.id;
+  document.getElementById('cd-title').textContent = 'Complete — '+c.patient_name;
+  document.getElementById('cd-info').innerHTML = '<div style="background:var(--color-surface-2,#1a2822);border-radius:8px;padding:10px 12px"><div style="font-size:11px;color:var(--color-text-secondary)">Patient</div><div style="font-size:13px;font-weight:600">'+c.patient_name+'</div></div>'+'<div style="background:var(--color-surface-2,#1a2822);border-radius:8px;padding:10px 12px"><div style="font-size:11px;color:var(--color-text-secondary)">Phone</div><div style="font-size:13px;font-weight:600">'+c.patient_phone+'</div></div>'+'<div style="background:var(--color-surface-2,#1a2822);border-radius:8px;padding:10px 12px;grid-column:1/-1"><div style="font-size:11px;color:var(--color-text-secondary)">Symptoms</div><div style="font-size:13px">'+( c.symptoms||'—')+'</div></div>';
+  document.getElementById('cd-diagnosis').value = c.diagnosis||'';
+  document.getElementById('cd-prescription').value = c.prescription||'';
+  document.getElementById('cd-amount').value = c.amount||300;
+  document.getElementById('consultDetailModal').style.display = 'flex';
+}
+
+function closeConsultDetailModal() {
+  document.getElementById('consultDetailModal').style.display = 'none';
+  activeConsultId = null;
+}
+
+async function completeConsult() {
+  if (!activeConsultId) return;
+  var diagnosis = document.getElementById('cd-diagnosis').value.trim();
+  var prescription = document.getElementById('cd-prescription').value.trim();
+  var amount = parseInt(document.getElementById('cd-amount').value)||0;
+  if (!prescription) { showToast('Please enter a prescription.', 'error'); return; }
+  var data = await apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+activeConsultId, 'PUT', {
+    status:'completed', diagnosis:diagnosis, prescription:prescription, amount:amount
+  });
+  if (data.success) { closeConsultDetailModal(); showToast('Consultation completed! Prescription sent via WhatsApp ✓', 'success'); loadTeleconsult(); }
+  else { showToast('Error: '+data.message, 'error'); }
+}
+
+async function cancelConsult(consultId) {
+  if (!confirm('Cancel this consultation?')) return;
+  var data = await apiFetch('/hospitals/'+mwHospitalId+'/teleconsult/'+consultId, 'DELETE');
+  if (data.success) { showToast('Consultation cancelled', 'error'); loadTeleconsult(); }
+}
+
 </script>
 </body>
 </html>
