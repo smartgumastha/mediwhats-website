@@ -374,15 +374,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
           </button>
         </div>
         <div class="card">
-          <table>
-            <thead><tr><th>MRN</th><th>Patient</th><th>Age</th><th>Phone</th><th>Last visit</th><th>Status</th><th>Action</th></tr></thead>
-            <tbody>
-              <tr><td style="color:var(--teal);font-weight:600">VH-2026-94784</td><td class="td-name">Priya Sharma</td><td>32F</td><td>9553053446</td><td>Today</td><td><span class="badge badge-green">Active</span></td><td><button class="action-btn">View</button></td></tr>
-              <tr><td style="color:var(--teal);font-weight:600">VH-2026-91744</td><td class="td-name">Raju Yadav</td><td>45M</td><td>9876543210</td><td>Yesterday</td><td><span class="badge badge-green">Active</span></td><td><button class="action-btn">View</button></td></tr>
-              <tr><td style="color:var(--teal);font-weight:600">VH-2026-44521</td><td class="td-name">Sunita Devi</td><td>52F</td><td>9012345678</td><td>2 days ago</td><td><span class="badge badge-amber">IPD</span></td><td><button class="action-btn">View</button></td></tr>
-              <tr><td style="color:var(--teal);font-weight:600">VH-2026-33210</td><td class="td-name">Mohammed Ali</td><td>58M</td><td>9123456789</td><td>1 week ago</td><td><span class="badge badge-gray">Inactive</span></td><td><button class="action-btn">View</button></td></tr>
-            </tbody>
-          </table>
+          <div id="patients-list"><div style="padding:40px;text-align:center;color:var(--color-text-secondary)">Loading patients...</div></div>
         </div>
       </div>
 
@@ -567,23 +559,23 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <div class="modal-title">Register new patient <button class="modal-close" onclick="closeModal('registerModal')">×</button></div>
     <div class="form-section-title">Personal details</div>
     <div class="form-grid">
-      <div class="form-group"><label class="form-label">First name *</label><input class="form-input" placeholder="Suresh"></div>
-      <div class="form-group"><label class="form-label">Last name</label><input class="form-input" placeholder="Kumar"></div>
+      <div class="form-group"><label class="form-label">First name *</label><input id="reg_first" class="form-input" placeholder="Suresh"></div>
+      <div class="form-group"><label class="form-label">Last name</label><input id="reg_last" class="form-input" placeholder="Kumar"></div>
     </div>
     <div class="form-grid-3">
-      <div class="form-group"><label class="form-label">Age</label><input class="form-input" placeholder="45" type="number"></div>
-      <div class="form-group"><label class="form-label">Gender</label><select class="form-select"><option>Male</option><option>Female</option><option>Other</option></select></div>
-      <div class="form-group"><label class="form-label">Blood group</label><select class="form-select"><option>—</option><option>A+</option><option>B+</option><option>O+</option><option>AB+</option></select></div>
+      <div class="form-group"><label class="form-label">Age</label><input id="reg_age" class="form-input" placeholder="45" type="number"></div>
+      <div class="form-group"><label class="form-label">Gender</label><select id="reg_gender" class="form-select"><option>Male</option><option>Female</option><option>Other</option></select></div>
+      <div class="form-group"><label class="form-label">Blood group</label><select id="reg_blood" class="form-select"><option>—</option><option>A+</option><option>B+</option><option>O+</option><option>AB+</option></select></div>
     </div>
     <div class="form-section-title">Contact</div>
     <div class="form-grid">
-      <div class="form-group"><label class="form-label">Phone *</label><input class="form-input" placeholder="9876543210" type="tel"></div>
-      <div class="form-group"><label class="form-label">City</label><input class="form-input" placeholder="Hyderabad"></div>
+      <div class="form-group"><label class="form-label">Phone *</label><input id="reg_phone" class="form-input" placeholder="9876543210" type="tel"></div>
+      <div class="form-group"><label class="form-label">City</label><input id="reg_city" class="form-input" placeholder="Hyderabad"></div>
     </div>
     <div class="form-section-title">Medical</div>
     <div class="form-group"><label class="form-label">Chief complaint</label><input class="form-input" placeholder="BP problem, fever..."></div>
     <div class="form-group"><label class="form-label">Referred by</label><input class="form-input" placeholder="Dr. Name or Hospital"></div>
-    <button class="submit-btn" onclick="closeModal('registerModal');showToast('Patient registered! WhatsApp notification sent ✓')">Register + Send WhatsApp</button>
+    <button class="submit-btn" onclick="registerPatient()">Register + Send WhatsApp</button>
   </div>
 </div>
 
@@ -765,6 +757,7 @@ function showScreen(name, navEl) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
+  if (name === 'patients') loadPatients();
   if (navEl) navEl.classList.add('active');
   const titles = {dashboard:'Dashboard',patients:'Patients',appointments:'Appointments',ipd:'IPD & Bed Management',billing:'Billing',staff:'Staff Management'};
   const actions = {dashboard:'New appointment',patients:'Register patient',appointments:'Book appointment',ipd:'Admit patient',billing:'New bill',staff:'Add staff'};
@@ -899,6 +892,88 @@ function updateRoleModules(roleId) {
   const hint = document.getElementById('roleModulesHint');
   if (hint) hint.textContent = 'Access: ' + (map[roleId] || 'Basic access');
 }
+// ===== PATIENTS =====
+var patientsData = [];
+
+function loadPatients() {
+  document.getElementById('patients-list').innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">Loading patients...</div>';
+  apiFetch('/hospitals/' + mwHospitalId + '/patients').then(function(data) {
+    if (!data.success) {
+      document.getElementById('patients-list').innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">No patients yet. Register your first patient above.</div>';
+      return;
+    }
+    patientsData = data.data || [];
+    renderPatients(patientsData);
+  }).catch(function(e) {
+    document.getElementById('patients-list').innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">Failed to load patients.</div>';
+  });
+}
+
+function renderPatients(list) {
+  var el = document.getElementById('patients-list');
+  if (!list.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">No patients yet. Register your first patient above.</div>';
+    return;
+  }
+  var rows = '';
+  for (var i = 0; i < list.length; i++) {
+    var p = list[i];
+    var name = (p.first_name||'') + ' ' + (p.last_name||'');
+    var age = p.age ? p.age + (p.gender ? p.gender[0].toUpperCase() : '') : '—';
+    var mrn = p.mrn || ('VH-' + new Date().getFullYear() + '-' + String(p.patient_id||'').slice(-5));
+    rows += '<tr>'
+      + '<td style="color:var(--teal);font-weight:600">' + mrn + '</td>'
+      + '<td class="td-name">' + name.trim() + '</td>'
+      + '<td>' + age + '</td>'
+      + '<td>' + (p.phone_number||'—') + '</td>'
+      + '<td>' + (p.updated_at ? new Date(p.updated_at*1000).toLocaleDateString('en-IN') : '—') + '</td>'
+      + '<td><span class="badge badge-green">Active</span></td>'
+      + '<td><button class="action-btn">View</button></td>'
+      + '</tr>';
+  }
+  el.innerHTML = '<table><thead><tr><th>MRN</th><th>Patient</th><th>Age</th><th>Phone</th><th>Last visit</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+// Search patients
+var patSearchEl = document.getElementById('patientSearch');
+if (patSearchEl) {
+  patSearchEl.addEventListener('input', function() {
+    var q = this.value.toLowerCase();
+    if (!q) { renderPatients(patientsData); return; }
+    renderPatients(patientsData.filter(function(p) {
+      var n = ((p.first_name||'') + ' ' + (p.last_name||'')).toLowerCase();
+      var ph = (p.phone_number||'').toLowerCase();
+      return n.includes(q) || ph.includes(q);
+    }));
+  });
+}
+
+async function registerPatient() {
+  var first_name   = document.getElementById('reg_first')?.value?.trim() || document.getElementById('reg-name')?.value?.trim() || '';
+  var phone        = document.getElementById('reg_phone')?.value?.trim() || document.getElementById('reg-phone')?.value?.trim() || '';
+  var age          = document.getElementById('reg_age')?.value || document.getElementById('reg-age')?.value || '';
+  var gender       = document.getElementById('reg_gender')?.value || document.getElementById('reg-gender')?.value || '';
+  var blood_group  = document.getElementById('reg_blood')?.value || document.getElementById('reg-blood')?.value || '';
+
+  if (!first_name || !phone) { showToast('Name and phone are required.', 'error'); return; }
+
+  var data = await apiFetch('/hospitals/' + mwHospitalId + '/patients', 'POST', {
+    first_name: first_name,
+    phone_number: phone,
+    age: parseInt(age)||0,
+    gender: gender,
+    blood_group: blood_group
+  });
+
+  if (data.success) {
+    closeModal('registerModal');
+    showToast('Patient registered! ✓', 'success');
+    loadPatients();
+  } else {
+    showToast(data.message || 'Failed to register patient.', 'error');
+  }
+}
+
 // ===== TELECONSULT =====
 var tcData = [];
 var activeTcId = null;
