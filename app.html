@@ -182,6 +182,15 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 .toast.show{transform:translateY(0);opacity:1}
 
 @media(max-width:768px){.sidebar{display:none}.stats-grid{grid-template-columns:repeat(2,1fr)}.dash-grid{grid-template-columns:1fr}.bill-layout{grid-template-columns:1fr}}
+
+.pr-tab{padding:8px 16px;background:rgba(0,196,154,0.06);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;color:rgba(240,250,247,0.6);cursor:pointer;font-size:12.5px;font-family:'Cabinet Grotesk',sans-serif;font-weight:500;transition:all 0.2s}
+.pr-tab.active,.pr-tab:hover{background:var(--teal);color:#000;border-color:var(--teal);font-weight:700}
+.vr-label{display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+.vr-section-title{font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;padding-bottom:8px;border-bottom:0.5px solid rgba(0,196,154,0.2)}
+
+.emr-tab-btn { transition: all 0.2s; }
+.emr-tab-btn.active { background: var(--teal) !important; color: #000 !important; }
+.emr-tab-btn:not(.active):hover { background: rgba(0,196,154,0.1) !important; }
 </style>
 </head>
 <body>
@@ -374,7 +383,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
           </button>
         </div>
         <div class="card">
-          <div id="patients-list"><div style="padding:40px;text-align:center;color:var(--color-text-secondary)">Loading patients...</div></div>
+          <div id="patients-list"><div style="padding:40px;text-align:center;color:rgba(240,250,247,0.55)">Loading patients...</div></div>
         </div>
       </div>
 
@@ -506,7 +515,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       <!-- STAFF MANAGEMENT -->
       <div class="screen" id="screen-staff">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-          <div style="font-size:14px;color:var(--color-text-secondary)">Manage your hospital staff — create logins and assign roles</div>
+          <div style="font-size:14px;color:rgba(240,250,247,0.55)">Manage your hospital staff — create logins and assign roles</div>
           <button class="topbar-btn" onclick="openModal('addStaffModal')">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Add staff
@@ -602,44 +611,44 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
     <div>
       <h2 style="font-size:22px;font-weight:700;font-family:'Cabinet Grotesk',sans-serif">Teleconsultation</h2>
-      <p style="font-size:13px;color:var(--color-text-secondary);margin-top:4px">Video consultations via WhatsApp link — no app needed</p>
+      <p style="font-size:13px;color:rgba(240,250,247,0.55);margin-top:4px">Video consultations via WhatsApp link — no app needed</p>
     </div>
     <button onclick="openTcModal()" style="background:var(--teal);color:#000;border:none;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;font-family:'Cabinet Grotesk',sans-serif">+ New Consultation</button>
   </div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">
-    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px"><div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Today</div><div style="font-size:26px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="tc-today">0</div></div>
-    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px"><div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Pending</div><div style="font-size:26px;font-weight:700;color:#F59E0B;font-family:'Cabinet Grotesk',sans-serif" id="tc-pending">0</div></div>
-    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px"><div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Completed</div><div style="font-size:26px;font-weight:700;color:#22C55E;font-family:'Cabinet Grotesk',sans-serif" id="tc-completed">0</div></div>
-    <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:12px;padding:16px"><div style="font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Revenue</div><div style="font-size:26px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="tc-revenue">&#8377;0</div></div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:12px;padding:16px"><div style="font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Today</div><div style="font-size:26px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="tc-today">0</div></div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:12px;padding:16px"><div style="font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Pending</div><div style="font-size:26px;font-weight:700;color:#F59E0B;font-family:'Cabinet Grotesk',sans-serif" id="tc-pending">0</div></div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:12px;padding:16px"><div style="font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Completed</div><div style="font-size:26px;font-weight:700;color:#22C55E;font-family:'Cabinet Grotesk',sans-serif" id="tc-completed">0</div></div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:12px;padding:16px"><div style="font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Revenue</div><div style="font-size:26px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="tc-revenue">&#8377;0</div></div>
   </div>
-  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:16px;overflow:hidden">
-    <div style="padding:16px 20px;border-bottom:0.5px solid var(--color-border);font-weight:600;font-size:14px">All Consultations</div>
-    <div id="tc-list" style="padding:24px;text-align:center;color:var(--color-text-secondary);font-size:14px">Loading...</div>
+  <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:16px;overflow:hidden">
+    <div style="padding:16px 20px;border-bottom:0.5px solid rgba(0,196,154,0.15);font-weight:600;font-size:14px">All Consultations</div>
+    <div id="tc-list" style="padding:24px;text-align:center;color:rgba(240,250,247,0.55);font-size:14px">Loading...</div>
   </div>
 </div>
 
 <!-- TC CREATE MODAL -->
-<div id="tcCreateModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:2000;align-items:center;justify-content:center">
-  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:20px;width:90%;max-width:460px">
+<div id="tcCreateModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center">
+  <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:20px;width:90%;max-width:460px">
     <div style="background:var(--teal);padding:18px 22px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center">
       <span style="font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:700;color:#000">New Teleconsultation</span>
       <button onclick="closeTcModal()" style="background:rgba(0,0,0,0.15);border:none;color:#000;width:26px;height:26px;border-radius:50%;cursor:pointer;font-size:15px;font-weight:700">&#215;</button>
     </div>
     <div style="padding:22px">
       <div id="tc-alert" style="display:none;padding:10px;border-radius:8px;font-size:13px;margin-bottom:12px;background:#FEF2F2;color:#D44444;border:1px solid #FECACA"></div>
-      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Patient Name *</label>
+      <label style="display:block;font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Patient Name *</label>
       <input id="tc-name" type="text" placeholder="Ramu Krishna" class="form-input" style="width:100%;margin-bottom:14px">
-      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">WhatsApp Number *</label>
+      <label style="display:block;font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">WhatsApp Number *</label>
       <input id="tc-phone" type="text" placeholder="9876543210" class="form-input" style="width:100%;margin-bottom:14px">
-      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Symptoms</label>
+      <label style="display:block;font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Symptoms</label>
       <input id="tc-symptoms" type="text" placeholder="Fever, headache..." class="form-input" style="width:100%;margin-bottom:14px">
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
         <div>
-          <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Fee (&#8377;)</label>
+          <label style="display:block;font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Fee (&#8377;)</label>
           <input id="tc-amount" type="number" value="300" class="form-input" style="width:100%">
         </div>
         <div>
-          <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Time</label>
+          <label style="display:block;font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Time</label>
           <input id="tc-time" type="datetime-local" class="form-input" style="width:100%">
         </div>
       </div>
@@ -647,7 +656,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         &#128241; Patient gets WhatsApp link. No app download needed.
       </div>
     </div>
-    <div style="padding:14px 22px;border-top:0.5px solid var(--color-border);display:flex;gap:10px;justify-content:flex-end">
+    <div style="padding:14px 22px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end">
       <button onclick="closeTcModal()" class="action-btn">Cancel</button>
       <button id="tc-create-btn" onclick="createTcConsult()" style="background:var(--teal);color:#000;border:none;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">Create + Send WhatsApp</button>
     </div>
@@ -655,22 +664,22 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 
 <!-- TC COMPLETE MODAL -->
-<div id="tcCompleteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:2000;align-items:center;justify-content:center">
-  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:20px;width:90%;max-width:500px">
-    <div style="padding:18px 22px;border-bottom:0.5px solid var(--color-border);display:flex;justify-content:space-between;align-items:center">
+<div id="tcCompleteModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center">
+  <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:20px;width:90%;max-width:500px">
+    <div style="padding:18px 22px;border-bottom:0.5px solid rgba(0,196,154,0.15);display:flex;justify-content:space-between;align-items:center">
       <span style="font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:700" id="tc-complete-title">Complete Consultation</span>
-      <button onclick="closeTcCompleteModal()" style="background:none;border:none;color:var(--color-text-secondary);cursor:pointer;font-size:20px">&#215;</button>
+      <button onclick="closeTcCompleteModal()" style="background:none;border:none;color:rgba(240,250,247,0.55);cursor:pointer;font-size:20px">&#215;</button>
     </div>
     <div style="padding:22px">
-      <div id="tc-complete-info" style="background:rgba(0,196,154,0.06);border:0.5px solid var(--teal);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:var(--color-text-secondary)"></div>
-      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Diagnosis</label>
+      <div id="tc-complete-info" style="background:rgba(0,196,154,0.06);border:0.5px solid var(--teal);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:13px;color:rgba(240,250,247,0.55)"></div>
+      <label style="display:block;font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Diagnosis</label>
       <input id="tc-comp-diagnosis" type="text" placeholder="Viral fever, UTI, etc." class="form-input" style="width:100%;margin-bottom:14px">
-      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Prescription *</label>
+      <label style="display:block;font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Prescription *</label>
       <textarea id="tc-comp-prescription" rows="5" placeholder="Tab Paracetamol 500mg — 1 tab 3x daily x 5 days" class="form-input" style="width:100%;resize:vertical;font-family:monospace;font-size:13px;margin-bottom:14px"></textarea>
-      <label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Fee (&#8377;)</label>
+      <label style="display:block;font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Fee (&#8377;)</label>
       <input id="tc-comp-amount" type="number" placeholder="300" class="form-input" style="width:160px">
     </div>
-    <div style="padding:14px 22px;border-top:0.5px solid var(--color-border);display:flex;gap:10px;justify-content:flex-end">
+    <div style="padding:14px 22px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end">
       <button onclick="closeTcCompleteModal()" class="action-btn">Cancel</button>
       <button onclick="completeTcConsult()" style="background:var(--teal);color:#000;border:none;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">&#10003; Complete + Send Prescription</button>
     </div>
@@ -678,8 +687,8 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 
 <!-- PATIENT VIEW/EDIT MODAL -->
-<div id="patientModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:2000;align-items:center;justify-content:center;overflow-y:auto;padding:20px">
-  <div style="background:var(--color-surface);border:0.5px solid var(--color-border);border-radius:20px;width:100%;max-width:600px;margin:auto">
+<div id="patientModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:2000;align-items:center;justify-content:center;overflow-y:auto;padding:20px;backdrop-filter:blur(4px)">
+  <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:20px;width:100%;max-width:600px;margin:auto">
     <div style="background:var(--teal);padding:18px 22px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center">
       <div>
         <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:17px;font-weight:700;color:#000" id="pm-title">Patient Details</div>
@@ -688,9 +697,456 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       <button onclick="closePatientModal()" style="background:rgba(0,0,0,0.15);border:none;color:#000;width:28px;height:28px;border-radius:50%;cursor:pointer;font-size:16px;font-weight:700">&#215;</button>
     </div>
     <div style="padding:22px" id="pm-body">Loading...</div>
-    <div style="padding:14px 22px;border-top:0.5px solid var(--color-border);display:flex;gap:10px;justify-content:flex-end">
+    <div style="padding:14px 22px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end">
       <button onclick="closePatientModal()" class="action-btn">Close</button>
       <button onclick="savePatient()" style="background:var(--teal);color:#000;border:none;padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">Save Changes</button>
+      <button onclick="closePatientModal();openEMR(activePatientId, document.getElementById('pm_first').value+' '+document.getElementById('pm_last').value, document.getElementById('pm_phone').value)" style="background:rgba(0,196,154,0.15);color:var(--teal);border:0.5px solid var(--teal);padding:10px 22px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">+ New Visit</button>
+    </div>
+  </div>
+</div>
+
+<!-- PATIENT RECORD PANEL -->
+<div id="prPanel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:3000;flex-direction:column;overflow:hidden">
+  <!-- Header -->
+  <div style="background:#0D1412;border-bottom:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <button onclick="closePatientRecord()" style="background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.3);color:var(--teal);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">&#8592; Back</button>
+      <div>
+        <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:18px;font-weight:700" id="prPatientName">Patient</div>
+        <div style="font-size:12px;color:rgba(240,250,247,0.5)">Patient Records</div>
+      </div>
+    </div>
+    <button onclick="newVisit()" style="background:var(--teal);color:#000;border:none;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;font-family:'Cabinet Grotesk',sans-serif">+ New Visit</button>
+  </div>
+
+  <!-- Body: History left + Form right -->
+  <div style="display:grid;grid-template-columns:280px 1fr;flex:1;overflow:hidden">
+
+    <!-- Visit History Sidebar -->
+    <div style="background:#080C0B;border-right:0.5px solid rgba(0,196,154,0.15);overflow-y:auto;padding:16px">
+      <div style="font-size:11px;font-weight:700;color:rgba(240,250,247,0.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">Visit History</div>
+      <div id="prHistory"><div style="color:rgba(240,250,247,0.4);font-size:13px;text-align:center;padding:20px">Loading...</div></div>
+    </div>
+
+    <!-- EMR Form -->
+    <div style="overflow-y:auto;padding:24px" id="prForm">
+      <!-- Tab navigation -->
+      <div style="display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap">
+        <button id="prtab-subjective"  class="pr-tab active" onclick="switchPrTab('subjective')">Subjective</button>
+        <button id="prtab-vitals"      class="pr-tab" onclick="switchPrTab('vitals')">Vitals</button>
+        <button id="prtab-examination" class="pr-tab" onclick="switchPrTab('examination')">Examination</button>
+        <button id="prtab-diagnosis"   class="pr-tab" onclick="switchPrTab('diagnosis')">Diagnosis</button>
+        <button id="prtab-prescription" class="pr-tab" onclick="switchPrTab('prescription')">Prescription</button>
+        <button id="prtab-lab"         class="pr-tab" onclick="switchPrTab('lab')">Lab / Radiology</button>
+        <button id="prtab-followup"    class="pr-tab" onclick="switchPrTab('followup')">Follow-up</button>
+        <button id="prtab-dept"        class="pr-tab" onclick="switchPrTab('dept');loadDeptSection(document.getElementById('vr_dept').value,{})">Dept-Specific</button>
+      </div>
+
+      <!-- Visit meta row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:20px;padding:14px;background:#0D1412;border-radius:12px;border:0.5px solid rgba(0,196,154,0.15)">
+        <div>
+          <label class="vr-label">Department</label>
+          <select id="vr_dept" class="form-select" onchange="loadDeptSection(this.value,{})"><option>General Medicine</option><option>Ophthalmology</option><option>Dental</option><option>Gynaecology</option><option>Paediatrics</option><option>ENT</option><option>Orthopaedics</option><option>Dermatology</option></select>
+        </div>
+        <div><label class="vr-label">Date</label><input id="vr_date" type="date" class="form-input" style="width:100%"></div>
+        <div>
+          <label class="vr-label">Visit Type</label>
+          <select id="vr_type" class="form-select"><option>OPD</option><option>IPD</option><option>Teleconsult</option><option>Follow-up</option></select>
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <div style="font-size:11px;color:var(--teal);font-weight:600" id="visit-status-badge">New Visit</div>
+        </div>
+      </div>
+
+      <!-- SECTION: SUBJECTIVE -->
+      <div class="pr-section" id="prsec-subjective">
+        <div class="vr-section-title">Subjective — What the patient tells you</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div><label class="vr-label">Chief Complaint *</label><input id="vr_complaint" class="form-input" style="width:100%" placeholder="Fever, cough, headache..."></div>
+          <div><label class="vr-label">Duration</label><input id="vr_duration" class="form-input" style="width:100%" placeholder="3 days, 1 week..."></div>
+          <div style="grid-column:1/-1"><label class="vr-label">History of Present Illness</label><textarea id="vr_history" class="form-input" rows="3" style="width:100%;resize:vertical" placeholder="Onset, character, progression, associated symptoms..."></textarea></div>
+          <div><label class="vr-label">Known Allergies</label><input id="vr_allergies" class="form-input" style="width:100%" placeholder="Penicillin, Sulfa..."></div>
+          <div><label class="vr-label">Past Surgical History</label><input id="vr_surgical" class="form-input" style="width:100%" placeholder="Appendectomy 2018..."></div>
+        </div>
+      </div>
+
+      <!-- SECTION: VITALS -->
+      <div class="pr-section" id="prsec-vitals" style="display:none">
+        <div class="vr-section-title">Objective — Vitals</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+          <div>
+            <label class="vr-label">Blood Pressure</label>
+            <div style="display:flex;align-items:center;gap:6px">
+              <input id="vr_bp_s" type="number" class="form-input" style="width:70px;text-align:center" placeholder="120">
+              <span style="color:rgba(240,250,247,0.4)">/</span>
+              <input id="vr_bp_d" type="number" class="form-input" style="width:70px;text-align:center" placeholder="80">
+              <span style="font-size:11px;color:rgba(240,250,247,0.4)">mmHg</span>
+            </div>
+          </div>
+          <div><label class="vr-label">Temperature (&#8451;)</label><input id="vr_temp" type="number" step="0.1" class="form-input" style="width:100%" placeholder="98.6"></div>
+          <div><label class="vr-label">Pulse (bpm)</label><input id="vr_pulse" type="number" class="form-input" style="width:100%" placeholder="72"></div>
+          <div><label class="vr-label">SpO2 (%)</label><input id="vr_spo2" type="number" class="form-input" style="width:100%" placeholder="98"></div>
+          <div><label class="vr-label">Weight (kg)</label><input id="vr_weight" type="number" step="0.1" class="form-input" style="width:100%" placeholder="70" oninput="calcBMI()"></div>
+          <div><label class="vr-label">Height (cm)</label><input id="vr_height" type="number" class="form-input" style="width:100%" placeholder="170" oninput="calcBMI()"></div>
+          <div style="display:flex;align-items:flex-end"><div style="font-size:18px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="vr_bmi_display">BMI: —</div><input type="hidden" id="vr_bmi_val"></div>
+        </div>
+      </div>
+
+      <!-- SECTION: EXAMINATION -->
+      <div class="pr-section" id="prsec-examination" style="display:none">
+        <div class="vr-section-title">Objective — Physical Examination</div>
+        <textarea id="vr_exam" class="form-input" rows="8" style="width:100%;resize:vertical;font-family:monospace;font-size:13px" placeholder="General: Conscious, oriented, afebrile&#10;CVS: S1 S2 heard, no murmur&#10;RS: Clear, no wheeze&#10;Abdomen: Soft, non-tender&#10;CNS: No focal deficit"></textarea>
+      </div>
+
+      <!-- SECTION: DIAGNOSIS -->
+      <div class="pr-section" id="prsec-diagnosis" style="display:none">
+        <div class="vr-section-title">Assessment — Diagnosis</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="grid-column:1/-1"><label class="vr-label">Primary Diagnosis *</label><input id="vr_dx" class="form-input" style="width:100%" placeholder="Acute viral fever"></div>
+          <div><label class="vr-label">Secondary Diagnosis</label><input id="vr_dx2" class="form-input" style="width:100%" placeholder="Upper respiratory tract infection"></div>
+          <div><label class="vr-label">ICD-10 Code</label><input id="vr_icd" class="form-input" style="width:100%" placeholder="J06.9"></div>
+        </div>
+      </div>
+
+      <!-- SECTION: PRESCRIPTION -->
+      <div class="pr-section" id="prsec-prescription" style="display:none">
+        <div class="vr-section-title">Plan — Prescription</div>
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <select id="rx-drug-select" class="form-select" style="width:220px">
+            <option value="">Select drug...</option><option>Paracetamol</option><option>Dolo 650</option><option>Ibuprofen</option><option>Aspirin</option><option>Diclofenac</option><option>Amoxicillin</option><option>Azithromycin</option><option>Ciprofloxacin</option><option>Metronidazole</option><option>Doxycycline</option><option>Pantoprazole</option><option>Omeprazole</option><option>Domperidone</option><option>Ondansetron</option><option>Metformin</option><option>Glimepiride</option><option>Amlodipine</option><option>Atenolol</option><option>Telmisartan</option><option>Atorvastatin</option><option>Cetirizine</option><option>Levocetrizine</option><option>Montelukast</option><option>Salbutamol</option><option>Multivitamin</option><option>Vitamin D3</option><option>Calcium</option><option>Iron</option><option>Folic Acid</option><option>Augmentin</option><option>Cefixime</option><option>Levofloxacin</option></select>
+          <button onclick="addRxRow(document.getElementById('rx-drug-select').value)" style="background:var(--teal);color:#000;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">+ Add</button>
+          <button onclick="addRxRow('')" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px">+ Custom drug</button>
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Drug</th>
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Strength</th>
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Dose</th>
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Frequency</th>
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Duration</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="rx-table-body"></tbody>
+        </table>
+        <div style="margin-top:16px"><label class="vr-label">General Advice</label><textarea id="vr_advice" class="form-input" rows="2" style="width:100%;resize:vertical" placeholder="Drink plenty of fluids, rest, avoid spicy food..."></textarea></div>
+      </div>
+
+      <!-- SECTION: LAB -->
+      <div class="pr-section" id="prsec-lab" style="display:none">
+        <div class="vr-section-title">Plan — Lab & Radiology Requests</div>
+        <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Laboratory Tests</div>
+        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <select id="lab-select" class="form-select" style="width:260px">
+            <option value="">Select test...</option><option>CBC (Complete Blood Count)</option><option>ESR</option><option>Blood Sugar Fasting</option><option>Blood Sugar PP</option><option>Blood Sugar Random</option><option>HbA1c</option><option>LFT</option><option>KFT</option><option>Lipid Profile</option><option>Thyroid Profile (T3/T4/TSH)</option><option>Urine Routine & Microscopy</option><option>Dengue NS1 Antigen</option><option>Malaria Antigen</option><option>Widal Test</option><option>CRP</option><option>Serum Electrolytes</option><option>Vitamin D</option><option>Vitamin B12</option><option>HIV (ELISA)</option><option>HBsAg</option><option>Pregnancy Test (Urine)</option><option>Pap Smear</option></select>
+          <button onclick="addLabRow(document.getElementById('lab-select').value)" style="background:var(--teal);color:#000;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">+ Add</button>
+        </div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+          <thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Test</th>
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Urgency</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="lab-table-body"></tbody>
+        </table>
+        <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Radiology</div>
+        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <select id="rad-select" class="form-select" style="width:260px">
+            <option value="">Select...</option><option>X-Ray Chest (PA view)</option><option>X-Ray KUB</option><option>X-Ray Spine</option><option>X-Ray Hand/Wrist</option><option>USG Abdomen</option><option>USG Pelvis</option><option>USG Thyroid</option><option>2D Echocardiogram</option><option>ECG</option><option>MRI Brain</option><option>CT Scan Head</option><option>DEXA Scan</option></select>
+          <button onclick="addRadRow(document.getElementById('rad-select').value)" style="background:var(--teal);color:#000;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">+ Add</button>
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Investigation</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="rad-table-body"></tbody>
+        </table>
+      </div>
+
+      <!-- SECTION: FOLLOW-UP -->
+      <div class="pr-section" id="prsec-followup" style="display:none">
+        <div class="vr-section-title">Plan — Follow-up & Instructions</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div><label class="vr-label">Follow-up Date</label><input id="vr_followup" type="date" class="form-input" style="width:100%"></div>
+          <div><label class="vr-label">Referral To</label><input id="vr_referral" class="form-input" style="width:100%" placeholder="Dr. Sharma / Apollo Hospital"></div>
+          <div style="grid-column:1/-1"><label class="vr-label">Follow-up Instructions</label><textarea id="vr_followup_notes" class="form-input" rows="3" style="width:100%;resize:vertical" placeholder="Return if fever persists beyond 3 days, or if any new symptoms develop..."></textarea></div>
+        </div>
+      </div>
+
+      <!-- SECTION: DEPT SPECIFIC -->
+      <div class="pr-section" id="prsec-dept" style="display:none">
+        <div class="vr-section-title">Department-Specific Findings</div>
+        <div id="dept-section"><div style="color:rgba(240,250,247,0.4);font-size:13px;padding:16px;text-align:center">Select department from the top to see specific fields</div></div>
+      </div>
+
+      <!-- Save buttons -->
+      <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:0.5px solid rgba(0,196,154,0.15)">
+        <button onclick="saveVisitRecord(false)" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);padding:12px 24px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;font-family:'Cabinet Grotesk',sans-serif">Save Draft</button>
+        <button onclick="confirmSend()" style="background:var(--teal);color:#000;border:none;padding:12px 28px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;font-family:'Cabinet Grotesk',sans-serif">&#10003; Save & Send WhatsApp</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- EMR MODAL - Full Screen Visit Record -->
+<div id="emrModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:3000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px">
+  <div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.25);border-radius:20px;width:100%;max-width:900px;margin:auto">
+    
+    <!-- Header -->
+    <div style="background:linear-gradient(135deg,#0A9E80,#065C4A);padding:18px 24px;border-radius:20px 20px 0 0;display:flex;justify-content:space-between;align-items:center">
+      <div>
+        <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:18px;font-weight:700;color:#000" id="emr-patient-title">New Visit</div>
+        <div style="font-size:12px;color:rgba(0,0,0,0.6)">MediWhats EMR — Complete Visit Record</div>
+      </div>
+      <button onclick="closeEMR()" style="background:rgba(0,0,0,0.2);border:none;color:#000;width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;font-weight:700">&#215;</button>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 220px;gap:0">
+      
+      <!-- Main content -->
+      <div style="padding:20px">
+        
+        <!-- Visit meta row -->
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:0.5px solid rgba(0,196,154,0.15)">
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Department</label>
+            <select id="emr_department" onchange="loadDeptFields()" class="form-select" style="width:100%;padding:8px 10px;font-size:12px">
+              <option>General Medicine</option><option>Ophthalmology</option><option>Dental</option>
+              <option>Gynaecology</option><option>Paediatrics</option><option>ENT</option>
+              <option>Orthopaedics</option><option>Dermatology</option><option>Surgery</option><option>Other</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Visit Date</label>
+            <input id="emr_visit_date" type="date" class="form-input" style="width:100%;padding:8px 10px;font-size:12px">
+          </div>
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Visit Type</label>
+            <select id="emr_visit_type" class="form-select" style="width:100%;padding:8px 10px;font-size:12px">
+              <option>OPD</option><option>IPD</option><option>Emergency</option><option>Follow-up</option><option>Teleconsult</option>
+            </select>
+          </div>
+          <div>
+            <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">Severity</label>
+            <select id="emr_severity" class="form-select" style="width:100%;padding:8px 10px;font-size:12px">
+              <option value="">Normal</option><option>Mild</option><option>Moderate</option><option>Severe</option><option>Critical</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Tab buttons -->
+        <div style="display:flex;gap:4px;margin-bottom:16px;flex-wrap:wrap">
+          <button class="emr-tab-btn active" data-tab="subjective" onclick="showEMRTab('subjective')" style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid rgba(0,196,154,0.3);background:var(--teal);color:#000">1. Subjective</button>
+          <button class="emr-tab-btn" data-tab="vitals" onclick="showEMRTab('vitals')" style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7)">2. Vitals</button>
+          <button class="emr-tab-btn" data-tab="examination" onclick="showEMRTab('examination')" style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7)">3. Examination</button>
+          <button class="emr-tab-btn" data-tab="assessment" onclick="showEMRTab('assessment')" style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7)">4. Diagnosis</button>
+          <button class="emr-tab-btn" data-tab="prescription" onclick="showEMRTab('prescription')" style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7)">5. Prescription</button>
+          <button class="emr-tab-btn" data-tab="lab" onclick="showEMRTab('lab')" style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7)">6. Lab/Radiology</button>
+          <button class="emr-tab-btn" data-tab="followup" onclick="showEMRTab('followup')" style="padding:7px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7)">7. Follow-up</button>
+        </div>
+
+        <!-- Tab 1: Subjective -->
+        <div id="emr-tab-subjective" class="emr-tab-content">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div style="grid-column:1/-1">
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Chief Complaint *</label>
+              <input id="emr_cc" type="text" placeholder="Main reason for visit" class="form-input" style="width:100%">
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Duration</label>
+              <input id="emr_duration" type="text" placeholder="Since 3 days" class="form-input" style="width:100%">
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Known Allergies</label>
+              <input id="emr_allergies" type="text" placeholder="Drug allergies, food allergies" class="form-input" style="width:100%">
+            </div>
+            <div style="grid-column:1/-1">
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">History of Present Illness</label>
+              <textarea id="emr_history" rows="3" placeholder="Detailed history of presenting complaint..." class="form-input" style="width:100%;resize:vertical"></textarea>
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Family History</label>
+              <textarea id="emr_family_hx" rows="2" placeholder="DM, HTN, CAD in family..." class="form-input" style="width:100%;resize:vertical"></textarea>
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Past Surgical / Medical History</label>
+              <textarea id="emr_surgical_hx" rows="2" placeholder="Previous surgeries, hospitalizations..." class="form-input" style="width:100%;resize:vertical"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 2: Vitals -->
+        <div id="emr-tab-vitals" class="emr-tab-content" style="display:none">
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">BP Systolic (mmHg)</label>
+              <input id="emr_bp_sys" type="number" placeholder="120" class="form-input" style="width:100%">
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">BP Diastolic (mmHg)</label>
+              <input id="emr_bp_dia" type="number" placeholder="80" class="form-input" style="width:100%">
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Pulse (bpm)</label>
+              <input id="emr_pulse" type="number" placeholder="72" class="form-input" style="width:100%">
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">SpO2 (%)</label>
+              <input id="emr_spo2" type="number" placeholder="98" class="form-input" style="width:100%">
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Temperature (°F)</label>
+              <input id="emr_temp" type="number" step="0.1" placeholder="98.6" class="form-input" style="width:100%">
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Weight (kg)</label>
+              <input id="emr_weight" type="number" step="0.1" placeholder="65" onchange="calcBMI()" class="form-input" style="width:100%">
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Height (cm)</label>
+              <input id="emr_height" type="number" step="0.1" placeholder="165" onchange="calcBMI()" class="form-input" style="width:100%">
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">BMI <span id="emr_bmi_status" style="color:var(--teal);font-weight:400;font-size:10px"></span></label>
+              <input id="emr_bmi" type="number" step="0.1" placeholder="Auto" readonly class="form-input" style="width:100%;background:rgba(0,196,154,0.05)">
+            </div>
+          </div>
+          <!-- Vitals visual indicators -->
+          <div id="vitals-indicators" style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap"></div>
+        </div>
+
+        <!-- Tab 3: Examination -->
+        <div id="emr-tab-examination" class="emr-tab-content" style="display:none">
+          <div style="margin-bottom:16px">
+            <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">General & Systemic Examination</label>
+            <textarea id="emr_exam" rows="4" placeholder="General: conscious, oriented, no pallor, no icterus&#10;CVS: S1 S2 heard, no murmur&#10;RS: clear air entry&#10;Abdomen: soft, non-tender..." class="form-input" style="width:100%;resize:vertical"></textarea>
+          </div>
+          <!-- Department-specific fields loaded dynamically -->
+          <div id="emr_dept_fields" style="display:grid;grid-template-columns:1fr 1fr;gap:14px"></div>
+        </div>
+
+        <!-- Tab 4: Assessment/Diagnosis -->
+        <div id="emr-tab-assessment" class="emr-tab-content" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr;gap:14px">
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Primary Diagnosis *</label>
+              <input id="emr_dx1" type="text" placeholder="Acute viral fever" class="form-input" style="width:100%;font-size:15px">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+              <div>
+                <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Secondary Diagnosis / Co-morbidity</label>
+                <input id="emr_dx2" type="text" placeholder="Type 2 Diabetes, HTN..." class="form-input" style="width:100%">
+              </div>
+              <div>
+                <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">ICD-10 Code (optional)</label>
+                <input id="emr_icd" type="text" placeholder="J06.9" class="form-input" style="width:100%">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 5: Prescription -->
+        <div id="emr-tab-prescription" class="emr-tab-content" style="display:none">
+          <div style="position:relative;margin-bottom:14px">
+            <input id="rx-search" type="text" placeholder="Search drug name (e.g. Paracetamol, Metformin)..." oninput="rxSearch(this.value)" class="form-input" style="width:100%">
+            <div id="rx-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#111A18;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;z-index:100;max-height:200px;overflow-y:auto;margin-top:4px"></div>
+          </div>
+          <button onclick="addRxRow('')" style="padding:6px 14px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;margin-bottom:12px">+ Add custom drug</button>
+          <div id="rx-table"></div>
+        </div>
+
+        <!-- Tab 6: Lab/Radiology -->
+        <div id="emr-tab-lab" class="emr-tab-content" style="display:none">
+          <div style="margin-bottom:20px">
+            <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">&#128300; Laboratory Tests</div>
+            <div style="position:relative;margin-bottom:10px">
+              <input id="lab-search" type="text" placeholder="Search test (e.g. CBC, Blood Sugar, LFT)..." oninput="labSearch(this.value)" class="form-input" style="width:100%">
+              <div id="lab-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#111A18;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;z-index:100;max-height:200px;overflow-y:auto;margin-top:4px"></div>
+            </div>
+            <button onclick="addLabRow('')" style="padding:6px 14px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;margin-bottom:12px">+ Add custom test</button>
+            <div id="lab-table"></div>
+          </div>
+          <div>
+            <div style="font-size:12px;font-weight:700;color:var(--teal);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">&#128247; Radiology / Imaging</div>
+            <button onclick="addRadRow()" style="padding:6px 14px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;margin-bottom:12px">+ Add radiology request</button>
+            <div id="rad-table"></div>
+          </div>
+          <div style="margin-top:16px">
+            <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Referral To (if any)</label>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+              <input id="emr_referral" type="text" placeholder="Dr. Specialist / Hospital name" class="form-input">
+              <input id="emr_referral_notes" type="text" placeholder="Reason for referral" class="form-input">
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab 7: Follow-up -->
+        <div id="emr-tab-followup" class="emr-tab-content" style="display:none">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Follow-up Date</label>
+              <input id="emr_followup" type="date" class="form-input" style="width:100%">
+            </div>
+            <div>
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Return if...</label>
+              <input id="emr_followup_notes" type="text" placeholder="No improvement in 3 days, fever persists..." class="form-input" style="width:100%">
+            </div>
+            <div style="grid-column:1/-1">
+              <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Advice to Patient</label>
+              <textarea id="emr_advice" rows="4" placeholder="Rest, plenty of fluids, avoid spicy food, no smoking..." class="form-input" style="width:100%;resize:vertical"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div style="display:flex;gap:10px;margin-top:20px;padding-top:16px;border-top:0.5px solid rgba(0,196,154,0.15)">
+          <button onclick="closeEMR()" style="padding:10px 20px;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;background:none;color:rgba(240,250,247,0.7);cursor:pointer;font-size:13px">Cancel</button>
+          <button onclick="saveVisitRecord('draft')" style="padding:10px 20px;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;background:rgba(0,196,154,0.08);color:var(--teal);cursor:pointer;font-size:13px;font-weight:600">Save Draft</button>
+          <button onclick="saveVisitRecord('final')" style="padding:10px 28px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;font-family:'Cabinet Grotesk',sans-serif;margin-left:auto">Finalise & Send &#10132;</button>
+        </div>
+      </div>
+
+      <!-- Right sidebar: visit history -->
+      <div style="background:#080C0B;border-left:0.5px solid rgba(0,196,154,0.15);border-radius:0 20px 20px 0;padding:16px;overflow-y:auto;max-height:80vh">
+        <div style="font-size:11px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Visit History</div>
+        <div id="emr-history-list"><div style="padding:12px;color:rgba(240,250,247,0.4);font-size:12px">Loading...</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- DISPATCH CONFIRMATION MODAL -->
+<div id="dispatchModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:4000;align-items:center;justify-content:center">
+  <div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:20px;width:90%;max-width:440px">
+    <div style="padding:20px 22px;border-bottom:0.5px solid rgba(0,196,154,0.15)">
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:16px;font-weight:700;color:#F0FAF7">Confirm & Send</div>
+      <div style="font-size:13px;color:rgba(240,250,247,0.55);margin-top:4px">Choose what to send via WhatsApp</div>
+    </div>
+    <div style="padding:20px 22px">
+      <div style="margin-bottom:16px">
+        <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Patient WhatsApp Number</label>
+        <input id="dispatch_patient_phone" type="text" placeholder="9876543210" class="form-input" style="width:100%">
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#F0FAF7">
+          <input id="dispatch_send_rx" type="checkbox" checked style="width:16px;height:16px;accent-color:var(--teal)">
+          Send Prescription to patient
+        </label>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:13px;color:#F0FAF7">
+          <input id="dispatch_send_lab" type="checkbox" checked style="width:16px;height:16px;accent-color:var(--teal)">
+          Send Lab requests to patient + lab staff
+        </label>
+      </div>
+      <div id="dispatch_lab_phone_row" style="margin-bottom:4px">
+        <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Lab Staff WhatsApp Number</label>
+        <input id="dispatch_lab_phone" type="text" placeholder="9876543210 (lab technician)" class="form-input" style="width:100%">
+      </div>
+    </div>
+    <div style="padding:14px 22px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="document.getElementById('dispatchModal').style.display='none'" style="padding:10px 20px;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;background:none;color:rgba(240,250,247,0.7);cursor:pointer;font-size:13px">Skip for now</button>
+      <button onclick="dispatchRecord()" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">&#128241; Send via WhatsApp</button>
     </div>
   </div>
 </div>
@@ -915,23 +1371,23 @@ function updateRoleModules(roleId) {
 var patientsData = [];
 
 function loadPatients() {
-  document.getElementById('patients-list').innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">Loading patients...</div>';
+  document.getElementById('patients-list').innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.55)">Loading patients...</div>';
   apiCall('/hospitals/' + mwHospitalId + '/patients').then(function(data) {
     if (!data.success) {
-      document.getElementById('patients-list').innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">No patients yet. Register your first patient above.</div>';
+      document.getElementById('patients-list').innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.55)">No patients yet. Register your first patient above.</div>';
       return;
     }
     patientsData = data.data || [];
     renderPatients(patientsData);
   }).catch(function(e) {
-    document.getElementById('patients-list').innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">Failed to load patients.</div>';
+    document.getElementById('patients-list').innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.55)">Failed to load patients.</div>';
   });
 }
 
 function renderPatients(list) {
   var el = document.getElementById('patients-list');
   if (!list.length) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">No patients yet. Register your first patient above.</div>';
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.55)">No patients yet. Register your first patient above.</div>';
     return;
   }
   var rows = '';
@@ -947,7 +1403,7 @@ function renderPatients(list) {
       + '<td>' + (p.phone||'—') + '</td>'
       + '<td>' + (p.updated_at ? new Date(p.updated_at*1000).toLocaleDateString('en-IN') : '—') + '</td>'
       + '<td><span class="badge badge-green">Active</span></td>'
-      + '<td><button class="action-btn" onclick="viewPatient(\'' + p.patient_id + '\')">View</button></td>'
+      + '<td style="display:flex;gap:6px"><button class="action-btn" onclick="viewPatient(\'' + p.patient_id + '\')">Edit</button><button class="action-btn" style="background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)" onclick="openPatientRecord(\'' + p.patient_id + '\',\'' + ((p.first_name||'')+'+'+(p.last_name||'')).trim() + '\',\'' + (p.phone||'') + '\')">Records</button></td>'
       + '</tr>';
   }
   el.innerHTML = '<table><thead><tr><th>MRN</th><th>Patient</th><th>Age</th><th>Phone</th><th>Last visit</th><th>Status</th><th>Action</th></tr></thead><tbody>' + rows + '</tbody></table>';
@@ -1003,7 +1459,7 @@ var activePatientId = null;
 function viewPatient(patientId) {
   activePatientId = patientId;
   document.getElementById('patientModal').style.display = 'flex';
-  document.getElementById('pm-body').innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary)">Loading...</div>';
+  document.getElementById('pm-body').innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.55)">Loading...</div>';
   
   apiCall('/hospitals/' + mwHospitalId + '/patients/' + patientId).then(function(data) {
     if (!data.success) { document.getElementById('pm-body').innerHTML = 'Failed to load patient.'; return; }
@@ -1015,7 +1471,7 @@ function viewPatient(patientId) {
       '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">' +
       
       // Personal details
-      '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:0.5px solid var(--color-border)">Personal Details</div>' +
+      '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">Personal Details</div>' +
       
       pmField('pm_first', 'First Name', p.first_name||'') +
       pmField('pm_last', 'Last Name', p.last_name||'') +
@@ -1025,7 +1481,7 @@ function viewPatient(patientId) {
       pmField('pm_dob', 'Date of Birth', p.dob||'') +
       
       // Contact
-      '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:0.5px solid var(--color-border);margin-top:8px">Contact</div>' +
+      '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:0.5px solid rgba(0,196,154,0.15);margin-top:8px">Contact</div>' +
       
       pmField('pm_phone', 'Phone *', p.phone||'') +
       pmField('pm_phone_alt', 'Alt Phone', p.phone_alt||'') +
@@ -1035,22 +1491,22 @@ function viewPatient(patientId) {
       pmField('pm_address', 'Address', p.address||'') +
       
       // Medical
-      '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:0.5px solid var(--color-border);margin-top:8px">Medical</div>' +
+      '<div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding-bottom:6px;border-bottom:0.5px solid rgba(0,196,154,0.15);margin-top:8px">Medical</div>' +
       
       pmField('pm_pm_jay', 'PM-JAY ID', p.pm_jay_id||'') +
       pmField('pm_aadhar', 'Aadhar Number', p.aadhar_number||'') +
       pmField('pm_referred', 'Referred By', p.referred_by||'') +
       
       '<div style="grid-column:1/-1">' +
-      '<label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Notes</label>' +
+      '<label style="display:block;font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">Notes</label>' +
       '<textarea id="pm_notes" rows="3" class="form-input" style="width:100%;resize:vertical">' + (p.notes||'') + '</textarea>' +
       '</div>' +
       
       // Stats row
       '<div style="grid-column:1/-1;display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px">' +
-      '<div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--teal)">' + (p.total_visits||1) + '</div><div style="font-size:11px;color:var(--color-text-secondary)">Total Visits</div></div>' +
-      '<div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:10px;padding:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--teal)">' + (p.mrn||'—') + '</div><div style="font-size:11px;color:var(--color-text-secondary)">MRN</div></div>' +
-      '<div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:10px;padding:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--teal)">' + (p.blood_group||'—') + '</div><div style="font-size:11px;color:var(--color-text-secondary)">Blood Group</div></div>' +
+      '<div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:10px;padding:12px;text-align:center"><div style="font-size:22px;font-weight:700;color:var(--teal)">' + (p.total_visits||1) + '</div><div style="font-size:11px;color:rgba(240,250,247,0.55)">Total Visits</div></div>' +
+      '<div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:10px;padding:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--teal)">' + (p.mrn||'—') + '</div><div style="font-size:11px;color:rgba(240,250,247,0.55)">MRN</div></div>' +
+      '<div style="background:rgba(0,196,154,0.08);border:0.5px solid var(--teal);border-radius:10px;padding:12px;text-align:center"><div style="font-size:13px;font-weight:600;color:var(--teal)">' + (p.blood_group||'—') + '</div><div style="font-size:11px;color:rgba(240,250,247,0.55)">Blood Group</div></div>' +
       '</div>' +
       
       '</div>';
@@ -1060,13 +1516,13 @@ function viewPatient(patientId) {
 }
 
 function pmField(id, label, value, type) {
-  return '<div><label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">' + label + '</label>' +
+  return '<div><label style="display:block;font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">' + label + '</label>' +
     '<input id="' + id + '" type="' + (type||'text') + '" value="' + (value||'').toString().replace(/"/g,'&quot;') + '" class="form-input" style="width:100%"></div>';
 }
 
 function pmSelectField(id, label, value, options) {
   var opts = options.map(function(o) { return '<option' + (o===value?' selected':'') + '>' + o + '</option>'; }).join('');
-  return '<div><label style="display:block;font-size:11px;font-weight:700;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">' + label + '</label>' +
+  return '<div><label style="display:block;font-size:11px;font-weight:700;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:5px">' + label + '</label>' +
     '<select id="' + id + '" class="form-select" style="width:100%">' + opts + '</select></div>';
 }
 
@@ -1111,7 +1567,7 @@ var tcData = [];
 var activeTcId = null;
 
 function loadTeleconsult() {
-  document.getElementById('tc-list').innerHTML = '<div style="padding:24px;text-align:center;color:var(--color-text-secondary)">Loading...</div>';
+  document.getElementById('tc-list').innerHTML = '<div style="padding:24px;text-align:center;color:rgba(240,250,247,0.55)">Loading...</div>';
   apiCall('/hospitals/' + mwHospitalId + '/teleconsult').then(function(data) {
     if (!data.success) return;
     tcData = data.data || [];
@@ -1131,7 +1587,7 @@ function renderTcStats() {
 function renderTcList() {
   var el = document.getElementById('tc-list');
   if (!tcData.length) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--color-text-secondary);font-size:14px">No consultations yet. Create your first one above.</div>';
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.55);font-size:14px">No consultations yet. Create your first one above.</div>';
     return;
   }
   var rows = '';
@@ -1144,26 +1600,26 @@ function renderTcList() {
     }
     if (c.status!=='completed' && c.status!=='cancelled') {
       var cdata = encodeURIComponent(JSON.stringify({id:c.id,patient_name:c.patient_name,patient_phone:c.patient_phone,symptoms:c.symptoms,diagnosis:c.diagnosis,prescription:c.prescription,amount:c.amount}));
-      actions += '<button onclick="openTcCompleteModal(decodeURIComponent(\'' + cdata + '\'))" style="padding:5px 10px;background:none;border:0.5px solid var(--color-border);color:var(--color-text-primary);border-radius:7px;font-size:11px;cursor:pointer;margin-right:5px">Complete</button>';
+      actions += '<button onclick="openTcCompleteModal(decodeURIComponent(\'' + cdata + '\'))" style="padding:5px 10px;background:none;border:0.5px solid rgba(0,196,154,0.2);color:#F0FAF7;border-radius:7px;font-size:11px;cursor:pointer;margin-right:5px">Complete</button>';
     }
     if (c.status==='pending') {
       actions += '<button onclick="cancelTcConsult(\'' + c.id + '\')" style="padding:5px 10px;background:none;border:0.5px solid #EF4444;color:#EF4444;border-radius:7px;font-size:11px;cursor:pointer">Cancel</button>';
     }
-    rows += '<tr style="border-bottom:0.5px solid var(--color-border)">'
-      + '<td style="padding:12px;font-weight:600;font-size:13px">' + (c.patient_name||'—') + '<div style="font-size:11px;color:var(--color-text-secondary);font-weight:400">' + (c.patient_phone||'') + '</div></td>'
-      + '<td style="padding:12px;font-size:12.5px;color:var(--color-text-secondary);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (c.symptoms||'—') + '</td>'
+    rows += '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.15)">'
+      + '<td style="padding:12px;font-weight:600;font-size:13px">' + (c.patient_name||'—') + '<div style="font-size:11px;color:rgba(240,250,247,0.55);font-weight:400">' + (c.patient_phone||'') + '</div></td>'
+      + '<td style="padding:12px;font-size:12.5px;color:rgba(240,250,247,0.55);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">' + (c.symptoms||'—') + '</td>'
       + '<td style="padding:12px"><span style="background:' + sc + '22;color:' + sc + ';border:1px solid ' + sc + '55;border-radius:20px;padding:3px 10px;font-size:11px;font-weight:600">' + c.status + '</span></td>'
       + '<td style="padding:12px;font-size:13px">' + (c.amount ? String.fromCharCode(8377)+c.amount : '—') + '</td>'
       + '<td style="padding:12px">' + actions + '</td>'
       + '</tr>';
   }
   el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
-    + '<thead><tr style="border-bottom:0.5px solid var(--color-border)">'
-    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Patient</th>'
-    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Symptoms</th>'
-    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Status</th>'
-    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Fee</th>'
-    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:var(--color-text-secondary);text-transform:uppercase;letter-spacing:.05em">Action</th>'
+    + '<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.15)">'
+    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em">Patient</th>'
+    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em">Symptoms</th>'
+    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em">Status</th>'
+    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em">Fee</th>'
+    + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em">Action</th>'
     + '</tr></thead><tbody>' + rows + '</tbody></table>';
 }
 
@@ -1244,6 +1700,923 @@ function cancelTcConsult(id) {
   apiCall('/hospitals/'+mwHospitalId+'/teleconsult/'+id,'DELETE').then(function(data) {
     if (data.success) { showToast('Consultation cancelled','error'); loadTeleconsult(); }
   });
+}
+
+// ===== EMR VISIT RECORDS =====
+// Add this entire block before </script> in app.html
+
+const DRUGS = [
+  'Paracetamol','Dolo 650','Ibuprofen','Aspirin','Diclofenac',
+  'Amoxicillin','Azithromycin','Ciprofloxacin','Metronidazole','Doxycycline',
+  'Pantoprazole','Omeprazole','Ranitidine','Domperidone','Ondansetron',
+  'Metformin','Glimepiride','Insulin Regular','Sitagliptin',
+  'Amlodipine','Atenolol','Telmisartan','Enalapril','Losartan',
+  'Atorvastatin','Rosuvastatin',
+  'Cetirizine','Levocetrizine','Fexofenadine','Montelukast',
+  'Salbutamol','Budesonide','Theophylline',
+  'Multivitamin','Vitamin D3','Calcium','Iron','Folic Acid','Zinc',
+  'Tramadol','Pregabalin','Gabapentin',
+  'Clobetasol','Betamethasone','Calamine',
+  'Ciprofloxacin Eye Drops','Tobramycin Eye Drops','Timolol Eye Drops',
+  'Augmentin','Cefixime','Levofloxacin'
+];
+
+const LAB_TESTS = [
+  'CBC (Complete Blood Count)','ESR','Blood Group & Rh',
+  'Blood Sugar Fasting','Blood Sugar PP','Blood Sugar Random','HbA1c',
+  'LFT (Liver Function Test)','KFT (Kidney Function Test)',
+  'Lipid Profile','Thyroid Profile (T3/T4/TSH)',
+  'Urine Routine & Microscopy','Urine Culture',
+  'Dengue NS1 Antigen','Dengue IgM/IgG','Malaria Antigen',
+  'Widal Test','CRP','Procalcitonin',
+  'Serum Electrolytes','Serum Uric Acid','Serum Calcium',
+  'ECG','2D Echo','X-Ray Chest','X-Ray KUB',
+  'USG Abdomen','USG Pelvis','USG Thyroid',
+  'Pap Smear','Pregnancy Test (Urine)',
+  'HIV (ELISA)','HBsAg','HCV Antibody',
+  'Vitamin D','Vitamin B12','Iron Studies'
+];
+
+const DEPTS = ['General Medicine','Ophthalmology','Dental','Gynaecology','Paediatrics','ENT','Orthopaedics','Dermatology'];
+const FREQ  = ['Once daily','Twice daily','Thrice daily','Four times daily','At night','In the morning','SOS (as needed)'];
+const DOSE  = ['1 tablet','1/2 tablet','2 tablets','5ml','10ml','1 capsule','2 capsules','1 drop','2 drops'];
+const DUR   = ['3 days','5 days','7 days','10 days','14 days','1 month','3 months','Continuous'];
+
+var activeVisitPatient = null;
+var visitRxRows   = [];
+var visitLabRows  = [];
+var visitRadRows  = [];
+var editingVisitId = null;
+
+// Open patient record panel
+function openPatientRecord(patientId, patientName, patientPhone) {
+  activeVisitPatient = { id: patientId, name: patientName, phone: patientPhone };
+  document.getElementById('prPanel').style.display = 'flex';
+  document.getElementById('prPatientName').textContent = patientName;
+  loadVisitHistory(patientId);
+}
+
+function closePatientRecord() {
+  document.getElementById('prPanel').style.display = 'none';
+  activeVisitPatient = null;
+  editingVisitId = null;
+}
+
+async function loadVisitHistory(patientId) {
+  document.getElementById('prHistory').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.5)">Loading visit history...</div>';
+  try {
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + patientId);
+    if (!data.success || !data.data.length) {
+      document.getElementById('prHistory').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.5)">No visits yet. Click + New Visit above.</div>';
+      return;
+    }
+    var html = '';
+    data.data.forEach(function(v) {
+      var dt = new Date(v.created_at * 1000).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+      html += '<div style="border:0.5px solid rgba(0,196,154,0.2);border-radius:10px;padding:14px;margin-bottom:10px;cursor:pointer" onclick="loadVisitDetail(\'' + v.id + '\',\'' + patientId + '\')">'
+        + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">'
+        + '<span style="font-weight:600;font-size:13px">' + (v.department||'General') + ' — ' + (v.visit_type||'OPD') + '</span>'
+        + '<span style="font-size:11px;color:rgba(240,250,247,0.5)">' + dt + '</span>'
+        + '</div>'
+        + '<div style="font-size:12.5px;color:rgba(240,250,247,0.7)">' + (v.chief_complaint||'No complaint recorded') + '</div>'
+        + (v.diagnosis_primary ? '<div style="font-size:12px;color:var(--teal);margin-top:4px">Dx: ' + v.diagnosis_primary + '</div>' : '')
+        + '</div>';
+    });
+    document.getElementById('prHistory').innerHTML = html;
+  } catch(e) {
+    document.getElementById('prHistory').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.5)">Failed to load history.</div>';
+  }
+}
+
+async function loadVisitDetail(visitId, patientId) {
+  editingVisitId = visitId;
+  try {
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + patientId + '/' + visitId);
+    if (!data.success) return;
+    var v = data.data;
+    // Populate form
+    setVal('vr_dept', v.department);
+    setVal('vr_date', v.visit_date);
+    setVal('vr_type', v.visit_type);
+    setVal('vr_complaint', v.chief_complaint);
+    setVal('vr_duration', v.duration);
+    setVal('vr_history', v.history);
+    setVal('vr_allergies', v.allergies);
+    setVal('vr_bp_s', v.bp_systolic);
+    setVal('vr_bp_d', v.bp_diastolic);
+    setVal('vr_temp', v.temperature);
+    setVal('vr_pulse', v.pulse);
+    setVal('vr_spo2', v.spo2);
+    setVal('vr_weight', v.weight);
+    setVal('vr_height', v.height);
+    setVal('vr_exam', v.examination_notes);
+    setVal('vr_dx', v.diagnosis_primary);
+    setVal('vr_dx2', v.diagnosis_secondary);
+    setVal('vr_icd', v.icd_code);
+    setVal('vr_advice', v.advice);
+    setVal('vr_followup', v.followup_date);
+    setVal('vr_followup_notes', v.followup_instructions);
+    visitRxRows  = v.prescription  || [];
+    visitLabRows = v.lab_requests  || [];
+    visitRadRows = v.radiology_requests || [];
+    renderRxTable();
+    renderLabTable();
+    renderRadTable();
+    loadDeptSection(v.department, v.dept_data || {});
+    switchPrTab('subjective');
+    document.getElementById('prForm').scrollIntoView({ behavior: 'smooth' });
+  } catch(e) { console.error('Load visit detail error:', e); }
+}
+
+function setVal(id, val) {
+  var el = document.getElementById(id);
+  if (el && val !== null && val !== undefined) el.value = val;
+}
+
+function newVisit() {
+  editingVisitId = null;
+  visitRxRows = []; visitLabRows = []; visitRadRows = [];
+  // Reset form
+  ['vr_complaint','vr_duration','vr_history','vr_allergies',
+   'vr_bp_s','vr_bp_d','vr_temp','vr_pulse','vr_spo2','vr_weight','vr_height',
+   'vr_exam','vr_dx','vr_dx2','vr_icd','vr_advice','vr_followup','vr_followup_notes'
+  ].forEach(function(id) { var el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('vr_date').value = new Date().toISOString().split('T')[0];
+  document.getElementById('vr_dept').value = 'General Medicine';
+  renderRxTable(); renderLabTable(); renderRadTable();
+  loadDeptSection('General Medicine', {});
+  switchPrTab('subjective');
+  document.getElementById('prForm').scrollIntoView({ behavior: 'smooth' });
+}
+
+function switchPrTab(tab) {
+  document.querySelectorAll('.pr-tab').forEach(function(t) { t.classList.remove('active'); });
+  document.querySelectorAll('.pr-section').forEach(function(s) { s.style.display='none'; });
+  document.getElementById('prtab-'+tab).classList.add('active');
+  document.getElementById('prsec-'+tab).style.display = 'block';
+}
+
+// BMI auto-calculate
+function calcBMI() {
+  var w = parseFloat(document.getElementById('vr_weight').value);
+  var h = parseFloat(document.getElementById('vr_height').value);
+  if (w > 0 && h > 0) {
+    var bmi = (w / ((h/100) * (h/100))).toFixed(1);
+    document.getElementById('vr_bmi_display').textContent = 'BMI: ' + bmi;
+    document.getElementById('vr_bmi_val').value = bmi;
+  }
+}
+
+// Prescription table
+function addRxRow(drugName) {
+  visitRxRows.push({ drug: drugName||'', strength:'', dosage:'1 tablet', frequency:'Twice daily', duration:'5 days', notes:'' });
+  renderRxTable();
+}
+
+function removeRxRow(i) { visitRxRows.splice(i,1); renderRxTable(); }
+
+function renderRxTable() {
+  var el = document.getElementById('rx-table-body');
+  if (!el) return;
+  if (!visitRxRows.length) {
+    el.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:16px;color:rgba(240,250,247,0.4);font-size:13px">No medications added yet</td></tr>';
+    return;
+  }
+  el.innerHTML = visitRxRows.map(function(r, i) {
+    return '<tr>'
+      + '<td><input value="' + (r.drug||'') + '" oninput="visitRxRows['+i+'].drug=this.value" style="background:transparent;border:none;color:#F0FAF7;width:100%;font-size:12px;outline:none" placeholder="Drug name"/></td>'
+      + '<td><input value="' + (r.strength||'') + '" oninput="visitRxRows['+i+'].strength=this.value" style="background:transparent;border:none;color:#F0FAF7;width:80px;font-size:12px;outline:none" placeholder="500mg"/></td>'
+      + '<td><select onchange="visitRxRows['+i+'].dosage=this.value" style="background:#111A18;border:none;color:#F0FAF7;font-size:12px;outline:none">'
+      + DOSE.map(function(d){return '<option'+(d===r.dosage?' selected':'')+'>'+d+'</option>';}).join('')
+      + '</select></td>'
+      + '<td><select onchange="visitRxRows['+i+'].frequency=this.value" style="background:#111A18;border:none;color:#F0FAF7;font-size:12px;outline:none">'
+      + FREQ.map(function(f){return '<option'+(f===r.frequency?' selected':'')+'>'+f+'</option>';}).join('')
+      + '</select></td>'
+      + '<td><select onchange="visitRxRows['+i+'].duration=this.value" style="background:#111A18;border:none;color:#F0FAF7;font-size:12px;outline:none">'
+      + DUR.map(function(d){return '<option'+(d===r.duration?' selected':'')+'>'+d+'</option>';}).join('')
+      + '</select></td>'
+      + '<td><button onclick="removeRxRow('+i+')" style="background:none;border:none;color:#e24b4a;cursor:pointer;font-size:16px">×</button></td>'
+      + '</tr>';
+  }).join('');
+}
+
+// Lab table
+function addLabRow(test) {
+  visitLabRows.push({ test: test||'', urgency:'Routine', notes:'' });
+  renderLabTable();
+}
+function removeLabRow(i) { visitLabRows.splice(i,1); renderLabTable(); }
+function renderLabTable() {
+  var el = document.getElementById('lab-table-body');
+  if (!el) return;
+  if (!visitLabRows.length) {
+    el.innerHTML = '<tr><td colspan="3" style="text-align:center;padding:16px;color:rgba(240,250,247,0.4);font-size:13px">No tests added yet</td></tr>';
+    return;
+  }
+  el.innerHTML = visitLabRows.map(function(r,i) {
+    return '<tr>'
+      + '<td style="padding:8px;font-size:13px">' + r.test + '</td>'
+      + '<td><select onchange="visitLabRows['+i+'].urgency=this.value" style="background:#111A18;border:none;color:#F0FAF7;font-size:12px;padding:4px">'
+      + ['Routine','Urgent','STAT'].map(function(u){return '<option'+(u===r.urgency?' selected':'')+'>'+u+'</option>';}).join('')
+      + '</select></td>'
+      + '<td><button onclick="removeLabRow('+i+')" style="background:none;border:none;color:#e24b4a;cursor:pointer;font-size:16px">×</button></td>'
+      + '</tr>';
+  }).join('');
+}
+
+// Radiology table
+function addRadRow(test) {
+  visitRadRows.push({ test: test||'' });
+  renderRadTable();
+}
+function removeRadRow(i) { visitRadRows.splice(i,1); renderRadTable(); }
+function renderRadTable() {
+  var el = document.getElementById('rad-table-body');
+  if (!el) return;
+  if (!visitRadRows.length) {
+    el.innerHTML = '<tr><td colspan="2" style="text-align:center;padding:16px;color:rgba(240,250,247,0.4);font-size:13px">No radiology requests added yet</td></tr>';
+    return;
+  }
+  el.innerHTML = visitRadRows.map(function(r,i) {
+    return '<tr><td style="padding:8px;font-size:13px">' + r.test + '</td>'
+      + '<td><button onclick="removeRadRow('+i+')" style="background:none;border:none;color:#e24b4a;cursor:pointer;font-size:16px">×</button></td>'
+      + '</tr>';
+  }).join('');
+}
+
+// Department-specific sections
+function loadDeptSection(dept, data) {
+  var el = document.getElementById('dept-section');
+  if (!el) return;
+  if (dept === 'Ophthalmology') {
+    el.innerHTML = deptEye(data);
+  } else if (dept === 'Dental') {
+    el.innerHTML = deptDental(data);
+  } else if (dept === 'Gynaecology') {
+    el.innerHTML = deptGynae(data);
+  } else if (dept === 'ENT') {
+    el.innerHTML = deptENT(data);
+  } else if (dept === 'Orthopaedics') {
+    el.innerHTML = deptOrtho(data);
+  } else {
+    el.innerHTML = '<div style="color:rgba(240,250,247,0.4);font-size:13px;padding:16px;text-align:center">No department-specific fields for ' + dept + '</div>';
+  }
+}
+
+function deptEye(d) {
+  return vrLabel('Vision & Refraction') +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">' +
+    vrGroup('RIGHT EYE') +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' +
+    vrInput('re_sph','Sph',d.re_sph||'') + vrInput('re_cyl','Cyl',d.re_cyl||'') + vrInput('re_axis','Axis',d.re_axis||'') +
+    vrInput('re_va','VA',d.re_va||'') + vrInput('re_iop','IOP',d.re_iop||'') + '</div>' +
+    vrGroup('LEFT EYE') +
+    '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">' +
+    vrInput('le_sph','Sph',d.le_sph||'') + vrInput('le_cyl','Cyl',d.le_cyl||'') + vrInput('le_axis','Axis',d.le_axis||'') +
+    vrInput('le_va','VA',d.le_va||'') + vrInput('le_iop','IOP',d.le_iop||'') + '</div>' +
+    '</div>' +
+    vrLabel('Fundus & Other') +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+    vrInput('re_fundus','RE Fundus',d.re_fundus||'') + vrInput('le_fundus','LE Fundus',d.le_fundus||'') +
+    '</div>';
+}
+
+function deptDental(d) {
+  return vrLabel('Dental Examination') +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+    vrInput('tooth_no','Tooth Number(s)',d.tooth_no||'') +
+    vrInput('gum_condition','Gum Condition',d.gum_condition||'') +
+    vrInput('treatment_done','Treatment Done',d.treatment_done||'') +
+    vrInput('material_used','Material Used',d.material_used||'') +
+    '</div>';
+}
+
+function deptGynae(d) {
+  return vrLabel('Gynaecology') +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+    vrInput('lmp','LMP',d.lmp||'','date') +
+    vrInput('cycle','Cycle',d.cycle||'') +
+    vrInput('gravida','Gravida',d.gravida||'') +
+    vrInput('para','Para',d.para||'') +
+    vrInput('edd','EDD',d.edd||'','date') +
+    '</div>';
+}
+
+function deptENT(d) {
+  return vrLabel('ENT Examination') +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+    vrInput('ear_re','Right Ear',d.ear_re||'') +
+    vrInput('ear_le','Left Ear',d.ear_le||'') +
+    vrInput('nose','Nose',d.nose||'') +
+    vrInput('throat','Throat',d.throat||'') +
+    '</div>';
+}
+
+function deptOrtho(d) {
+  return vrLabel('Orthopaedics') +
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">' +
+    vrInput('joint','Affected Joint',d.joint||'') +
+    vrInput('rom','Range of Motion',d.rom||'') +
+    vrInput('xray','X-Ray Findings',d.xray||'') +
+    vrInput('fracture','Fracture Details',d.fracture||'') +
+    '</div>';
+}
+
+function vrLabel(text) {
+  return '<div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin:12px 0 8px">' + text + '</div>';
+}
+function vrGroup(text) {
+  return '<div style="font-size:12px;font-weight:600;color:rgba(240,250,247,0.7);margin-bottom:6px">' + text + '</div>';
+}
+function vrInput(id, label, value, type) {
+  return '<div><label style="display:block;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.04em;margin-bottom:3px">' + label + '</label>'
+    + '<input id="dept_' + id + '" type="' + (type||'text') + '" value="' + value + '" class="form-input" style="width:100%;padding:8px 10px;font-size:13px"></div>';
+}
+
+function getDeptData(dept) {
+  var d = {};
+  var fields = {
+    'Ophthalmology': ['re_sph','re_cyl','re_axis','re_va','re_iop','le_sph','le_cyl','le_axis','le_va','le_iop','re_fundus','le_fundus'],
+    'Dental':        ['tooth_no','gum_condition','treatment_done','material_used'],
+    'Gynaecology':   ['lmp','cycle','gravida','para','edd'],
+    'ENT':           ['ear_re','ear_le','nose','throat'],
+    'Orthopaedics':  ['joint','rom','xray','fracture']
+  };
+  var flds = fields[dept] || [];
+  flds.forEach(function(f) {
+    var el = document.getElementById('dept_' + f);
+    if (el) d[f] = el.value;
+  });
+  return d;
+}
+
+// Save visit record
+async function saveVisitRecord(sendNow) {
+  if (!activeVisitPatient) return;
+  var dept = document.getElementById('vr_dept').value;
+  var payload = {
+    department:          dept,
+    visit_date:          document.getElementById('vr_date').value,
+    visit_type:          document.getElementById('vr_type').value,
+    chief_complaint:     document.getElementById('vr_complaint').value,
+    duration:            document.getElementById('vr_duration').value,
+    history:             document.getElementById('vr_history').value,
+    allergies:           document.getElementById('vr_allergies').value,
+    bp_systolic:         document.getElementById('vr_bp_s').value || null,
+    bp_diastolic:        document.getElementById('vr_bp_d').value || null,
+    temperature:         document.getElementById('vr_temp').value || null,
+    pulse:               document.getElementById('vr_pulse').value || null,
+    spo2:                document.getElementById('vr_spo2').value || null,
+    weight:              document.getElementById('vr_weight').value || null,
+    height:              document.getElementById('vr_height').value || null,
+    bmi:                 document.getElementById('vr_bmi_val')?.value || null,
+    examination_notes:   document.getElementById('vr_exam').value,
+    diagnosis_primary:   document.getElementById('vr_dx').value,
+    diagnosis_secondary: document.getElementById('vr_dx2').value,
+    icd_code:            document.getElementById('vr_icd').value,
+    advice:              document.getElementById('vr_advice').value,
+    followup_date:       document.getElementById('vr_followup').value,
+    followup_instructions: document.getElementById('vr_followup_notes').value,
+    prescription:        visitRxRows,
+    lab_requests:        visitLabRows,
+    radiology_requests:  visitRadRows,
+    dept_data:           getDeptData(dept),
+    status:              sendNow ? 'final' : 'draft',
+    send_prescription:   sendNow && visitRxRows.length > 0,
+    send_lab:            sendNow && visitLabRows.length > 0,
+    patient_phone:       activeVisitPatient.phone,
+    patient_name:        activeVisitPatient.name,
+    lab_staff_phone:     ''
+  };
+
+  try {
+    var data;
+    if (editingVisitId) {
+      data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + activeVisitPatient.id + '/' + editingVisitId, 'PUT', payload);
+    } else {
+      data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + activeVisitPatient.id, 'POST', payload);
+      if (data.success) editingVisitId = data.data.id;
+    }
+    if (data.success) {
+      showToast(sendNow ? 'Visit saved & WhatsApp sent ✓' : 'Visit saved as draft ✓', 'success');
+      loadVisitHistory(activeVisitPatient.id);
+    } else {
+      showToast('Error: ' + data.message, 'error');
+    }
+  } catch(e) { showToast('Network error', 'error'); }
+}
+
+function confirmSend() {
+  if (!activeVisitPatient) return;
+  var rxCount  = visitRxRows.length;
+  var labCount = visitLabRows.length;
+  var msg = 'Send to ' + activeVisitPatient.name + ' (' + activeVisitPatient.phone + ')?\n\n';
+  if (rxCount)  msg += '✅ Prescription (' + rxCount + ' medications)\n';
+  if (labCount) msg += '🔬 Lab requests (' + labCount + ' tests)\n';
+  if (!rxCount && !labCount) { saveVisitRecord(false); return; }
+  if (confirm(msg + '\nThis will send WhatsApp messages immediately.')) {
+    saveVisitRecord(true);
+  }
+}
+
+// ===== COMPLETE EMR SYSTEM =====
+// Add this entire block before </script> in app.html
+
+const DRUG_LIST = [
+  'Paracetamol','Dolo 650','Ibuprofen','Aspirin','Diclofenac',
+  'Amoxicillin','Azithromycin','Ciprofloxacin','Doxycycline','Metronidazole','Cefixime','Amoxicillin+Clavulanate',
+  'Metformin','Glimepiride','Insulin Regular','Insulin NPH','Sitagliptin',
+  'Amlodipine','Atenolol','Enalapril','Telmisartan','Losartan','Metoprolol','Ramipril',
+  'Atorvastatin','Rosuvastatin',
+  'Pantoprazole','Omeprazole','Ranitidine','Domperidone','Ondansetron','ORS',
+  'Cetirizine','Fexofenadine','Montelukast','Salbutamol','Deriphylline',
+  'Prednisolone','Methylprednisolone','Hydrocortisone',
+  'Vitamin D3','Vitamin B12','Calcium','Iron+Folic Acid','Multivitamin',
+  'Tramadol','Codeine','Gabapentin','Pregabalin',
+  'Alprazolam','Clonazepam','Sertraline','Escitalopram',
+  'Levothyroxine','Medroxyprogesterone',
+  'Chlorhexidine Mouthwash','Betadine','Mupirocin Ointment',
+  'Eye drops - Ciprofloxacin','Eye drops - Timolol','Lubricating Eye drops',
+  'Ear drops - Ciprofloxacin','Nasal drops - Xylometazoline'
+];
+
+const LAB_TESTS = [
+  'CBC (Complete Blood Count)','Haemoglobin','Blood Group & Rh',
+  'Blood Sugar Fasting','Blood Sugar PP','Blood Sugar Random','HbA1c',
+  'LFT (Liver Function Test)','KFT (Kidney Function Test)',
+  'Lipid Profile','Thyroid Profile (T3/T4/TSH)','TSH',
+  'Serum Electrolytes','Serum Calcium','Serum Uric Acid',
+  'Urine R/E (Routine Examination)','Urine Culture',
+  'Dengue NS1 Antigen','Dengue IgM/IgG','Malaria Antigen',
+  'Widal Test','CRP (C-Reactive Protein)','ESR',
+  'PT/INR (Prothrombin Time)','APTT',
+  'Hepatitis B Surface Antigen','Anti-HCV','HIV 1&2',
+  'Pregnancy Test (urine beta-hCG)',
+  'Sputum AFB (for TB)','Mantoux Test',
+  'ECG','2D Echo','Holter Monitor',
+  'X-Ray Chest','X-Ray KUB','X-Ray Spine',
+  'USG Abdomen','USG Pelvis','USG Thyroid',
+  'FNAC','Biopsy',
+  'Pap Smear','Colposcopy',
+  'Audiometry','PFT (Pulmonary Function Test)',
+  'Blood Culture','Stool R/E'
+];
+
+const DEPT_FIELDS = {
+  'Ophthalmology': `
+    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#128065; Eye Examination</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;grid-column:1/-1">
+      <div>
+        <div style="font-size:12px;font-weight:700;color:rgba(240,250,247,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">RIGHT EYE (RE)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${vfld('dept_re_va','Vision (VA)','6/6')}
+          ${vfld('dept_re_iop','IOP (mmHg)','14')}
+          ${vfld('dept_re_sph','Sph','0.00')}
+          ${vfld('dept_re_cyl','Cyl','0.00')}
+          ${vfld('dept_re_axis','Axis','0')}
+          ${vfld('dept_re_add','Add','')}
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:rgba(240,250,247,0.55);margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em">LEFT EYE (LE)</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          ${vfld('dept_le_va','Vision (VA)','6/6')}
+          ${vfld('dept_le_iop','IOP (mmHg)','14')}
+          ${vfld('dept_le_sph','Sph','0.00')}
+          ${vfld('dept_le_cyl','Cyl','0.00')}
+          ${vfld('dept_le_axis','Axis','0')}
+          ${vfld('dept_le_add','Add','')}
+        </div>
+      </div>
+      <div style="grid-column:1/-1">${vtxt('dept_fundus','Fundus Findings / Slit Lamp Findings','')}</div>
+      <div style="grid-column:1/-1">${vtxt('dept_glasses','Glasses Prescription / Advice','')}</div>
+    </div>`,
+  'Dental': `
+    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#129463; Dental Examination</div>
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      ${vfld('dept_chief_tooth','Chief Tooth / Location','')}
+      ${vsel('dept_gum','Gum Condition',['Normal','Gingivitis','Periodontitis','Recession'])}
+      ${vfld('dept_mobility','Tooth Mobility','')}
+      ${vsel('dept_treatment','Treatment Done',['Scaling','Extraction','RCT','Filling','Crown','Denture','Other'])}
+      <div style="grid-column:1/-1">${vtxt('dept_dental_notes','Dental Notes / Tooth Chart Description','')}</div>
+    </div>`,
+  'Gynaecology': `
+    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#9792; Gynaecology Examination</div>
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      ${vfld('dept_lmp','LMP (Last Menstrual Period)','')}
+      ${vfld('dept_cycle','Cycle (days)','28')}
+      ${vfld('dept_gravida','Gravida','')}
+      ${vfld('dept_para','Para','')}
+      ${vfld('dept_abortion','Abortions','')}
+      ${vfld('dept_living','Living Children','')}
+      ${vsel('dept_contraception','Contraception',['None','OCP','IUCD','Condom','Sterilisation','Other'])}
+      ${vfld('dept_edd','EDD (if pregnant)','')}
+      <div style="grid-column:1/-1">${vtxt('dept_gyn_exam','P/V and P/S Examination Findings','')}</div>
+    </div>`,
+  'Paediatrics': `
+    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#128102; Paediatrics Assessment</div>
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      ${vfld('dept_birth_weight','Birth Weight (kg)','')}
+      ${vfld('dept_gestational_age','Gestational Age (weeks)','')}
+      ${vsel('dept_immunization','Immunization Status',['Up to date','Incomplete','Not started'])}
+      ${vfld('dept_milestones','Developmental Milestones','')}
+      ${vfld('dept_feeding','Feeding (breast/formula/solids)','')}
+      ${vfld('dept_perc_weight','Weight Percentile','')}
+      ${vfld('dept_perc_height','Height Percentile','')}
+      ${vfld('dept_perc_hc','Head Circumference (cm)','')}
+      <div style="grid-column:1/-1">${vtxt('dept_peds_notes','Examination Notes','')}</div>
+    </div>`,
+  'ENT': `
+    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#128066; ENT Examination</div>
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      ${vtxt('dept_ear','Ear Examination (RE/LE)','')}
+      ${vtxt('dept_nose','Nose Examination (DNS/Polyp)','')}
+      ${vtxt('dept_throat','Throat / Tonsils','')}
+      ${vtxt('dept_neck','Neck / Lymph Nodes','')}
+    </div>`,
+  'Orthopaedics': `
+    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#129460; Orthopaedics Assessment</div>
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      ${vfld('dept_affected_joint','Affected Joint / Site','')}
+      ${vsel('dept_side','Side',['Right','Left','Bilateral'])}
+      ${vfld('dept_rom','Range of Motion (ROM)','')}
+      ${vsel('dept_fracture','Fracture',['None','Simple','Compound','Stress fracture','Other'])}
+      ${vfld('dept_xray','X-Ray Findings','')}
+      <div style="grid-column:1/-1">${vtxt('dept_ortho_notes','Examination Notes / Special Tests','')} </div>
+    </div>`,
+  'Dermatology': `
+    <div style="grid-column:1/-1;font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;padding:10px 0 6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">&#129504; Dermatology Examination</div>
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+      ${vsel('dept_lesion_type','Lesion Type',['Macule','Papule','Plaque','Vesicle','Pustule','Nodule','Ulcer','Wheal','Other'])}
+      ${vfld('dept_lesion_site','Site / Location','')}
+      ${vsel('dept_distribution','Distribution',['Localised','Generalised','Bilateral','Unilateral','Symmetrical'])}
+      ${vsel('dept_morphology','Morphology',['Erythematous','Hyperpigmented','Hypopigmented','Scaly','Crusted','Weeping','Lichenified'])}
+      <div style="grid-column:1/-1">${vtxt('dept_derm_notes','Dermatology Notes','')} </div>
+    </div>`
+};
+
+function vfld(id, label, placeholder) {
+  return '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">'+label+'</label><input id="'+id+'" type="text" placeholder="'+placeholder+'" class="form-input" style="width:100%;padding:8px 10px;font-size:13px"></div>';
+}
+function vtxt(id, label, placeholder) {
+  return '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">'+label+'</label><textarea id="'+id+'" placeholder="'+placeholder+'" rows="2" class="form-input" style="width:100%;resize:vertical;font-size:13px"></textarea></div>';
+}
+function vsel(id, label, options) {
+  return '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px">'+label+'</label><select id="'+id+'" class="form-select" style="width:100%;padding:8px 10px;font-size:13px"><option value="">Select...</option>'+options.map(function(o){return '<option>'+o+'</option>';}).join('')+'</select></div>';
+}
+
+var visitPatientId  = null;
+var visitPatientName = '';
+var visitPatientPhone = '';
+var rxRows = [];
+var labRows = [];
+var radRows = [];
+var currentVisitId = null;
+
+function openEMR(patientId, patientName, patientPhone) {
+  visitPatientId   = patientId;
+  visitPatientName  = patientName || 'Patient';
+  visitPatientPhone = patientPhone || '';
+  rxRows   = [];
+  labRows  = [];
+  radRows  = [];
+  currentVisitId = null;
+
+  document.getElementById('emrModal').style.display = 'flex';
+  document.getElementById('emr-patient-title').textContent = 'New Visit — ' + visitPatientName;
+
+  // Set today's date
+  var today = new Date().toISOString().split('T')[0];
+  document.getElementById('emr_visit_date').value = today;
+
+  // Reset all tabs
+  showEMRTab('subjective');
+  renderRxTable();
+  renderLabTable();
+  renderRadTable();
+  loadVisitHistory();
+}
+
+function closeEMR() {
+  document.getElementById('emrModal').style.display = 'none';
+  visitPatientId = null;
+}
+
+function showEMRTab(tab) {
+  document.querySelectorAll('.emr-tab-content').forEach(function(t){ t.style.display='none'; });
+  document.querySelectorAll('.emr-tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('emr-tab-'+tab).style.display = 'block';
+  var btn = document.querySelector('[data-tab="'+tab+'"]');
+  if (btn) btn.classList.add('active');
+}
+
+// Auto-calculate BMI
+function calcBMI() {
+  var w = parseFloat(document.getElementById('emr_weight').value)||0;
+  var h = parseFloat(document.getElementById('emr_height').value)||0;
+  if (w > 0 && h > 0) {
+    var bmi = (w / ((h/100)*(h/100))).toFixed(1);
+    document.getElementById('emr_bmi').value = bmi;
+    var status = bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Overweight' : 'Obese';
+    document.getElementById('emr_bmi_status').textContent = status;
+  }
+}
+
+// Department-specific fields
+function loadDeptFields() {
+  var dept = document.getElementById('emr_department').value;
+  var el   = document.getElementById('emr_dept_fields');
+  el.innerHTML = DEPT_FIELDS[dept] || '';
+}
+
+// Prescription table
+function addRxRow(drugName) {
+  rxRows.push({ drug: drugName||'', strength:'', frequency:'1-0-1', duration:'5 days', instructions:'' });
+  renderRxTable();
+}
+
+function renderRxTable() {
+  var el = document.getElementById('rx-table');
+  if (!rxRows.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">No medicines added yet. Use the search above to add.</div>';
+    return;
+  }
+  var html = '<table style="width:100%;border-collapse:collapse"><thead><tr>';
+  ['Drug','Strength','Frequency','Duration','Instructions',''].forEach(function(h){
+    html += '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;border-bottom:0.5px solid rgba(0,196,154,0.15)">'+h+'</th>';
+  });
+  html += '</tr></thead><tbody>';
+  rxRows.forEach(function(r, i) {
+    html += '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.08)">'
+      + '<td style="padding:6px 8px"><input value="'+r.drug+'" onchange="rxRows['+i+'].drug=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%;min-width:120px"></td>'
+      + '<td style="padding:6px 8px"><input value="'+r.strength+'" placeholder="500mg" onchange="rxRows['+i+'].strength=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:70px"></td>'
+      + '<td style="padding:6px 8px"><select onchange="rxRows['+i+'].frequency=this.value" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px">'
+      + ['0-0-1','1-0-0','1-0-1','1-1-1','0-1-0','SOS','Once daily','Twice daily','Thrice daily','At bedtime'].map(function(f){return '<option'+(r.frequency===f?' selected':'')+'>'+f+'</option>';}).join('')
+      + '</select></td>'
+      + '<td style="padding:6px 8px"><select onchange="rxRows['+i+'].duration=this.value" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px">'
+      + ['1 day','3 days','5 days','7 days','10 days','14 days','1 month','2 months','3 months','Ongoing'].map(function(d){return '<option'+(r.duration===d?' selected':'')+'>'+d+'</option>';}).join('')
+      + '</select></td>'
+      + '<td style="padding:6px 8px"><input value="'+r.instructions+'" placeholder="After food" onchange="rxRows['+i+'].instructions=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100px"></td>'
+      + '<td style="padding:6px 8px"><button onclick="rxRows.splice('+i+',1);renderRxTable()" style="background:rgba(239,68,68,0.15);border:0.5px solid rgba(239,68,68,0.4);color:#EF4444;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">Remove</button></td>'
+      + '</tr>';
+  });
+  html += '</tbody></table>';
+  el.innerHTML = html;
+}
+
+function rxSearch(val) {
+  var suggestions = document.getElementById('rx-suggestions');
+  if (!val || val.length < 2) { suggestions.style.display='none'; return; }
+  var matches = DRUG_LIST.filter(function(d){ return d.toLowerCase().includes(val.toLowerCase()); }).slice(0,8);
+  if (!matches.length) { suggestions.style.display='none'; return; }
+  suggestions.innerHTML = matches.map(function(m){
+    return '<div onclick="addRxRow(\''+m+'\');document.getElementById(\'rx-search\').value=\'\';document.getElementById(\'rx-suggestions\').style.display=\'none\'" style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:0.5px solid rgba(0,196,154,0.1)" onmouseover="this.style.background=\'rgba(0,196,154,0.1)\'" onmouseout="this.style.background=\'none\'">'+m+'</div>';
+  }).join('');
+  suggestions.style.display = 'block';
+}
+
+// Lab table
+function addLabRow(testName) {
+  labRows.push({ test: testName||'', instructions:'' });
+  renderLabTable();
+}
+
+function renderLabTable() {
+  var el = document.getElementById('lab-table');
+  if (!labRows.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">No tests added yet.</div>';
+    return;
+  }
+  var html = '<table style="width:100%;border-collapse:collapse"><thead><tr>'
+    + '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;border-bottom:0.5px solid rgba(0,196,154,0.15)">Test</th>'
+    + '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;border-bottom:0.5px solid rgba(0,196,154,0.15)">Special Instructions</th>'
+    + '<th style="border-bottom:0.5px solid rgba(0,196,154,0.15)"></th>'
+    + '</tr></thead><tbody>';
+  labRows.forEach(function(r,i) {
+    html += '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.08)">'
+      + '<td style="padding:6px 8px"><input value="'+r.test+'" onchange="labRows['+i+'].test=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%;min-width:200px"></td>'
+      + '<td style="padding:6px 8px"><input value="'+r.instructions+'" placeholder="Fasting, urgent, etc." onchange="labRows['+i+'].instructions=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%;min-width:150px"></td>'
+      + '<td style="padding:6px 8px"><button onclick="labRows.splice('+i+',1);renderLabTable()" style="background:rgba(239,68,68,0.15);border:0.5px solid rgba(239,68,68,0.4);color:#EF4444;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">Remove</button></td>'
+      + '</tr>';
+  });
+  el.innerHTML = html + '</tbody></table>';
+}
+
+function labSearch(val) {
+  var suggestions = document.getElementById('lab-suggestions');
+  if (!val || val.length < 2) { suggestions.style.display='none'; return; }
+  var matches = LAB_TESTS.filter(function(t){ return t.toLowerCase().includes(val.toLowerCase()); }).slice(0,8);
+  if (!matches.length) { suggestions.style.display='none'; return; }
+  suggestions.innerHTML = matches.map(function(m){
+    return '<div onclick="addLabRow(\''+m.replace(/'/g,"\\'") +'\');document.getElementById(\'lab-search\').value=\'\';document.getElementById(\'lab-suggestions\').style.display=\'none\'" style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:0.5px solid rgba(0,196,154,0.1)" onmouseover="this.style.background=\'rgba(0,196,154,0.1)\'" onmouseout="this.style.background=\'none\'">'+m+'</div>';
+  }).join('');
+  suggestions.style.display = 'block';
+}
+
+// Radiology table
+function addRadRow() {
+  radRows.push({ test:'', instructions:'' });
+  renderRadTable();
+}
+
+function renderRadTable() {
+  var el = document.getElementById('rad-table');
+  if (!radRows.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">No radiology requests added yet.</div>';
+    return;
+  }
+  var html = '<table style="width:100%;border-collapse:collapse"><thead><tr>'
+    + '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;border-bottom:0.5px solid rgba(0,196,154,0.15)">Investigation</th>'
+    + '<th style="text-align:left;padding:6px 8px;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;border-bottom:0.5px solid rgba(0,196,154,0.15)">Clinical Indication</th>'
+    + '<th style="border-bottom:0.5px solid rgba(0,196,154,0.15)"></th></tr></thead><tbody>';
+  radRows.forEach(function(r,i) {
+    html += '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.08)">'
+      + '<td style="padding:6px 8px"><select onchange="radRows['+i+'].test=this.value" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%">'
+      + '<option value="">Select investigation...</option>'
+      + ['X-Ray Chest PA','X-Ray KUB','X-Ray Spine AP/Lat','X-Ray Hand/Wrist','X-Ray Knee','X-Ray Hip','X-Ray Pelvis','USG Abdomen & Pelvis','USG Thyroid','USG Breast','2D Echo','CT Brain Plain','CT Chest','CT Abdomen','MRI Brain','MRI Spine','MRI Knee','Mammography','Bone Scan (DEXA)','OPG (Dental)'].map(function(t){return '<option'+(r.test===t?' selected':'')+'>'+t+'</option>';}).join('')
+      + '</select></td>'
+      + '<td style="padding:6px 8px"><input value="'+r.instructions+'" placeholder="Reason / clinical details" onchange="radRows['+i+'].instructions=this.value" style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 8px;color:#F0FAF7;font-size:12px;width:100%"></td>'
+      + '<td style="padding:6px 8px"><button onclick="radRows.splice('+i+',1);renderRadTable()" style="background:rgba(239,68,68,0.15);border:0.5px solid rgba(239,68,68,0.4);color:#EF4444;border-radius:6px;padding:4px 8px;cursor:pointer;font-size:11px">Remove</button></td>'
+      + '</tr>';
+  });
+  el.innerHTML = html + '</tbody></table>';
+}
+
+function collectDeptData() {
+  var dept   = document.getElementById('emr_department').value;
+  var data   = {};
+  var fields = DEPT_FIELDS[dept];
+  if (!fields) return data;
+  var matches = fields.match(/id="(dept_[^"]+)"/g)||[];
+  matches.forEach(function(m) {
+    var id = m.replace(/id="|"/g,'');
+    var el = document.getElementById(id);
+    if (el) data[id] = el.value;
+  });
+  return data;
+}
+
+async function saveVisitRecord(status) {
+  if (!visitPatientId) return;
+
+  var payload = {
+    department:          document.getElementById('emr_department').value,
+    visit_date:          document.getElementById('emr_visit_date').value,
+    visit_type:          document.getElementById('emr_visit_type').value,
+    chief_complaint:     document.getElementById('emr_cc').value,
+    duration:            document.getElementById('emr_duration').value,
+    history:             document.getElementById('emr_history').value,
+    allergies:           document.getElementById('emr_allergies').value,
+    family_history:      document.getElementById('emr_family_hx').value,
+    surgical_history:    document.getElementById('emr_surgical_hx').value,
+    bp_systolic:         document.getElementById('emr_bp_sys').value,
+    bp_diastolic:        document.getElementById('emr_bp_dia').value,
+    temperature:         document.getElementById('emr_temp').value,
+    pulse:               document.getElementById('emr_pulse').value,
+    spo2:                document.getElementById('emr_spo2').value,
+    weight:              document.getElementById('emr_weight').value,
+    height:              document.getElementById('emr_height').value,
+    bmi:                 document.getElementById('emr_bmi').value,
+    examination_notes:   document.getElementById('emr_exam').value,
+    diagnosis_primary:   document.getElementById('emr_dx1').value,
+    diagnosis_secondary: document.getElementById('emr_dx2').value,
+    icd_code:            document.getElementById('emr_icd').value,
+    severity:            document.getElementById('emr_severity').value,
+    prescription:        rxRows,
+    lab_requests:        labRows,
+    radiology_requests:  radRows,
+    referral_to:         document.getElementById('emr_referral').value,
+    referral_notes:      document.getElementById('emr_referral_notes').value,
+    followup_date:       document.getElementById('emr_followup').value,
+    followup_instructions: document.getElementById('emr_followup_notes').value,
+    advice:              document.getElementById('emr_advice').value,
+    dept_data:           collectDeptData(),
+    status:              status
+  };
+
+  try {
+    var data;
+    if (currentVisitId) {
+      data = await apiCall('/hospitals/'+mwHospitalId+'/patients/'+visitPatientId+'/visits/'+currentVisitId, 'PUT', payload);
+    } else {
+      data = await apiCall('/hospitals/'+mwHospitalId+'/patients/'+visitPatientId+'/visits', 'POST', payload);
+      if (data.success) currentVisitId = data.data.id;
+    }
+
+    if (!data.success) { showToast('Error: '+data.message,'error'); return; }
+
+    if (status === 'final') {
+      // Show dispatch confirmation modal
+      document.getElementById('dispatchModal').style.display = 'flex';
+      document.getElementById('dispatch_patient_phone').value = visitPatientPhone;
+    } else {
+      showToast('Draft saved ✓','success');
+    }
+  } catch(e) {
+    showToast('Network error: '+e.message,'error');
+  }
+}
+
+async function dispatchRecord() {
+  if (!currentVisitId) return;
+  var patPhone  = document.getElementById('dispatch_patient_phone').value.trim();
+  var labPhone  = document.getElementById('dispatch_lab_phone').value.trim();
+  var sendRx    = document.getElementById('dispatch_send_rx').checked;
+  var sendLab   = document.getElementById('dispatch_send_lab').checked;
+
+  var data = await apiCall('/hospitals/'+mwHospitalId+'/patients/'+visitPatientId+'/visits/'+currentVisitId+'/dispatch','POST',{
+    patient_phone:   patPhone,
+    lab_staff_phone: labPhone,
+    send_prescription: sendRx,
+    send_lab:          sendLab
+  });
+
+  document.getElementById('dispatchModal').style.display = 'none';
+
+  if (data.success) {
+    showToast(data.message || 'Sent successfully ✓','success');
+    closeEMR();
+    loadPatients();
+  } else {
+    showToast('Dispatch error: '+data.message,'error');
+  }
+}
+
+async function loadVisitHistory() {
+  if (!visitPatientId) return;
+  var el = document.getElementById('emr-history-list');
+  el.innerHTML = '<div style="padding:16px;color:rgba(240,250,247,0.4);font-size:13px">Loading...</div>';
+  try {
+    var data = await apiCall('/hospitals/'+mwHospitalId+'/patients/'+visitPatientId+'/visits');
+    if (!data.success || !data.data.length) {
+      el.innerHTML = '<div style="padding:16px;color:rgba(240,250,247,0.4);font-size:13px">No previous visits</div>';
+      return;
+    }
+    el.innerHTML = data.data.map(function(v) {
+      return '<div style="padding:10px 14px;border-bottom:0.5px solid rgba(0,196,154,0.1);cursor:pointer" onclick="loadVisit(\''+v.id+'\')" onmouseover="this.style.background=\'rgba(0,196,154,0.05)\'" onmouseout="this.style.background=\'none\'">'
+        + '<div style="font-size:12px;font-weight:600;color:#F0FAF7">'+v.visit_date+' — '+v.department+'</div>'
+        + '<div style="font-size:11px;color:rgba(240,250,247,0.55);margin-top:2px">'+(v.chief_complaint||v.diagnosis_primary||'—')+'</div>'
+        + '<div style="font-size:10px;color:var(--teal);margin-top:2px">'+v.visit_type+' · '+v.status+'</div>'
+        + '</div>';
+    }).join('');
+  } catch(e) {
+    el.innerHTML = '<div style="padding:16px;color:rgba(240,250,247,0.4);font-size:13px">Failed to load</div>';
+  }
+}
+
+async function loadVisit(visitId) {
+  var data = await apiCall('/hospitals/'+mwHospitalId+'/patients/'+visitPatientId+'/visits/'+visitId);
+  if (!data.success) return;
+  var v = data.data;
+  currentVisitId = visitId;
+
+  // Populate all fields
+  document.getElementById('emr_department').value   = v.department||'General Medicine';
+  document.getElementById('emr_visit_date').value   = v.visit_date||'';
+  document.getElementById('emr_visit_type').value   = v.visit_type||'OPD';
+  document.getElementById('emr_cc').value           = v.chief_complaint||'';
+  document.getElementById('emr_duration').value     = v.duration||'';
+  document.getElementById('emr_history').value      = v.history||'';
+  document.getElementById('emr_allergies').value    = v.allergies||'';
+  document.getElementById('emr_family_hx').value    = v.family_history||'';
+  document.getElementById('emr_surgical_hx').value  = v.surgical_history||'';
+  document.getElementById('emr_bp_sys').value       = v.bp_systolic||'';
+  document.getElementById('emr_bp_dia').value       = v.bp_diastolic||'';
+  document.getElementById('emr_temp').value         = v.temperature||'';
+  document.getElementById('emr_pulse').value        = v.pulse||'';
+  document.getElementById('emr_spo2').value         = v.spo2||'';
+  document.getElementById('emr_weight').value       = v.weight||'';
+  document.getElementById('emr_height').value       = v.height||'';
+  document.getElementById('emr_bmi').value          = v.bmi||'';
+  document.getElementById('emr_exam').value         = v.examination_notes||'';
+  document.getElementById('emr_dx1').value          = v.diagnosis_primary||'';
+  document.getElementById('emr_dx2').value          = v.diagnosis_secondary||'';
+  document.getElementById('emr_icd').value          = v.icd_code||'';
+  document.getElementById('emr_severity').value     = v.severity||'';
+  document.getElementById('emr_referral').value     = v.referral_to||'';
+  document.getElementById('emr_referral_notes').value = v.referral_notes||'';
+  document.getElementById('emr_followup').value     = v.followup_date||'';
+  document.getElementById('emr_followup_notes').value = v.followup_instructions||'';
+  document.getElementById('emr_advice').value       = v.advice||'';
+
+  rxRows  = Array.isArray(v.prescription)     ? v.prescription     : JSON.parse(v.prescription||'[]');
+  labRows = Array.isArray(v.lab_requests)     ? v.lab_requests     : JSON.parse(v.lab_requests||'[]');
+  radRows = Array.isArray(v.radiology_requests) ? v.radiology_requests : JSON.parse(v.radiology_requests||'[]');
+
+  renderRxTable();
+  renderLabTable();
+  renderRadTable();
+  loadDeptFields();
+
+  // Populate dept data
+  var deptData = typeof v.dept_data === 'object' ? v.dept_data : JSON.parse(v.dept_data||'{}');
+  Object.keys(deptData).forEach(function(key) {
+    var el = document.getElementById(key);
+    if (el) el.value = deptData[key];
+  });
+
+  document.getElementById('emr-patient-title').textContent = 'Visit: '+v.visit_date+' — '+v.department;
+  showEMRTab('subjective');
 }
 
 </script>
