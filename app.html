@@ -1156,8 +1156,8 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <div class="toast" id="toast"></div>
 
 <script>
-let currentRole = 'Doctor';
-let isDark = true;
+var currentRole = 'Doctor';
+var isDark = true;
 
 function selectRole(btn, role) {
   document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
@@ -1266,9 +1266,9 @@ function showToast(msg) {
 
 
 var API_BASE = 'https://smartgumastha-backend-production.up.railway.app/api';
-let mwToken = localStorage.getItem('mw_token') || '';
-let mwUser = JSON.parse(localStorage.getItem('mw_user') || '{}');
-let mwHospitalId = mwUser.hospital_id || 1;
+var mwToken = localStorage.getItem('mw_token') || '';
+var mwUser = JSON.parse(localStorage.getItem('mw_user') || '{}');
+var mwHospitalId = mwUser.hospital_id || 1;
 
 async function apiCall(path, method='GET', body=null) {
   var token = localStorage.getItem('mw_token') || '';
