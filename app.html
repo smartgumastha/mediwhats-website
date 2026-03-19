@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773960328 -->
+<!-- MediWhats v23 BUILD:1773961412 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -48,15 +48,15 @@ body.light{
 /* APP LAYOUT */
 .app{display:none;height:100vh;overflow:hidden}
 .app.visible{display:flex}
-.sidebar{width:var(--sidebar);background:var(--dark);border-right:0.5px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar{width:var(--sidebar);background:var(--dark);border-right:0.5px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto;height:100vh}
 .sidebar-logo{display:flex;align-items:center;gap:10px;padding:24px 20px;border-bottom:0.5px solid var(--border)}
 .sidebar-logo-icon{width:36px;height:36px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-weight:800;font-size:14px;color:#000;flex-shrink:0}
 .sidebar-logo-name{font-family:'Clash Display',sans-serif;font-weight:700;font-size:16px;color:var(--white)}
 .sidebar-logo-name span{color:var(--teal)}
-.sidebar-nav{padding:16px 12px;flex:1}
-.nav-section{margin-bottom:24px}
+.sidebar-nav{padding:16px 12px;flex:1;overflow-y:auto}
+.nav-section{margin-bottom:12px}
 .nav-section-title{font-size:10px;font-weight:700;color:var(--gray-dim);letter-spacing:1.5px;text-transform:uppercase;padding:0 8px;margin-bottom:8px}
-.nav-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;cursor:pointer;transition:all 0.2s;margin-bottom:2px;font-size:13px;font-weight:500;color:var(--gray)}
+.nav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:8px;cursor:pointer;transition:all 0.2s;margin-bottom:1px;font-size:12px;font-weight:500;color:var(--gray)}
 .nav-item:hover{background:rgba(255,255,255,0.05);color:var(--white)}
 .nav-item.active{background:var(--teal-light);color:var(--teal)}
 .nav-item svg{flex-shrink:0;opacity:0.7}
@@ -1327,6 +1327,9 @@ async function doLogin() {
       currentRole = role;
       document.getElementById('loginWrap').style.display = 'none';
       document.getElementById('app').classList.add('visible');
+      // Ensure ALL nav items are visible
+      document.querySelectorAll('.nav-item').forEach(function(el){ el.style.display=''; el.style.visibility='visible'; el.style.opacity='1'; });
+      document.querySelectorAll('.nav-section').forEach(function(el){ el.style.display=''; el.style.visibility='visible'; });
       document.getElementById('sidebarUserName').textContent = data.data.first_name + ' ' + (data.data.last_name || '');
       document.getElementById('sidebarUserRole').textContent = role;
       // Light theme for non-clinical roles
@@ -1408,7 +1411,13 @@ var API_BASE = 'https://smartgumastha-backend-production.up.railway.app/api';
 var mwToken = localStorage.getItem('mw_token') || '';
 var mwUser = JSON.parse(localStorage.getItem('mw_user') || '{}');
 var mwHospitalId = mwUser.hospital_id || 1;
-if (mwUser && mwUser.role) { document.addEventListener("DOMContentLoaded", function(){ applyRoleAccess(mwUser.role); }); }
+if (mwUser && mwUser.role) {
+  document.addEventListener("DOMContentLoaded", function(){
+    applyRoleAccess(mwUser.role);
+    document.querySelectorAll('.nav-item').forEach(function(el){ el.style.display=''; });
+    document.querySelectorAll('.nav-section').forEach(function(el){ el.style.display=''; });
+  });
+}
 
 async function apiCall(path, method='GET', body=null) {
   var token = localStorage.getItem('mw_token') || '';
