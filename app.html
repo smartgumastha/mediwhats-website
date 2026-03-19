@@ -707,7 +707,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 
 <!-- PATIENT RECORD PANEL -->
-<div id="prPanel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:3000;flex-direction:column;overflow:hidden">
+<div id="prPanel" style="display:none;position:fixed;inset:0;background:#080C0B;z-index:3000;flex-direction:column;overflow:hidden">
   <!-- Header -->
   <div style="background:#0D1412;border-bottom:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
     <div style="display:flex;align-items:center;gap:16px">
@@ -1779,7 +1779,7 @@ function closePatientRecord() {
 async function loadVisitHistory(patientId) {
   document.getElementById('prHistory').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.5)">Loading visit history...</div>';
   try {
-    var data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + patientId);
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/patients/' + patientId + '/visits');
     if (!data.success || !data.data.length) {
       document.getElementById('prHistory').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.5)">No visits yet. Click + New Visit above.</div>';
       return;
@@ -1805,7 +1805,7 @@ async function loadVisitHistory(patientId) {
 async function loadVisitDetail(visitId, patientId) {
   editingVisitId = visitId;
   try {
-    var data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + patientId + '/' + visitId);
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/patients/' + patientId + '/visits/' + visitId);
     if (!data.success) return;
     var v = data.data;
     // Populate form
@@ -2106,9 +2106,9 @@ async function saveVisitRecord(sendNow) {
   try {
     var data;
     if (editingVisitId) {
-      data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + activeVisitPatient.id + '/' + editingVisitId, 'PUT', payload);
+      data = await apiCall('/hospitals/' + mwHospitalId + '/patients/' + activeVisitPatient.id + '/visits/' + editingVisitId, 'PUT', payload);
     } else {
-      data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + activeVisitPatient.id, 'POST', payload);
+      data = await apiCall('/hospitals/' + mwHospitalId + '/patients/' + activeVisitPatient.id + '/visits', 'POST', payload);
       if (data.success) editingVisitId = data.data.id;
     }
     if (data.success) {
