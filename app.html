@@ -1413,6 +1413,13 @@ var mwToken = localStorage.getItem('mw_token') || '';
 var mwUser = JSON.parse(localStorage.getItem('mw_user') || '{}');
 var mwHospitalId = mwUser.hospital_id || 1;
 
+// Apply role access on page load for existing sessions
+if (mwUser && mwUser.role) {
+  document.addEventListener('DOMContentLoaded', function() {
+    applyRoleAccess(mwUser.role);
+  });
+}
+
 async function apiCall(path, method='GET', body=null) {
   var token = localStorage.getItem('mw_token') || '';
   var opts = { method, headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } };
