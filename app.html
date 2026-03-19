@@ -1351,11 +1351,11 @@ async function doLogin() {
 
 function applyRoleAccess(role) {
   var access = {
-    HOSPITAL_ADMIN: ['dashboard','patients','appointments','ipd','billing'],
-    DOCTOR:         ['dashboard','patients','appointments','ipd','billing'],
-    RECEPTIONIST:   ['dashboard','patients','appointments'],
+    HOSPITAL_ADMIN: ['dashboard','patients','appointments','ipd','billing','investigations','settings','teleconsult'],
+    DOCTOR:         ['dashboard','patients','appointments','ipd','billing','investigations','teleconsult'],
+    RECEPTIONIST:   ['dashboard','patients','appointments','billing'],
     BILLING:        ['dashboard','billing'],
-    LAB:            ['dashboard'],
+    LAB:            ['dashboard','investigations'],
     PHARMACY:       ['dashboard','billing'],
   };
   var allowed = access[role] || ['dashboard'];
