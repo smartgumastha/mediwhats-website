@@ -1350,26 +1350,10 @@ async function doLogin() {
 }
 
 function applyRoleAccess(role) {
-  var access = {
-    HOSPITAL_ADMIN: ['dashboard','patients','appointments','ipd','billing','investigations','settings','teleconsult'],
-    DOCTOR:         ['dashboard','patients','appointments','ipd','billing','investigations','teleconsult'],
-    RECEPTIONIST:   ['dashboard','patients','appointments','billing'],
-    BILLING:        ['dashboard','billing'],
-    LAB:            ['dashboard','investigations'],
-    PHARMACY:       ['dashboard','billing'],
-  };
-  var allowed = access[role] || ['dashboard'];
+  // Show all nav items for all roles - role filtering disabled
   document.querySelectorAll('.nav-item').forEach(function(item) {
-    var onclick = item.getAttribute('onclick') || '';
-    var screenName = '';
-    var m = onclick.match(/showScreen\([\'"]([a-z]+)[\'"]/);
-    if (m) screenName = m[1];
-    if (!screenName) return;
-    if (allowed.includes(screenName)) {
-      item.style.display = '';
-    } else {
-      item.style.display = 'none';
-    }
+    item.style.display = '';
+    item.style.removeProperty('display');
   });
 }
 
@@ -1481,25 +1465,6 @@ async function removeStaff(userId) {
 }
 
 // Show staff section only for HOSPITAL_ADMIN
-function applyRoleAccess(role) {
-  var access = {
-    HOSPITAL_ADMIN: ['dashboard','patients','appointments','ipd','billing','staff'],
-    DOCTOR:         ['dashboard','patients','appointments','ipd','billing'],
-    RECEPTIONIST:   ['dashboard','patients','appointments'],
-    BILLING:        ['dashboard','billing'],
-    LAB:            ['dashboard'],
-    PHARMACY:       ['dashboard','billing'],
-  };
-  var allowed = access[role] || ['dashboard'];
-  if (allowed.includes('staff')) {
-    document.getElementById('staffNavSection').style.display = 'block';
-  }
-  document.querySelectorAll('.nav-item').forEach(item => {
-    var screen = item.getAttribute('onclick') || '';
-    var match = screen.match(/'([^']+)'/);
-    if (match && !allowed.includes(match[1])) item.style.display = 'none';
-  });
-}
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
