@@ -2934,6 +2934,31 @@ async function deleteMedicine(id) {
 // ===== BILLING =====
 var billsData = [];
 
+async function sendBillWhatsApp(billId) {
+  var phone = prompt('Enter patient WhatsApp number (10 digits):');
+  if (!phone || phone.length < 10) return;
+  var data = await apiCall('/hospitals/' + mwHospitalId + '/bills/' + billId);
+  if (!data.success) { showToast('Failed to load bill','error'); return; }
+  var b = data.data;
+  var name = ((b.first_name||'') + ' ' + (b.last_name||'')).trim() || 'Patient';
+  var items = Array.isArray(b.items) ? b.items : JSON.parse(b.items||'[]');
+  var itemList = items.map(function(i,n){ return (n+1)+'. '+i.description+' — ₹'+i.amount; }).join('\n');
+  var msg = '*' + (b.hospital_name||'MediWhats') + '*\n'
+    + 'Bill No: ' + b.bill_number + '\n'
+    + 'Date: ' + b.bill_date + '\n'
+    + 'Patient: ' + name + '\n\n'
+    + '*Items:*\n' + itemList + '\n\n'
+    + '*Total: ₹' + parseFloat(b.total).toLocaleString('en-IN') + '*\n'
+    + 'Payment: ' + b.payment_mode + '\n\n'
+    + '_Thank you for visiting us._\n_MediWhats — AI Hospital Manager_';
+
+  // Open WhatsApp Web with pre-filled message
+  var encoded = encodeURIComponent(msg);
+  var waUrl = 'https://wa.me/91' + phone.replace(/\D/g,'').replace(/^91/,'') + '?text=' + encoded;
+  window.open(waUrl, '_blank');
+  showToast('Opening WhatsApp...','success');
+}
+
 async function loadBilling() {
   try {
     var data = await apiCall('/hospitals/' + mwHospitalId + '/bills');
@@ -3015,77 +3040,87 @@ function openNewBillModal() {
 var billItems = [];
 
 function buildNewBillForm() {
-  return '<div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:20px;width:100%;max-width:780px;max-height:92vh;overflow-y:auto">'
+  var today = new Date().toISOString().split('T')[0];
+  return '<div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:20px;width:100%;max-width:760px;max-height:92vh;overflow-y:auto">'
     + '<div style="padding:16px 22px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0D1412;z-index:10">'
-    + '<div style="font-size:16px;font-weight:700">New Bill</div>'
-    + '<button onclick="document.getElementById(\'newBillModal\').style.display=\'none\'" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:22px;cursor:pointer;line-height:1">&#215;</button>'
+    + '<div style="font-size:16px;font-weight:700;font-family:\'Cabinet Grotesk\',sans-serif">New Bill</div>'
+    + '<button onclick="document.getElementById(\'newBillModal\').style.display=\'none\'" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:22px;cursor:pointer">&#215;</button>'
     + '</div>'
-    + '<div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+    + '<div style="padding:20px;display:flex;flex-direction:column;gap:16px">'
 
-    // Patient section
-    + '<div style="grid-column:1/-1"><div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">Patient Details</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
-    + '<div style="grid-column:1/-1"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Search Patient</label>'
-    + '<div style="position:relative"><input id="bill_patient_search" type="text" class="form-input" style="width:100%" placeholder="Search by name or MRN..." oninput="searchBillPatient(this.value)">'
-    + '<div id="bill_patient_suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#111A18;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;z-index:100;max-height:160px;overflow-y:auto;margin-top:4px"></div>'
-    + '</div><input type="hidden" id="bill_patient_id"></div>'
-    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Patient Name</label><input id="bill_patient_name" class="form-input" style="width:100%" placeholder="Auto-filled"></div>'
-    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Age / Gender</label><input id="bill_age_gender" class="form-input" style="width:100%" placeholder="35 / Male"></div>'
-    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">UHID / MRN</label><input id="bill_uhid" class="form-input" style="width:100%" placeholder="Auto-filled"></div>'
-    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Referred By</label><input id="bill_referred_by" class="form-input" style="width:100%" placeholder="Dr. Name / Hospital"></div>'
+    // Patient Search
+    + '<div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">'
+    + '<div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Patient Details</div>'
+    + '<div style="position:relative;margin-bottom:12px">'
+    + '<label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Search Patient</label>'
+    + '<input id="bill_patient_search" type="text" class="form-input" style="width:100%" placeholder="Type name or MRN to search..." oninput="searchBillPatient(this.value)">'
+    + '<div id="bill_patient_suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;z-index:200;max-height:160px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,0.5)"></div>'
+    + '</div>'
+    + '<input type="hidden" id="bill_patient_id">'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px" id="bill_patient_info_row" style="display:none">'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Patient Name</label>'
+    + '<input id="bill_patient_name" class="form-input" style="width:100%;background:rgba(0,196,154,0.05);cursor:not-allowed" placeholder="Auto-filled" readonly></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Age / Gender</label>'
+    + '<input id="bill_age_gender" class="form-input" style="width:100%;background:rgba(0,196,154,0.05);cursor:not-allowed" placeholder="Auto-filled" readonly></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">UHID / MRN</label>'
+    + '<input id="bill_uhid" class="form-input" style="width:100%;background:rgba(0,196,154,0.05);cursor:not-allowed" placeholder="Auto-filled" readonly></div>'
     + '</div></div>'
 
-    // Bill details
-    + '<div style="grid-column:1/-1"><div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">Bill Details</div>'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">'
-    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Bill Type</label><select id="bill_type" class="form-select" style="width:100%"><option>OPD</option><option>IPD</option><option>Lab</option><option>Pharmacy</option><option>Procedure</option><option>Package</option></select></div>'
-    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Department</label><select id="bill_dept" class="form-select" style="width:100%"><option>General Medicine</option><option>Ophthalmology</option><option>Dental</option><option>Gynaecology</option><option>Paediatrics</option><option>ENT</option><option>Orthopaedics</option><option>Dermatology</option><option>Surgery</option><option>Radiology</option><option>Lab</option></select></div>'
-    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Bill Date</label><input id="bill_date" type="date" class="form-input" style="width:100%"></div>'
+    // Bill Details
+    + '<div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">'
+    + '<div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Bill Details</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px">'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Bill Type</label>'
+    + '<select id="bill_type" class="form-select" style="width:100%"><option>OPD</option><option>IPD</option><option>Lab</option><option>Pharmacy</option><option>Procedure</option><option>Package</option></select></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Department</label>'
+    + '<select id="bill_dept" class="form-select" style="width:100%"><option>General Medicine</option><option>Ophthalmology</option><option>Dental</option><option>Gynaecology</option><option>Paediatrics</option><option>ENT</option><option>Orthopaedics</option><option>Dermatology</option><option>Surgery</option><option>Radiology</option><option>Lab</option></select></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Bill Date</label>'
+    + '<input id="bill_date" type="date" value="' + today + '" class="form-input" style="width:100%"></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Referred By</label>'
+    + '<input id="bill_referred_by" class="form-input" style="width:100%" placeholder="Dr. Name"></div>'
     + '</div></div>'
 
-    // Bill items
-    + '<div style="grid-column:1/-1"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    // Bill Items
+    + '<div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">'
+    + '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'
     + '<div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em">Bill Items</div>'
     + '<div style="display:flex;gap:8px">'
-    + '<button onclick="addBillItemFromMaster()" style="padding:5px 12px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:6px;cursor:pointer;font-size:12px">+ From Master</button>'
-    + '<button onclick="addBillItem()" style="padding:5px 12px;background:rgba(0,196,154,0.08);border:0.5px solid rgba(0,196,154,0.3);color:var(--teal);border-radius:6px;cursor:pointer;font-size:12px">+ Custom Item</button>'
+    + '<button onclick="addBillItemFromMaster()" style="padding:5px 12px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:6px;cursor:pointer;font-size:12px;font-weight:600">+ From Master</button>'
+    + '<button onclick="addBillItem()" style="padding:5px 12px;background:transparent;border:0.5px solid rgba(0,196,154,0.3);color:rgba(240,250,247,0.7);border-radius:6px;cursor:pointer;font-size:12px">+ Custom</button>'
     + '</div></div>'
     + '<div id="bill-items-list"></div></div>'
 
-    // Totals
-    + '<div style="grid-column:1/-1;background:#080C0B;border-radius:12px;padding:16px">'
-    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
-    + '<div>'
+    // Totals + Payment
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+    + '<div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">'
+    + '<div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Summary</div>'
     + '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:rgba(240,250,247,0.6)">Subtotal</span><span id="bill_subtotal" style="font-weight:600">&#8377;0</span></div>'
     + '<div style="display:flex;justify-content:space-between;margin-bottom:8px;align-items:center"><span style="font-size:13px;color:rgba(240,250,247,0.6)">Discount</span>'
-    + '<div style="display:flex;gap:6px;align-items:center">'
-    + '<select id="bill_disc_type" onchange="recalcBill()" style="background:#1a1a1a;border:0.5px solid rgba(0,196,154,0.3);border-radius:6px;padding:4px 6px;color:#F0FAF7;font-size:12px"><option value="amount">&#8377;</option><option value="percent">%</option></select>'
-    + '<input id="bill_discount" type="number" value="0" min="0" oninput="recalcBill()" style="width:70px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 8px;color:#F0FAF7;font-size:12px;text-align:right">'
-    + '</div></div>'
+    + '<div style="display:flex;gap:6px"><select id="bill_disc_type" onchange="recalcBill()" style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 6px;color:#F0FAF7;font-size:12px"><option value="amount">&#8377;</option><option value="percent">%</option></select>'
+    + '<input id="bill_discount" type="number" value="0" min="0" oninput="recalcBill()" style="width:65px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 8px;color:#F0FAF7;font-size:12px;text-align:right"></div></div>'
     + '<div style="display:flex;justify-content:space-between;margin-bottom:8px;align-items:center"><span style="font-size:13px;color:rgba(240,250,247,0.6)">GST %</span>'
-    + '<input id="bill_gst_pct" type="number" value="0" min="0" max="28" oninput="recalcBill()" style="width:60px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 8px;color:#F0FAF7;font-size:12px;text-align:right">'
-    + '</div>'
+    + '<input id="bill_gst_pct" type="number" value="0" min="0" max="28" oninput="recalcBill()" style="width:65px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 8px;color:#F0FAF7;font-size:12px;text-align:right"></div>'
     + '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:rgba(240,250,247,0.6)">GST Amount</span><span id="bill_gst_amt" style="font-weight:600">&#8377;0</span></div>'
     + '<div style="display:flex;justify-content:space-between;padding-top:10px;border-top:0.5px solid rgba(0,196,154,0.2)"><span style="font-size:15px;font-weight:700">TOTAL</span><span id="bill_total" style="font-size:18px;font-weight:700;color:var(--teal)">&#8377;0</span></div>'
+    + '<div style="margin-top:10px;padding:8px 10px;background:rgba(0,196,154,0.05);border-radius:8px;font-size:12px;color:rgba(240,250,247,0.6)" id="bill_amount_words">Zero Rupees Only</div>'
     + '</div>'
-    + '<div>'
+    + '<div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">'
+    + '<div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:12px">Payment</div>'
     + '<div style="margin-bottom:10px"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Payment Mode</label>'
     + '<select id="bill_payment_mode" onchange="togglePaymentRef()" class="form-select" style="width:100%"><option>Cash</option><option>UPI</option><option>Card</option><option>Cheque</option><option>Insurance</option><option>Pending</option></select></div>'
-    + '<div id="payment_ref_row" style="display:none;margin-bottom:10px"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Reference / Transaction ID</label>'
-    + '<input id="bill_ref" type="text" class="form-input" style="width:100%" placeholder="UPI ref / Card last 4 / Policy no / Cheque no"></div>'
-    + '<div style="margin-bottom:10px"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Amount in Words</label>'
-    + '<div id="bill_amount_words" style="padding:8px 10px;background:rgba(0,196,154,0.05);border-radius:8px;font-size:12px;color:rgba(240,250,247,0.7);min-height:32px">Zero</div></div>'
-    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Remarks</label>'
-    + '<textarea id="bill_remarks" rows="2" class="form-input" style="width:100%;resize:none" placeholder="Message from hospital to patient..."></textarea></div>'
-    + '</div></div></div>'
+    + '<div id="payment_ref_row" style="display:none;margin-bottom:10px"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Reference No.</label>'
+    + '<input id="bill_ref" type="text" class="form-input" style="width:100%" placeholder="UPI ref / Card last 4 / Policy no"></div>'
+    + '</div></div>'
 
-    // Action buttons
-    + '<div style="padding:14px 20px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:#0D1412">'
+    // Buttons
+    + '<div style="display:flex;gap:10px;justify-content:flex-end;padding-top:4px">'
     + '<button onclick="document.getElementById(\'newBillModal\').style.display=\'none\'" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Cancel</button>'
     + '<button onclick="saveBill(false)" style="padding:10px 20px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:10px;font-weight:700;cursor:pointer">Save</button>'
-    + '<button onclick="saveBill(true)" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer">Save &amp; Print</button>'
+    + '<button onclick="saveBill(true)" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-family:\'Cabinet Grotesk\',sans-serif">Save &amp; Print</button>'
+    + '</div>'
     + '</div></div>';
 }
+
 
 
 function addBillItem() {
@@ -3235,10 +3270,14 @@ function searchBillPatient(val) {
 function selectBillPatient(id, name, age, gender, mrn) {
   document.getElementById('bill_patient_id').value = id;
   document.getElementById('bill_patient_search').value = name;
+  document.getElementById('bill_patient_search').readOnly = true;
   document.getElementById('bill_patient_suggestions').style.display = 'none';
   var nm = document.getElementById('bill_patient_name'); if(nm) nm.value = name;
   var ag = document.getElementById('bill_age_gender'); if(ag) ag.value = (age||'') + (gender?' / '+gender:'');
   var uh = document.getElementById('bill_uhid'); if(uh) uh.value = mrn||'';
+  var row = document.getElementById('bill_patient_info_row');
+  if (row) row.style.display = 'grid';
+  document.getElementById('bill_patient_search').style.borderColor = 'var(--teal)';
 }
 
 async function saveBill(print) {
@@ -3354,6 +3393,10 @@ async function printBill(billId) {
     + '<div style="margin-left:auto;width:260px">'
     + '<div style="display:flex;justify-content:space-between;padding:8px 0;border-top:2px solid #333;font-size:16px;font-weight:700">TOTAL<span style="color:#00C49A">₹'+parseFloat(b.total).toFixed(2)+'</span></div></div>'
     + (h.bill_terms?'<div style="margin-top:16px;font-size:11px;color:#777"><b>T&C:</b> '+h.bill_terms+'</div>':'')
+    + '<div style="margin-top:16px;padding-top:10px;border-top:1px solid #eee;display:flex;justify-content:space-between;font-size:10px;color:#aaa">'
+    + '<span>Generated by: ' + (mwUser?.name||mwUser?.email||'Staff') + ' | ' + new Date().toLocaleString('en-IN') + '</span>'
+    + '<span>MediWhats — AI Hospital Manager</span>'
+    + '</div>'
     + '</body></html>';
   var win = window.open('','_blank','width=850,height:750');
   win.document.write(html); win.document.close();
