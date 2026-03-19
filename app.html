@@ -830,6 +830,52 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <div style="grid-column:1/-1">
       <button onclick="saveSettings()" style="padding:12px 32px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:15px;font-family:'Cabinet Grotesk',sans-serif">Save Settings</button>
     </div>
+
+    <!-- Medicine Master List -->
+    <div style="grid-column:1/-1;background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;padding:20px;margin-top:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em">Medicine / Service Master List</div>
+        <button onclick="openAddMedicineModal()" style="padding:7px 16px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">+ Add Item</button>
+      </div>
+      <div style="margin-bottom:12px">
+        <input type="text" id="med_search" placeholder="Search medicines..." oninput="loadMedicinesList(thi
+  // Event delegation for delete buttons
+  setTimeout(function() {
+    var tbl = document.getElementById('med-master-table');
+    if (tbl) tbl.addEventListener('click', function(e) {
+      var btn = e.target.closest('.del-med-btn');
+      if (btn) deleteMedicine(btn.getAttribute('data-mid'));
+    });
+  }, 100);s.value)" class="form-input" style="width:100%;max-width:320px">
+      </div>
+      <div id="medicines-table">
+        <div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADD MEDICINE MODAL -->
+<div id="addMedModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:6000;align-items:center;justify-content:center">
+  <div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:16px;width:90%;max-width:500px">
+    <div style="padding:16px 20px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between">
+      <div style="font-weight:700" id="addMedTitle">Add Medicine / Service</div>
+      <button onclick="document.getElementById('addMedModal').style.display='none'" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:20px;cursor:pointer">&#215;</button>
+    </div>
+    <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="grid-column:1/-1"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Name *</label><input id="med_name" class="form-input" style="width:100%" placeholder="Consultation fee / Paracetamol 500mg / CBC"></div>
+      <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Category</label><select id="med_category" class="form-select" style="width:100%"><option>Consultation</option><option>Medicine</option><option>Lab Test</option><option>Procedure</option><option>Radiology</option><option>Package</option><option>Other</option></select></div>
+      <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Form</label><input id="med_form" class="form-input" style="width:100%" placeholder="Tablet/Syrup/Test/Service"></div>
+      <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Strength / Details</label><input id="med_strength" class="form-input" style="width:100%" placeholder="500mg / 5ml / 30min"></div>
+      <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Price (&#8377;) *</label><input id="med_price" type="number" class="form-input" style="width:100%" placeholder="0"></div>
+      <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">GST %</label><input id="med_gst" type="number" class="form-input" style="width:100%" value="0" placeholder="0/5/12/18"></div>
+      <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">HSN Code</label><input id="med_hsn" class="form-input" style="width:100%" placeholder="3004" value="3004"></div>
+      <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Generic Name</label><input id="med_generic" class="form-input" style="width:100%" placeholder="Generic/alternative name"></div>
+    </div>
+    <div style="padding:14px 20px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="document.getElementById('addMedModal').style.display='none'" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Cancel</button>
+      <button onclick="saveMedicine()" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer">Save Item</button>
+    </div>
   </div>
 </div>
 
@@ -1759,7 +1805,7 @@ function renderTcList() {
       + '<td style="padding:12px">' + actions + '</td>'
       + '</tr>';
   }
-  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse" id="med-master-table">'
     + '<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.15)">'
     + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em">Patient</th>'
     + '<th style="text-align:left;padding:10px 12px;font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em">Symptoms</th>'
@@ -2701,6 +2747,11 @@ function renderAIPrescription(drugs, advice, warnings) {
     + '</div>';
 
   modal.style.display = 'flex';
+  modal.querySelector('tbody').addEventListener('click', function(e) {
+    var row = e.target.closest('.master-row');
+    if (!row) return;
+    addMasterItemToBill(row.dataset.mid, row.dataset.mname, parseFloat(row.dataset.mprice)||0);
+  });
 }
 
 function applyAIPrescription(drugs, advice) {
@@ -2754,6 +2805,7 @@ async function loadSettings() {
       prev.innerHTML = '<img src="' + h.logo_url + '" style="width:100%;height:100%;object-fit:contain">';
     }
     updateUHIDPreview();
+    loadMedicinesList('');
   } catch(e) { showToast('Failed to load settings', 'error'); }
 }
 
@@ -2804,6 +2856,76 @@ async function saveSettings() {
   } else {
     showToast('Error: ' + data.message, 'error');
   }
+}
+
+// ===== MEDICINE MASTER =====
+async function loadMedicinesList(search) {
+  var url = '/hospitals/' + mwHospitalId + '/medicines' + (search ? '?search=' + encodeURIComponent(search) : '');
+  var data = await apiCall(url);
+  var el = document.getElementById('medicines-table');
+  if (!el) return;
+  if (!data.success || !data.data.length) {
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4)">No items yet. Click + Add Item.</div>';
+    return;
+  }
+  window.masterItems = data.data;
+  var tbody = data.data.map(function(m) {
+    return '<tr>'
+      + '<td style="padding:8px 12px;font-weight:600">' + m.name + '</td>'
+      + '<td style="padding:8px 12px;font-size:12px;color:rgba(240,250,247,0.6)">' + (m.category||'') + '</td>'
+      + '<td style="padding:8px 12px;font-size:12px;color:rgba(240,250,247,0.6)">' + (m.form||'') + ' ' + (m.strength||'') + '</td>'
+      + '<td style="padding:8px 12px;font-weight:700;color:var(--teal)">&#8377;' + (m.price||0) + '</td>'
+      + '<td style="padding:8px 12px;font-size:12px">' + (m.gst_percent||0) + '%</td>'
+      + '<td style="padding:8px 12px"><button data-delid="' + m.id + '" class="del-med" style="background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);color:#ef4444;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:11px">Remove</button></td>'
+      + '</tr>';
+  }).join('');
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">'
+    + ['Name','Category','Form','Price','GST',''].map(function(h){ return '<th style="padding:8px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">'+h+'</th>'; }).join('')
+    + '</tr></thead><tbody>' + tbody + '</tbody></table>';
+  el.querySelectorAll('.del-med').forEach(function(btn) {
+    btn.addEventListener('click', function() { deleteMedicine(this.getAttribute('data-delid')); });
+  });
+}
+
+
+function openAddMedicineModal() {
+  ['med_name','med_form','med_strength','med_generic'].forEach(function(id) {
+    var el = document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('med_price').value = '0';
+  document.getElementById('med_gst').value = '0';
+  document.getElementById('med_hsn').value = '3004';
+  document.getElementById('addMedModal').style.display = 'flex';
+}
+
+async function saveMedicine() {
+  var name = document.getElementById('med_name')?.value?.trim();
+  if (!name) { showToast('Medicine name is required','error'); return; }
+  var payload = {
+    name:        name,
+    generic:     document.getElementById('med_generic')?.value?.trim(),
+    category:    document.getElementById('med_category')?.value,
+    form:        document.getElementById('med_form')?.value?.trim(),
+    strength:    document.getElementById('med_strength')?.value?.trim(),
+    price:       parseFloat(document.getElementById('med_price')?.value)||0,
+    gst_percent: parseFloat(document.getElementById('med_gst')?.value)||0,
+    hsn_code:    document.getElementById('med_hsn')?.value?.trim() || '3004'
+  };
+  var data = await apiCall('/hospitals/' + mwHospitalId + '/medicines', 'POST', payload);
+  if (data.success) {
+    showToast(name + ' added to master list ✓', 'success');
+    document.getElementById('addMedModal').style.display = 'none';
+    loadMedicinesList('');
+  } else {
+    showToast('Error: ' + data.message, 'error');
+  }
+}
+
+async function deleteMedicine(id) {
+  if (!confirm('Remove this item from master list?')) return;
+  var data = await apiCall('/hospitals/' + mwHospitalId + '/medicines/' + id, 'DELETE');
+  if (data.success) { showToast('Removed ✓','success'); loadMedicinesList(''); }
 }
 
 // ===== BILLING =====
@@ -2890,48 +3012,78 @@ function openNewBillModal() {
 var billItems = [];
 
 function buildNewBillForm() {
-  return '<div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:20px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto">'
-    + '<div style="padding:18px 22px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between;align-items:center">'
+  return '<div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:20px;width:100%;max-width:780px;max-height:92vh;overflow-y:auto">'
+    + '<div style="padding:16px 22px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0D1412;z-index:10">'
     + '<div style="font-size:16px;font-weight:700">New Bill</div>'
-    + '<button onclick="document.getElementById(\'newBillModal\').style.display=\'none\'" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:20px;cursor:pointer">×</button>'
-    + '</div><div style="padding:20px">'
-    // Patient search
-    + '<div style="margin-bottom:14px"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Patient (search by name/MRN)</label>'
-    + '<input id="bill_patient_search" type="text" class="form-input" style="width:100%" placeholder="Search patient..." oninput="searchBillPatient(this.value)">'
-    + '<div id="bill_patient_suggestions" style="display:none;background:#111A18;border:0.5px solid rgba(0,196,154,0.3);border-radius:8px;margin-top:4px;max-height:150px;overflow-y:auto"></div>'
-    + '<input type="hidden" id="bill_patient_id"></div>'
-    // Bill type and date
-    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">'
-    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Bill Type</label>'
-    + '<select id="bill_type" class="form-select" style="width:100%"><option>OPD</option><option>IPD</option><option>Lab</option><option>Pharmacy</option><option>Procedure</option></select></div>'
-    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Date</label>'
-    + '<input id="bill_date" type="date" class="form-input" style="width:100%"></div>'
-    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Payment Mode</label>'
-    + '<select id="bill_payment_mode" onchange="togglePaymentRef()" class="form-select" style="width:100%"><option>Cash</option><option>UPI</option><option>Card</option><option>Cheque</option><option>Insurance</option><option>Pending</option></select></div>'
+    + '<button onclick="document.getElementById(\'newBillModal\').style.display=\'none\'" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:22px;cursor:pointer;line-height:1">&#215;</button>'
     + '</div>'
-    + '<div style="margin-bottom:14px" id="payment_ref_row">'
-    + '<label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Reference / Transaction ID</label>'
-    + '<input id="bill_ref" type="text" class="form-input" style="width:100%" placeholder="UPI ref / Card last 4 / Insurance policy no / Cheque no">'
-    + '</div>'
-    // Items
-    + '<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
-    + '<label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase">Bill Items</label>'
-    + '<button onclick="addBillItem()" style="padding:4px 12px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:6px;cursor:pointer;font-size:12px">+ Add Item</button>'
-    + '</div><div id="bill-items-list"></div></div>'
+    + '<div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:14px">'
+
+    // Patient section
+    + '<div style="grid-column:1/-1"><div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">Patient Details</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">'
+    + '<div style="grid-column:1/-1"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Search Patient</label>'
+    + '<div style="position:relative"><input id="bill_patient_search" type="text" class="form-input" style="width:100%" placeholder="Search by name or MRN..." oninput="searchBillPatient(this.value)">'
+    + '<div id="bill_patient_suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#111A18;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;z-index:100;max-height:160px;overflow-y:auto;margin-top:4px"></div>'
+    + '</div><input type="hidden" id="bill_patient_id"></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Patient Name</label><input id="bill_patient_name" class="form-input" style="width:100%" placeholder="Auto-filled"></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Age / Gender</label><input id="bill_age_gender" class="form-input" style="width:100%" placeholder="35 / Male"></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">UHID / MRN</label><input id="bill_uhid" class="form-input" style="width:100%" placeholder="Auto-filled"></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Referred By</label><input id="bill_referred_by" class="form-input" style="width:100%" placeholder="Dr. Name / Hospital"></div>'
+    + '</div></div>'
+
+    // Bill details
+    + '<div style="grid-column:1/-1"><div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px;padding-bottom:6px;border-bottom:0.5px solid rgba(0,196,154,0.15)">Bill Details</div>'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Bill Type</label><select id="bill_type" class="form-select" style="width:100%"><option>OPD</option><option>IPD</option><option>Lab</option><option>Pharmacy</option><option>Procedure</option><option>Package</option></select></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Department</label><select id="bill_dept" class="form-select" style="width:100%"><option>General Medicine</option><option>Ophthalmology</option><option>Dental</option><option>Gynaecology</option><option>Paediatrics</option><option>ENT</option><option>Orthopaedics</option><option>Dermatology</option><option>Surgery</option><option>Radiology</option><option>Lab</option></select></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Bill Date</label><input id="bill_date" type="date" class="form-input" style="width:100%"></div>'
+    + '</div></div>'
+
+    // Bill items
+    + '<div style="grid-column:1/-1"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    + '<div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em">Bill Items</div>'
+    + '<div style="display:flex;gap:8px">'
+    + '<button onclick="addBillItemFromMaster()" style="padding:5px 12px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:6px;cursor:pointer;font-size:12px">+ From Master</button>'
+    + '<button onclick="addBillItem()" style="padding:5px 12px;background:rgba(0,196,154,0.08);border:0.5px solid rgba(0,196,154,0.3);color:var(--teal);border-radius:6px;cursor:pointer;font-size:12px">+ Custom Item</button>'
+    + '</div></div>'
+    + '<div id="bill-items-list"></div></div>'
+
     // Totals
-    + '<div style="background:#080C0B;border-radius:10px;padding:14px;margin-bottom:14px">'
-    + '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:rgba(240,250,247,0.6)">Subtotal</span><span id="bill_subtotal" style="font-weight:600">₹0</span></div>'
-    + '<div style="display:flex;justify-content:space-between;margin-bottom:6px;align-items:center"><span style="font-size:13px;color:rgba(240,250,247,0.6)">Discount</span><input id="bill_discount" type="number" value="0" oninput="recalcBill()" style="width:80px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 8px;color:#F0FAF7;font-size:12px;text-align:right"></div>'
-    + '<div style="display:flex;justify-content:space-between;margin-bottom:6px;align-items:center"><span style="font-size:13px;color:rgba(240,250,247,0.6)">GST %</span><input id="bill_gst_pct" type="number" value="0" oninput="recalcBill()" style="width:60px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 8px;color:#F0FAF7;font-size:12px;text-align:right"></div>'
-    + '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:rgba(240,250,247,0.6)">GST Amount</span><span id="bill_gst_amt" style="font-weight:600">₹0</span></div>'
-    + '<div style="display:flex;justify-content:space-between;padding-top:8px;border-top:0.5px solid rgba(0,196,154,0.2)"><span style="font-size:15px;font-weight:700">Total</span><span id="bill_total" style="font-size:18px;font-weight:700;color:var(--teal)">₹0</span></div>'
+    + '<div style="grid-column:1/-1;background:#080C0B;border-radius:12px;padding:16px">'
+    + '<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">'
+    + '<div>'
+    + '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:rgba(240,250,247,0.6)">Subtotal</span><span id="bill_subtotal" style="font-weight:600">&#8377;0</span></div>'
+    + '<div style="display:flex;justify-content:space-between;margin-bottom:8px;align-items:center"><span style="font-size:13px;color:rgba(240,250,247,0.6)">Discount</span>'
+    + '<div style="display:flex;gap:6px;align-items:center">'
+    + '<select id="bill_disc_type" onchange="recalcBill()" style="background:#1a1a1a;border:0.5px solid rgba(0,196,154,0.3);border-radius:6px;padding:4px 6px;color:#F0FAF7;font-size:12px"><option value="amount">&#8377;</option><option value="percent">%</option></select>'
+    + '<input id="bill_discount" type="number" value="0" min="0" oninput="recalcBill()" style="width:70px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 8px;color:#F0FAF7;font-size:12px;text-align:right">'
+    + '</div></div>'
+    + '<div style="display:flex;justify-content:space-between;margin-bottom:8px;align-items:center"><span style="font-size:13px;color:rgba(240,250,247,0.6)">GST %</span>'
+    + '<input id="bill_gst_pct" type="number" value="0" min="0" max="28" oninput="recalcBill()" style="width:60px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 8px;color:#F0FAF7;font-size:12px;text-align:right">'
     + '</div>'
-    + '<div style="display:flex;gap:10px;justify-content:flex-end">'
+    + '<div style="display:flex;justify-content:space-between;margin-bottom:8px"><span style="font-size:13px;color:rgba(240,250,247,0.6)">GST Amount</span><span id="bill_gst_amt" style="font-weight:600">&#8377;0</span></div>'
+    + '<div style="display:flex;justify-content:space-between;padding-top:10px;border-top:0.5px solid rgba(0,196,154,0.2)"><span style="font-size:15px;font-weight:700">TOTAL</span><span id="bill_total" style="font-size:18px;font-weight:700;color:var(--teal)">&#8377;0</span></div>'
+    + '</div>'
+    + '<div>'
+    + '<div style="margin-bottom:10px"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Payment Mode</label>'
+    + '<select id="bill_payment_mode" onchange="togglePaymentRef()" class="form-select" style="width:100%"><option>Cash</option><option>UPI</option><option>Card</option><option>Cheque</option><option>Insurance</option><option>Pending</option></select></div>'
+    + '<div id="payment_ref_row" style="display:none;margin-bottom:10px"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Reference / Transaction ID</label>'
+    + '<input id="bill_ref" type="text" class="form-input" style="width:100%" placeholder="UPI ref / Card last 4 / Policy no / Cheque no"></div>'
+    + '<div style="margin-bottom:10px"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Amount in Words</label>'
+    + '<div id="bill_amount_words" style="padding:8px 10px;background:rgba(0,196,154,0.05);border-radius:8px;font-size:12px;color:rgba(240,250,247,0.7);min-height:32px">Zero</div></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Remarks</label>'
+    + '<textarea id="bill_remarks" rows="2" class="form-input" style="width:100%;resize:none" placeholder="Message from hospital to patient..."></textarea></div>'
+    + '</div></div></div>'
+
+    // Action buttons
+    + '<div style="padding:14px 20px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:#0D1412">'
     + '<button onclick="document.getElementById(\'newBillModal\').style.display=\'none\'" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Cancel</button>'
     + '<button onclick="saveBill(false)" style="padding:10px 20px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:10px;font-weight:700;cursor:pointer">Save</button>'
-    + '<button onclick="saveBill(true)" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer">Save & Print</button>'
-    + '</div></div></div>';
+    + '<button onclick="saveBill(true)" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer">Save &amp; Print</button>'
+    + '</div></div>';
 }
+
 
 function addBillItem() {
   billItems.push({ description: '', qty: 1, rate: 0, amount: 0 });
@@ -2962,6 +3114,73 @@ function renderBillItems() {
   });
   el.innerHTML = html + '</tbody></table>';
   recalcBill();
+}
+
+function numberToWords(n) {
+  var ones = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  var tens = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  if (n === 0) return 'Zero';
+  if (n < 0) return 'Minus ' + numberToWords(-n);
+  var words = '';
+  if (Math.floor(n/100000) > 0) { words += numberToWords(Math.floor(n/100000)) + ' Lakh '; n %= 100000; }
+  if (Math.floor(n/1000) > 0) { words += numberToWords(Math.floor(n/1000)) + ' Thousand '; n %= 1000; }
+  if (Math.floor(n/100) > 0) { words += ones[Math.floor(n/100)] + ' Hundred '; n %= 100; }
+  if (n > 0) { if (n < 20) words += ones[n]; else words += tens[Math.floor(n/10)] + (n%10?' '+ones[n%10]:''); }
+  return words.trim();
+}
+
+function addBillItemFromMaster() {
+  if (!window.masterItems || !window.masterItems.length) {
+    apiCall('/hospitals/' + mwHospitalId + '/medicines').then(function(d) {
+      if (d.success) { window.masterItems = d.data; showMasterPicker(); }
+      else showToast('No master items found. Add from Settings.','error');
+    });
+  } else { showMasterPicker(); }
+}
+
+function showMasterPicker() {
+  var items = window.masterItems || [];
+  if (!items.length) { showToast('No items in master list','error'); return; }
+  var modal = document.getElementById('masterPickerModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'masterPickerModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;display:flex;align-items:center;justify-content:center';
+    document.body.appendChild(modal);
+  }
+  var rows = items.map(function(item) {
+    var safeName = (item.name||'').replace(/"/g,'&quot;');
+    return '<tr class="mrow" data-name="' + safeName + '" data-price="' + (item.price||0) + '" style="cursor:pointer;border-bottom:0.5px solid rgba(0,196,154,0.1)">'
+      + '<td style="padding:8px 12px;font-size:13px">' + safeName + '</td>'
+      + '<td style="padding:8px 12px;font-size:12px;color:rgba(240,250,247,0.5)">' + (item.form||'') + ' ' + (item.strength||'') + '</td>'
+      + '<td style="padding:8px 12px;font-size:13px;font-weight:600;color:var(--teal)">&#8377;' + (item.price||0) + '</td>'
+      + '</tr>';
+  }).join('');
+  modal.innerHTML = '<div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:16px;width:90%;max-width:500px;max-height:80vh;overflow:hidden;display:flex;flex-direction:column">'
+    + '<div style="padding:14px 18px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between">'
+    + '<div style="font-weight:700">Select from Master List</div>'
+    + '<button id="closeMasterPicker" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:20px;cursor:pointer">&#215;</button>'
+    + '</div>'
+    + '<div style="overflow-y:auto"><table style="width:100%;border-collapse:collapse" id="masterTable">'
+    + '<thead><tr style="background:rgba(0,196,154,0.08)"><th style="padding:8px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Name</th><th style="padding:8px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Details</th><th style="padding:8px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Price</th></tr></thead>'
+    + '<tbody>' + rows + '</tbody></table></div></div>';
+  modal.style.display = 'flex';
+  modal.querySelector('#closeMasterPicker').onclick = function() { modal.style.display='none'; };
+  modal.querySelector('#masterTable tbody').addEventListener('click', function(e) {
+    var row = e.target.closest('.mrow');
+    if (!row) return;
+    addMasterItemToBill(row.getAttribute('data-name'), parseFloat(row.getAttribute('data-price'))||0);
+    modal.style.display = 'none';
+  });
+}
+
+
+function addMasterItemToBill(name, price) {
+  billItems.push({ description: name, qty: 1, rate: price, amount: price });
+  renderBillItems();
+  recalcBill();
+  var modal = document.getElementById('masterPickerModal');
+  if (modal) modal.style.display = 'none';
 }
 
 function togglePaymentRef() {
@@ -3010,10 +3229,13 @@ function searchBillPatient(val) {
   s.style.display = 'block';
 }
 
-function selectBillPatient(id, name) {
+function selectBillPatient(id, name, age, gender, mrn) {
   document.getElementById('bill_patient_id').value = id;
   document.getElementById('bill_patient_search').value = name;
   document.getElementById('bill_patient_suggestions').style.display = 'none';
+  var nm = document.getElementById('bill_patient_name'); if(nm) nm.value = name;
+  var ag = document.getElementById('bill_age_gender'); if(ag) ag.value = (age||'') + (gender?' / '+gender:'');
+  var uh = document.getElementById('bill_uhid'); if(uh) uh.value = mrn||'';
 }
 
 async function saveBill(print) {
