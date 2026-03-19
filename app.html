@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773961412 -->
+<!-- MediWhats v23 BUILD:1773963751 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -737,14 +737,86 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 
 <!-- TELECONSULT -->
-<div class="screen" id="screen-teleconsult">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+<div class="screen" <div id="screen-teleconsult" class="screen">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
     <div>
-      <h2 style="font-size:22px;font-weight:700;font-family:'Cabinet Grotesk',sans-serif">Teleconsultation</h2>
-      <p style="font-size:13px;color:rgba(240,250,247,0.55);margin-top:4px">Video consultations via WhatsApp link — no app needed</p>
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Teleconsultation</div>
+      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Video consults via WhatsApp or browser link</div>
     </div>
-    <button onclick="openTcModal()" style="background:var(--teal);color:#000;border:none;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;font-family:'Cabinet Grotesk',sans-serif">+ New Consultation</button>
+    <button onclick="startNewTeleconsult()" style="padding:10px 22px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px">+ New Consult</button>
   </div>
+
+  <!-- Stats -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Today</div>
+      <div style="font-size:22px;font-weight:700;color:var(--teal);margin-top:4px" id="tc-today-count">0</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Pending</div>
+      <div style="font-size:22px;font-weight:700;color:#ef9f27;margin-top:4px" id="tc-pending-count">0</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">This Month</div>
+      <div style="font-size:22px;font-weight:700;color:#F0FAF7;margin-top:4px" id="tc-month-count">0</div>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div id="tc-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
+    <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading consults...</div>
+  </div>
+</div>
+
+<!-- NEW TELECONSULT MODAL -->
+<div id="newTCModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:5000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:20px;width:100%;max-width:500px">
+    <div style="padding:16px 22px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between;align-items:center">
+      <div style="font-size:16px;font-weight:700">New Teleconsult</div>
+      <button onclick="document.getElementById('newTCModal').style.display='none'" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:22px;cursor:pointer">&#215;</button>
+    </div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:12px">
+      <div>
+        <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Patient</label>
+        <div style="position:relative">
+          <input id="tc_patient_search" type="text" class="form-input" style="width:100%" placeholder="Search patient by name or MRN..." oninput="searchTCPatient(this.value)">
+          <div id="tc_patient_suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;z-index:100;max-height:150px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,0.6)"></div>
+        </div>
+        <input type="hidden" id="tc_patient_id">
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div>
+          <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Date</label>
+          <input id="tc_date" type="date" class="form-input" style="width:100%">
+        </div>
+        <div>
+          <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Time</label>
+          <input id="tc_time" type="time" class="form-input" style="width:100%">
+        </div>
+      </div>
+      <div>
+        <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Type</label>
+        <select id="tc_type" class="form-select" style="width:100%">
+          <option>Video Call (Daily.co)</option>
+          <option>WhatsApp Video</option>
+          <option>Phone Call</option>
+        </select>
+      </div>
+      <div>
+        <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Chief Complaint</label>
+        <input id="tc_complaint" class="form-input" style="width:100%" placeholder="e.g. Follow-up for diabetes">
+      </div>
+      <div>
+        <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Consultation Fee (&#8377;)</label>
+        <input id="tc_fee" type="number" class="form-input" style="width:100%" value="300" placeholder="300">
+      </div>
+    </div>
+    <div style="padding:14px 20px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="document.getElementById('newTCModal').style.display='none'" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Cancel</button>
+      <button onclick="createTeleconsult()" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer">Create &amp; Send Link</button>
+    </div>
+  </div>
+</div>
   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px">
     <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:12px;padding:16px"><div style="font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Today</div><div style="font-size:26px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="tc-today">0</div></div>
     <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:12px;padding:16px"><div style="font-size:11px;color:rgba(240,250,247,0.55);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Pending</div><div style="font-size:26px;font-weight:700;color:#F59E0B;font-family:'Cabinet Grotesk',sans-serif" id="tc-pending">0</div></div>
@@ -937,7 +1009,13 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 
       <!-- SECTION: DIAGNOSIS -->
       <div class="pr-section" id="prsec-diagnosis" style="display:none">
-        <div class="vr-section-title">Assessment — Diagnosis</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="vr-section-title" style="margin:0">Assessment — Diagnosis</div>
+          <button onclick="aiSuggestDiagnosis()" style="padding:7px 16px;background:rgba(127,119,221,0.15);border:0.5px solid #7F77DD;color:#AFA9EC;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px">
+            <span style="font-size:14px">✨</span> AI Suggest Diagnosis
+          </button>
+        </div>
+        <div id="ai-diagnosis-suggestions" style="display:none;margin-bottom:14px"></div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
           <div style="grid-column:1/-1"><label class="vr-label">Primary Diagnosis *</label><input id="vr_dx" class="form-input" style="width:100%" placeholder="Acute viral fever"></div>
           <div><label class="vr-label">Secondary Diagnosis</label><input id="vr_dx2" class="form-input" style="width:100%" placeholder="Upper respiratory tract infection"></div>
@@ -947,7 +1025,13 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 
       <!-- SECTION: PRESCRIPTION -->
       <div class="pr-section" id="prsec-prescription" style="display:none">
-        <div class="vr-section-title">Plan — Prescription</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="vr-section-title" style="margin:0">Plan — Prescription</div>
+          <button onclick="aiDraftPrescription()" style="padding:7px 16px;background:rgba(127,119,221,0.15);border:0.5px solid #7F77DD;color:#AFA9EC;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px">
+            <span style="font-size:14px">✨</span> AI Draft Rx
+          </button>
+        </div>
+        <div id="ai-rx-review-panel" style="display:none;margin-bottom:14px"></div>
         <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
           <select id="rx-drug-select" class="form-select" style="width:220px">
             <option value="">Select drug...</option><option>Paracetamol</option><option>Dolo 650</option><option>Ibuprofen</option><option>Aspirin</option><option>Diclofenac</option><option>Amoxicillin</option><option>Azithromycin</option><option>Ciprofloxacin</option><option>Metronidazole</option><option>Doxycycline</option><option>Pantoprazole</option><option>Omeprazole</option><option>Domperidone</option><option>Ondansetron</option><option>Metformin</option><option>Glimepiride</option><option>Amlodipine</option><option>Atenolol</option><option>Telmisartan</option><option>Atorvastatin</option><option>Cetirizine</option><option>Levocetrizine</option><option>Montelukast</option><option>Salbutamol</option><option>Multivitamin</option><option>Vitamin D3</option><option>Calcium</option><option>Iron</option><option>Folic Acid</option><option>Augmentin</option><option>Cefixime</option><option>Levofloxacin</option></select>
@@ -2904,6 +2988,430 @@ async function dispatchInvResult(resultId,patientPhone) {
   var data=await apiCall('/hospitals/'+mwHospitalId+'/investigations/results/'+resultId+'/dispatch','POST',{patient_phone:phone});
   if (data.success) { showToast('Results sent \u2713','success'); loadInvResults(); }
   else showToast('Error: '+data.message,'error');
+}
+
+
+
+
+// ===== AI EMR FEATURES =====
+
+// ===== AI EMR FEATURES =====
+var aiCallCount = 0;
+var AI_MONTHLY_CAP = 100;
+
+function checkAICap() {
+  var month = new Date().toISOString().slice(0,7);
+  var stored = JSON.parse(localStorage.getItem('mw_ai_usage') || '{"month":"","count":0}');
+  if (stored.month !== month) { stored = {month: month, count: 0}; }
+  aiCallCount = stored.count;
+  return aiCallCount < AI_MONTHLY_CAP;
+}
+
+function incrementAICount() {
+  var month = new Date().toISOString().slice(0,7);
+  var stored = JSON.parse(localStorage.getItem('mw_ai_usage') || '{"month":"","count":0}');
+  if (stored.month !== month) { stored = {month: month, count: 0}; }
+  stored.count++;
+  localStorage.setItem('mw_ai_usage', JSON.stringify(stored));
+  aiCallCount = stored.count;
+}
+
+function setAIBtnLoading(btnId, loading) {
+  var btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (loading) {
+    btn.dataset.orig = btn.innerHTML;
+    btn.innerHTML = '<span style="animation:spin 1s linear infinite;display:inline-block">⟳</span> Thinking...';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+  } else {
+    btn.innerHTML = btn.dataset.orig || btn.innerHTML;
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+}
+
+async function callClaudeAPI(systemPrompt, userMessage) {
+  if (!checkAICap()) {
+    showToast('AI limit reached for this month (100 calls). Resets next month.', 'error');
+    return null;
+  }
+  var resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': 'USE_BACKEND_PROXY', 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }]
+    })
+  });
+  // Use backend proxy instead
+  return null; // Will be replaced by backend call
+}
+
+async function aiSuggestDiagnosis() {
+  var cc = document.getElementById('vr_complaint')?.value?.trim();
+  var duration = document.getElementById('vr_duration')?.value?.trim();
+  var age = activeVisitPatient?.age || '';
+  var gender = activeVisitPatient?.gender || '';
+  var allergies = document.getElementById('vr_allergies')?.value?.trim();
+  var bp = (document.getElementById('vr_bp_s')?.value||'') + '/' + (document.getElementById('vr_bp_d')?.value||'');
+  var temp = document.getElementById('vr_temp')?.value || '';
+  var pulse = document.getElementById('vr_pulse')?.value || '';
+
+  if (!cc) { showToast('Please enter chief complaint first', 'error'); return; }
+  if (!checkAICap()) { showToast('AI limit reached (100/month). Resets next month.', 'error'); return; }
+
+  setAIBtnLoading('ai-dx-btn', true);
+
+  try {
+    var payload = {
+      chief_complaint: cc,
+      duration: duration,
+      patient_age: age,
+      patient_gender: gender,
+      allergies: allergies,
+      vitals: { bp: bp, temperature: temp, pulse: pulse },
+      department: document.getElementById('vr_dept')?.value || 'General Medicine'
+    };
+
+    var data = await apiCall('/ai/suggest-diagnosis', 'POST', payload);
+    setAIBtnLoading('ai-dx-btn', false);
+
+    if (!data.success) { showToast('AI error: ' + data.message, 'error'); return; }
+
+    incrementAICount();
+    renderDiagnosisSuggestions(data.suggestions, data.investigations, data.red_flags);
+  } catch(e) {
+    setAIBtnLoading('ai-dx-btn', false);
+    showToast('AI unavailable: ' + e.message, 'error');
+  }
+}
+
+function renderDiagnosisSuggestions(suggestions, investigations, red_flags) {
+  var el = document.getElementById('ai-dx-suggestions');
+  if (!el || !suggestions || !suggestions.length) return;
+
+  var html = '<div style="padding:10px 14px;border-bottom:0.5px solid rgba(99,102,241,0.3)">'
+    + '<div style="font-size:10px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">✨ AI Suggestions — click to select</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+
+  suggestions.forEach(function(s) {
+    var conf_color = s.confidence === 'high' ? '#00C49A' : s.confidence === 'medium' ? '#ef9f27' : '#a5b4fc';
+    html += '<button onclick="selectDiagnosis(\'' + s.name.replace(/'/g,"\\'") + '\',\'' + (s.icd||'') + '\')" '
+      + 'style="background:rgba(99,102,241,0.15);border:0.5px solid rgba(99,102,241,0.5);color:#e0e7ff;padding:7px 12px;border-radius:8px;cursor:pointer;font-size:12px;text-align:left">'
+      + '<div style="font-weight:700">' + s.name + '</div>'
+      + '<div style="font-size:10px;color:' + conf_color + ';margin-top:2px">' + (s.icd||'') + ' · ' + s.confidence + ' confidence</div>'
+      + '</button>';
+  });
+
+  html += '</div>';
+
+  if (investigations && investigations.length) {
+    html += '<div style="margin-top:10px;font-size:11px;color:rgba(240,250,247,0.6)">'
+      + '🔬 Suggested tests: ' + investigations.join(', ')
+      + ' <button onclick="addAILabTests(' + JSON.stringify(investigations) + ')" style="background:rgba(0,196,154,0.15);border:0.5px solid var(--teal);color:var(--teal);padding:3px 8px;border-radius:6px;cursor:pointer;font-size:11px;margin-left:6px">Add all</button>'
+      + '</div>';
+  }
+
+  if (red_flags) {
+    html += '<div style="margin-top:8px;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);border-radius:8px;padding:8px 10px;font-size:11px;color:#fca5a5">'
+      + '⚠️ ' + red_flags + '</div>';
+  }
+
+  html += '<button onclick="document.getElementById(\'ai-dx-suggestions\').style.display=\'none\'" '
+    + 'style="position:absolute;top:8px;right:10px;background:none;border:none;color:rgba(240,250,247,0.4);cursor:pointer;font-size:16px">×</button>';
+  html += '</div>';
+
+  el.style.display = 'block';
+  el.style.position = 'relative';
+  el.innerHTML = html;
+}
+
+function selectDiagnosis(name, icd) {
+  var dx = document.getElementById('vr_dx');
+  var icdEl = document.getElementById('vr_icd');
+  if (dx) dx.value = name;
+  if (icdEl && icd) icdEl.value = icd;
+  document.getElementById('ai-dx-suggestions').style.display = 'none';
+  showToast('Diagnosis selected: ' + name, 'success');
+}
+
+function addAILabTests(tests) {
+  tests.forEach(function(t) {
+    visitLabRows.push({ test: t, instructions: '' });
+  });
+  if (typeof renderLabTable === 'function') renderLabTable();
+  showToast(tests.length + ' lab tests added', 'success');
+}
+
+async function aiDraftPrescription() {
+  var dx = document.getElementById('vr_dx')?.value?.trim();
+  var cc = document.getElementById('vr_complaint')?.value?.trim();
+  var age = activeVisitPatient?.age || '';
+  var gender = activeVisitPatient?.gender || '';
+  var allergies = document.getElementById('vr_allergies')?.value?.trim();
+  var dept = document.getElementById('vr_dept')?.value || 'General Medicine';
+
+  if (!dx) { showToast('Please enter a diagnosis first', 'error'); return; }
+  if (!checkAICap()) { showToast('AI limit reached (100/month). Resets next month.', 'error'); return; }
+
+  setAIBtnLoading('ai-rx-btn', true);
+
+  try {
+    var payload = {
+      diagnosis: dx,
+      chief_complaint: cc,
+      patient_age: age,
+      patient_gender: gender,
+      allergies: allergies,
+      department: dept,
+      existing_drugs: visitRxRows.map(function(r){ return r.drug; })
+    };
+
+    var data = await apiCall('/ai/draft-prescription', 'POST', payload);
+    setAIBtnLoading('ai-rx-btn', false);
+
+    if (!data.success) { showToast('AI error: ' + data.message, 'error'); return; }
+
+    incrementAICount();
+    renderAIPrescription(data.prescription, data.advice, data.warnings);
+  } catch(e) {
+    setAIBtnLoading('ai-rx-btn', false);
+    showToast('AI unavailable: ' + e.message, 'error');
+  }
+}
+
+function renderAIPrescription(drugs, advice, warnings) {
+  if (!drugs || !drugs.length) { showToast('AI could not generate prescription for this diagnosis', 'error'); return; }
+
+  // Show confirmation modal before adding
+  var modal = document.getElementById('aiRxConfirmModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'aiRxConfirmModal';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9000;align-items:center;justify-content:center;padding:20px';
+    document.body.appendChild(modal);
+  }
+
+  var drugsHTML = drugs.map(function(d,i) {
+    return '<tr style="border-bottom:0.5px solid rgba(99,102,241,0.15)">'
+      + '<td style="padding:8px;font-size:13px;font-weight:600;color:#e0e7ff">' + d.drug + '</td>'
+      + '<td style="padding:8px;font-size:12px;color:rgba(240,250,247,0.7)">' + (d.strength||'') + '</td>'
+      + '<td style="padding:8px;font-size:12px;color:rgba(240,250,247,0.7)">' + (d.dose||'1 tablet') + '</td>'
+      + '<td style="padding:8px;font-size:12px;color:rgba(240,250,247,0.7)">' + (d.freq||'') + '</td>'
+      + '<td style="padding:8px;font-size:12px;color:rgba(240,250,247,0.7)">' + (d.duration||'') + '</td>'
+      + '<td style="padding:8px;font-size:11px;color:rgba(240,250,247,0.5)">' + (d.instructions||'') + '</td>'
+      + '</tr>';
+  }).join('');
+
+  modal.innerHTML = '<div style="background:#0D1412;border:0.5px solid rgba(99,102,241,0.4);border-radius:20px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto">'
+    + '<div style="padding:18px 22px;border-bottom:0.5px solid rgba(99,102,241,0.3);background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.1))">'
+    + '<div style="font-size:16px;font-weight:700;color:#e0e7ff">✨ AI Generated Prescription</div>'
+    + '<div style="font-size:12px;color:rgba(165,180,252,0.8);margin-top:3px">Review carefully before adding to patient record</div>'
+    + '</div>'
+    + '<div style="padding:18px 22px">'
+    + (warnings ? '<div style="background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#fca5a5">⚠️ ' + warnings + '</div>' : '')
+    + '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="background:rgba(99,102,241,0.1)">'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Drug</th>'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Strength</th>'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Dose</th>'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Frequency</th>'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Duration</th>'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Instructions</th>'
+    + '</tr></thead><tbody>' + drugsHTML + '</tbody></table>'
+    + (advice ? '<div style="margin-top:14px;background:rgba(0,196,154,0.08);border:0.5px solid rgba(0,196,154,0.3);border-radius:8px;padding:10px 12px;font-size:13px;color:rgba(240,250,247,0.8)"><b>Advice:</b> ' + advice + '</div>' : '')
+    + '</div>'
+    + '<div style="padding:14px 22px;border-top:0.5px solid rgba(99,102,241,0.2);display:flex;gap:10px;justify-content:flex-end">'
+    + '<button onclick="document.getElementById(\'aiRxConfirmModal\').style.display=\'none\'" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Discard</button>'
+    + '<button onclick="applyAIPrescription(' + JSON.stringify(drugs).replace(/'/g,"\\'") + ',\'' + (advice||'').replace(/'/g,"\\'") + '\')" style="padding:10px 24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer">✓ Add to Prescription</button>'
+    + '</div>'
+    + '</div>';
+
+  modal.style.display = 'flex';
+}
+
+function applyAIPrescription(drugs, advice) {
+  drugs.forEach(function(d) {
+    visitRxRows.push({
+      drug:         d.drug,
+      strength:     d.strength || '',
+      dose:         d.dose || '1 tablet',
+      freq:         d.freq || 'Twice daily',
+      duration:     d.duration || '5 days',
+      instructions: d.instructions || ''
+    });
+  });
+  if (typeof renderRxTable === 'function') renderRxTable();
+  if (advice) {
+    var advEl = document.getElementById('vr_advice');
+    if (advEl && !advEl.value) advEl.value = advice;
+  }
+  document.getElementById('aiRxConfirmModal').style.display = 'none';
+  showToast(drugs.length + ' medicines added from AI draft ✓', 'success');
+}
+
+// CSS for spin animation
+var aiStyle = document.createElement('style');
+aiStyle.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+document.head.appendChild(aiStyle);
+
+
+
+
+
+// ===== TELECONSULT =====
+async function loadTeleconsult() {
+  var el = document.getElementById('tc-list');
+  if (el) el.innerHTML = '<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div>';
+  try {
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/teleconsult');
+    var list = data.data || [];
+    var today = new Date().toISOString().split('T')[0];
+    var todayC = list.filter(function(t){ return (t.scheduled_at||'').startsWith(today); }).length;
+    var pending = list.filter(function(t){ return t.status === 'scheduled'; }).length;
+    var monthStr = today.substring(0,7);
+    var monthC = list.filter(function(t){ return (t.scheduled_at||'').startsWith(monthStr); }).length;
+    var e1=document.getElementById('tc-today-count'); if(e1) e1.textContent=todayC;
+    var e2=document.getElementById('tc-pending-count'); if(e2) e2.textContent=pending;
+    var e3=document.getElementById('tc-month-count'); if(e3) e3.textContent=monthC;
+    renderTCList(list);
+  } catch(e) {
+    var el=document.getElementById('tc-list');
+    if(el) el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">No teleconsults yet. Click + New Consult to start.</div>';
+  }
+}
+
+function renderTCList(list) {
+  var el = document.getElementById('tc-list'); if(!el) return;
+  if (!list.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No teleconsults yet. Click + New Consult to start.</div>';
+    return;
+  }
+  var sc = { scheduled:'#ef9f27', completed:'#00C49A', cancelled:'#ef4444', in_progress:'#7F77DD' };
+  var rows = list.map(function(t) {
+    var name = ((t.patient_first_name||'') + ' ' + (t.patient_last_name||'')).trim() || 'Patient';
+    var dt = t.scheduled_at ? new Date(parseInt(t.scheduled_at)*1000).toLocaleString('en-IN',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
+    return '<tr class="tc-row" style="border-bottom:0.5px solid rgba(0,196,154,0.06)"'
+      + ' data-tcid="'+String(t.id)+'" data-phone="'+(t.patient_phone||'')+'" data-room="'+(t.room_url||'')+'">'
+      + '<td style="padding:10px 14px"><div style="font-weight:600">'+name+'</div>'
+      + '<div style="font-size:11px;color:rgba(240,250,247,0.4)">'+(t.chief_complaint||'')+'</div></td>'
+      + '<td style="padding:10px 14px;font-size:12px;color:rgba(240,250,247,0.6)">'+dt+'</td>'
+      + '<td style="padding:10px 14px;font-size:12px;color:rgba(240,250,247,0.6)">'+(t.consult_type||'Video')+'</td>'
+      + '<td style="padding:10px 14px"><span style="color:'+(sc[t.status]||'#888')+';font-weight:600;font-size:11px;text-transform:uppercase">'+(t.status||'scheduled')+'</span></td>'
+      + '<td style="padding:10px 14px"><div style="display:flex;gap:6px">'
+      + (t.room_url ? '<button class="action-btn tc-join-btn" style="font-size:11px;padding:5px 10px;background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">Join</button>' : '')
+      + '<button class="action-btn tc-send-btn" style="font-size:11px;padding:5px 10px">Send Link</button>'
+      + '</div></td></tr>';
+  }).join('');
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2);background:rgba(0,196,154,0.04)">'
+    + ['Patient','Scheduled','Type','Status','Actions'].map(function(h){ return '<th style="padding:10px 14px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">'+h+'</th>'; }).join('')
+    + '</tr></thead><tbody>' + rows + '</tbody></table>';
+  el.querySelectorAll('.tc-join-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ joinTCRoom(this.closest('.tc-row').dataset.room); });
+  });
+  el.querySelectorAll('.tc-send-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var row = this.closest('.tc-row');
+      sendTCLink(row.dataset.tcid, row.dataset.phone, row.dataset.room);
+    });
+  });
+}
+
+function startNewTeleconsult() {
+  var modal = document.getElementById('newTCModal');
+  if (modal) {
+    var today = new Date().toISOString().split('T')[0];
+    var now = new Date().toTimeString().slice(0,5);
+    var df = document.getElementById('tc_date'); if(df) df.value=today;
+    var tf = document.getElementById('tc_time'); if(tf) tf.value=now;
+    var ps = document.getElementById('tc_patient_search'); if(ps){ ps.value=''; ps.readOnly=false; }
+    var pid = document.getElementById('tc_patient_id'); if(pid) pid.value='';
+    modal.style.display = 'flex';
+  }
+}
+
+function searchTCPatient(val) {
+  var s = document.getElementById('tc_patient_suggestions'); if(!s) return;
+  if (!val||val.length<2) { s.style.display='none'; return; }
+  if (!window.patientsData||!window.patientsData.length) {
+    apiCall('/hospitals/'+mwHospitalId+'/patients').then(function(d){ if(d.success){ window.patientsData=d.data; searchTCPatient(val); }});
+    return;
+  }
+  var q=val.toLowerCase();
+  var matches=window.patientsData.filter(function(p){
+    return ((p.first_name||'')+' '+(p.last_name||'')).toLowerCase().includes(q)||(p.mrn||'').toLowerCase().includes(q)||(p.phone||'').includes(val);
+  }).slice(0,5);
+  if (!matches.length) { s.style.display='none'; return; }
+  s.innerHTML = matches.map(function(p){
+    var name=((p.first_name||'')+(p.last_name?' '+p.last_name:'')).trim();
+    return '<div class="tc-pat-opt" data-pid="'+p.patient_id+'" data-name="'+name.replace(/"/g,'&quot;')+'" data-phone="'+(p.phone||'')+'" style="padding:10px 12px;cursor:pointer;border-bottom:0.5px solid rgba(0,196,154,0.1)">'
+      +'<div style="font-weight:600;font-size:13px">'+name+'</div>'
+      +'<div style="font-size:11px;color:rgba(240,250,247,0.5)">'+(p.mrn||'')+(p.phone?' · '+p.phone:'')+'</div></div>';
+  }).join('');
+  s.style.display='block';
+  s.querySelectorAll('.tc-pat-opt').forEach(function(opt){
+    opt.onmouseenter=function(){ this.style.background='rgba(0,196,154,0.08)'; };
+    opt.onmouseleave=function(){ this.style.background=''; };
+    opt.onclick=function(){
+      document.getElementById('tc_patient_id').value=this.dataset.pid;
+      var ps=document.getElementById('tc_patient_search'); ps.value=this.dataset.name; ps.readOnly=true; ps.style.borderColor='var(--teal)';
+      s.style.display='none';
+    };
+  });
+}
+
+async function createTeleconsult() {
+  var patId = document.getElementById('tc_patient_id')?.value;
+  var date  = document.getElementById('tc_date')?.value;
+  var time  = document.getElementById('tc_time')?.value;
+  if (!patId) { showToast('Please select a patient','error'); return; }
+  if (!date||!time) { showToast('Please set date and time','error'); return; }
+
+  var payload = {
+    patient_id:      patId,
+    consult_type:    document.getElementById('tc_type')?.value || 'Video Call',
+    chief_complaint: document.getElementById('tc_complaint')?.value || '',
+    fee:             parseFloat(document.getElementById('tc_fee')?.value)||300,
+    scheduled_at:    Math.floor(new Date(date+'T'+time).getTime()/1000)
+  };
+
+  var btn = document.querySelector('#newTCModal button[onclick="createTeleconsult()"]');
+  if(btn) btn.textContent = 'Creating...';
+
+  var data = await apiCall('/hospitals/'+mwHospitalId+'/teleconsult', 'POST', payload);
+  if (!data.success) { showToast('Error: '+data.message,'error'); if(btn) btn.textContent='Create & Send Link'; return; }
+
+  // Send WhatsApp link to patient
+  var tc = data.data;
+  if (tc.room_url) {
+    var patName = (document.getElementById('tc_patient_search')||{}).value || 'Patient';
+    var dtStr = new Date(date+'T'+time).toLocaleString('en-IN',{weekday:'short',day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+    var phone = (window.patientsData && (function(){ var p=window.patientsData.find(function(x){ return String(x.patient_id)===String(patId); }); return p?p.phone:''; })()) || '';
+    if (phone) {
+      var msg = '*' + ((hospitalSettings&&hospitalSettings.name)||'MediWhats') + ' - Teleconsult*\n\nDear ' + patName + ',\nYour video consultation is scheduled for *' + dtStr + '*.\n\n*Join here:*\n' + tc.room_url + '\n\n_Please join 5 minutes early._\n\n_MediWhats - AI Hospital Manager_';
+      window.open('https://wa.me/91'+phone.replace(/\D/g,'').replace(/^91/,'')+'>?text='+encodeURIComponent(msg),'_blank');
+    }
+  }
+
+  showToast('Teleconsult created ✓ WhatsApp link sent', 'success');
+  document.getElementById('newTCModal').style.display='none';
+  loadTeleconsult();
+}
+
+function joinTCRoom(url) {
+  window.open(url, '_blank');
+}
+
+function sendTCLink(id, phone, roomUrl) {
+  if (!roomUrl) { showToast('No room URL for this consult','error'); return; }
+  var p = phone || prompt('Patient phone number:');
+  if (!p) return;
+  var msg = '*Video Consult Link*\n\nJoin your teleconsultation here:\n' + roomUrl + '\n\n_MediWhats - AI Hospital Manager_';
+  window.open('https://wa.me/91'+p.replace(/\D/g,'').replace(/^91/,'')+'?text='+encodeURIComponent(msg),'_blank');
 }
 
 
