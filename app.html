@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773963751 -->
+<!-- MediWhats v23 BUILD:1773964554 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1986,6 +1986,43 @@ var editingVisitId = null;
 // Open patient record panel
 function openEMR(patientId, patientName, patientPhone) {
   activeVisitPatient = { id: patientId, name: patientName, phone: patientPhone };
+  editingVisitId = null;
+  visitRxRows = [];
+  visitLabRows = [];
+  visitRadRows = [];
+
+  // Reset ALL form fields
+  var fieldIds = [
+    'vr_complaint','vr_duration','vr_history','vr_allergies',
+    'vr_bp_s','vr_bp_d','vr_temp','vr_pulse','vr_spo2',
+    'vr_weight','vr_height','vr_bmi_val',
+    'vr_exam',
+    'vr_dx','vr_dx2','vr_icd',
+    'vr_advice','vr_followup','vr_followup_notes',
+    'vr_subjective_notes'
+  ];
+  fieldIds.forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  // Reset visit meta
+  var today = new Date().toISOString().split('T')[0];
+  var dt = document.getElementById('vr_date'); if(dt) dt.value = today;
+
+  // Clear prescription, lab, radiology tables
+  if (typeof renderRxTable === 'function') renderRxTable();
+  if (typeof renderLabTable === 'function') renderLabTable();
+
+  // Hide AI panels
+  var aiDiag = document.getElementById('ai-diagnosis-suggestions');
+  if (aiDiag) aiDiag.style.display = 'none';
+  var aiRx = document.getElementById('ai-rx-review-panel');
+  if (aiRx) aiRx.style.display = 'none';
+
+  // Switch to subjective tab
+  if (typeof switchPrTab === 'function') switchPrTab('subjective');
+
   document.getElementById('prPanel').style.display = 'flex';
   document.getElementById('prPatientName').textContent = patientName;
   loadVisitHistory(patientId);
@@ -2000,7 +2037,7 @@ function closePatientRecord() {
 async function loadVisitHistory(patientId) {
   document.getElementById('prHistory').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.5)">Loading visit history...</div>';
   try {
-    var data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + patientId);
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/patients/' + patientId + '/visits');
     if (!data.success || !data.data.length) {
       document.getElementById('prHistory').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.5)">No visits yet. Click + New Visit above.</div>';
       return;
@@ -2327,9 +2364,9 @@ async function saveVisitRecord(sendNow) {
   try {
     var data;
     if (editingVisitId) {
-      data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + activeVisitPatient.id + '/' + editingVisitId, 'PUT', payload);
+      data = await apiCall('/hospitals/' + mwHospitalId + '/patients/' + activeVisitPatient.id + '/visits/' + editingVisitId, 'PUT', payload);
     } else {
-      data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + activeVisitPatient.id, 'POST', payload);
+      data = await apiCall('/hospitals/' + mwHospitalId + '/patients/' + activeVisitPatient.id + '/visits', 'POST', payload);
       if (data.success) editingVisitId = data.data.id;
     }
     if (data.success) {
@@ -3226,11 +3263,22 @@ function renderAIPrescription(drugs, advice, warnings) {
     + '</div>'
     + '<div style="padding:14px 22px;border-top:0.5px solid rgba(99,102,241,0.2);display:flex;gap:10px;justify-content:flex-end">'
     + '<button onclick="document.getElementById(\'aiRxConfirmModal\').style.display=\'none\'" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Discard</button>'
-    + '<button onclick="applyAIPrescription(' + JSON.stringify(drugs).replace(/'/g,"\\'") + ',\'' + (advice||'').replace(/'/g,"\\'") + '\')" style="padding:10px 24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer">✓ Add to Prescription</button>'
+    + '<button id="applyAIRxBtn" style="padding:10px 24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer">✓ Add to Prescription</button>'
     + '</div>'
     + '</div>';
 
   modal.style.display = 'flex';
+
+  // Wire the apply button using stored closure - avoids JSON stringify in onclick
+  window._aiRxPending = { drugs: drugs, advice: advice };
+  var applyBtn = document.getElementById('applyAIRxBtn');
+  if (applyBtn) {
+    applyBtn.onclick = function() {
+      var pending = window._aiRxPending;
+      if (pending) applyAIPrescription(pending.drugs, pending.advice);
+      document.getElementById('aiRxConfirmModal').style.display = 'none';
+    };
+  }
 }
 
 function applyAIPrescription(drugs, advice) {
