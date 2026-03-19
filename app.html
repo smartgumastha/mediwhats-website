@@ -1359,10 +1359,15 @@ function applyRoleAccess(role) {
     PHARMACY:       ['dashboard','billing'],
   };
   var allowed = access[role] || ['dashboard'];
-  document.querySelectorAll('.nav-item').forEach(item => {
-    var screen = item.getAttribute('onclick') || '';
-    var match = screen.match(/'([^']+)'/);
-    if (match && !allowed.includes(match[1])) {
+  document.querySelectorAll('.nav-item').forEach(function(item) {
+    var onclick = item.getAttribute('onclick') || '';
+    var screenName = '';
+    var m = onclick.match(/showScreen\([\'"]([a-z]+)[\'"]/);
+    if (m) screenName = m[1];
+    if (!screenName) return;
+    if (allowed.includes(screenName)) {
+      item.style.display = '';
+    } else {
       item.style.display = 'none';
     }
   });
