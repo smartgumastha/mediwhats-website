@@ -803,7 +803,16 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       <div class="pr-section" id="prsec-diagnosis" style="display:none">
         <div class="vr-section-title">Assessment — Diagnosis</div>
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-          <div style="grid-column:1/-1"><label class="vr-label">Primary Diagnosis *</label><input id="vr_dx" class="form-input" style="width:100%" placeholder="Acute viral fever"></div>
+          <div style="grid-column:1/-1">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px">
+              <label class="vr-label" style="margin-bottom:0">Primary Diagnosis *</label>
+              <button onclick="aiSuggestDiagnosis()" id="ai-dx-btn" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;padding:6px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:5px">
+                <span>✨</span> AI Suggest
+              </button>
+            </div>
+            <input id="vr_dx" class="form-input" style="width:100%" placeholder="Acute viral fever">
+            <div id="ai-dx-suggestions" style="display:none;margin-top:8px;background:#1a1f2e;border:0.5px solid #6366f1;border-radius:10px;overflow:hidden"></div>
+          </div>
           <div><label class="vr-label">Secondary Diagnosis</label><input id="vr_dx2" class="form-input" style="width:100%" placeholder="Upper respiratory tract infection"></div>
           <div><label class="vr-label">ICD-10 Code</label><input id="vr_icd" class="form-input" style="width:100%" placeholder="J06.9"></div>
         </div>
@@ -816,6 +825,9 @@ tr:hover td{background:rgba(255,255,255,0.02)}
           <select id="rx-drug-select" class="form-select" style="width:220px">
             <option value="">Select drug...</option><option>Paracetamol</option><option>Dolo 650</option><option>Ibuprofen</option><option>Aspirin</option><option>Diclofenac</option><option>Amoxicillin</option><option>Azithromycin</option><option>Ciprofloxacin</option><option>Metronidazole</option><option>Doxycycline</option><option>Pantoprazole</option><option>Omeprazole</option><option>Domperidone</option><option>Ondansetron</option><option>Metformin</option><option>Glimepiride</option><option>Amlodipine</option><option>Atenolol</option><option>Telmisartan</option><option>Atorvastatin</option><option>Cetirizine</option><option>Levocetrizine</option><option>Montelukast</option><option>Salbutamol</option><option>Multivitamin</option><option>Vitamin D3</option><option>Calcium</option><option>Iron</option><option>Folic Acid</option><option>Augmentin</option><option>Cefixime</option><option>Levofloxacin</option></select>
           <button onclick="addRxRow(document.getElementById('rx-drug-select').value)" style="background:var(--teal);color:#000;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">+ Add</button>
+          <button onclick="aiDraftPrescription()" id="ai-rx-btn" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:5px">
+            <span>✨</span> AI Draft Rx
+          </button>
           <button onclick="addRxRow('')" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px">+ Custom drug</button>
         </div>
         <table style="width:100%;border-collapse:collapse">
@@ -2324,6 +2336,270 @@ function generatePDF() {
   win.document.write(printHTML);
   win.document.close();
 }
+
+
+// ===== AI EMR FEATURES =====
+var aiCallCount = 0;
+var AI_MONTHLY_CAP = 100;
+
+function checkAICap() {
+  var month = new Date().toISOString().slice(0,7);
+  var stored = JSON.parse(localStorage.getItem('mw_ai_usage') || '{"month":"","count":0}');
+  if (stored.month !== month) { stored = {month: month, count: 0}; }
+  aiCallCount = stored.count;
+  return aiCallCount < AI_MONTHLY_CAP;
+}
+
+function incrementAICount() {
+  var month = new Date().toISOString().slice(0,7);
+  var stored = JSON.parse(localStorage.getItem('mw_ai_usage') || '{"month":"","count":0}');
+  if (stored.month !== month) { stored = {month: month, count: 0}; }
+  stored.count++;
+  localStorage.setItem('mw_ai_usage', JSON.stringify(stored));
+  aiCallCount = stored.count;
+}
+
+function setAIBtnLoading(btnId, loading) {
+  var btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (loading) {
+    btn.dataset.orig = btn.innerHTML;
+    btn.innerHTML = '<span style="animation:spin 1s linear infinite;display:inline-block">⟳</span> Thinking...';
+    btn.disabled = true;
+    btn.style.opacity = '0.7';
+  } else {
+    btn.innerHTML = btn.dataset.orig || btn.innerHTML;
+    btn.disabled = false;
+    btn.style.opacity = '1';
+  }
+}
+
+async function callClaudeAPI(systemPrompt, userMessage) {
+  if (!checkAICap()) {
+    showToast('AI limit reached for this month (100 calls). Resets next month.', 'error');
+    return null;
+  }
+  var resp = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': 'USE_BACKEND_PROXY', 'anthropic-version': '2023-06-01' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userMessage }]
+    })
+  });
+  // Use backend proxy instead
+  return null; // Will be replaced by backend call
+}
+
+async function aiSuggestDiagnosis() {
+  var cc = document.getElementById('vr_complaint')?.value?.trim();
+  var duration = document.getElementById('vr_duration')?.value?.trim();
+  var age = activeVisitPatient?.age || '';
+  var gender = activeVisitPatient?.gender || '';
+  var allergies = document.getElementById('vr_allergies')?.value?.trim();
+  var bp = (document.getElementById('vr_bp_s')?.value||'') + '/' + (document.getElementById('vr_bp_d')?.value||'');
+  var temp = document.getElementById('vr_temp')?.value || '';
+  var pulse = document.getElementById('vr_pulse')?.value || '';
+
+  if (!cc) { showToast('Please enter chief complaint first', 'error'); return; }
+  if (!checkAICap()) { showToast('AI limit reached (100/month). Resets next month.', 'error'); return; }
+
+  setAIBtnLoading('ai-dx-btn', true);
+
+  try {
+    var payload = {
+      chief_complaint: cc,
+      duration: duration,
+      patient_age: age,
+      patient_gender: gender,
+      allergies: allergies,
+      vitals: { bp: bp, temperature: temp, pulse: pulse },
+      department: document.getElementById('vr_dept')?.value || 'General Medicine'
+    };
+
+    var data = await apiCall('/ai/suggest-diagnosis', 'POST', payload);
+    setAIBtnLoading('ai-dx-btn', false);
+
+    if (!data.success) { showToast('AI error: ' + data.message, 'error'); return; }
+
+    incrementAICount();
+    renderDiagnosisSuggestions(data.suggestions, data.investigations, data.red_flags);
+  } catch(e) {
+    setAIBtnLoading('ai-dx-btn', false);
+    showToast('AI unavailable: ' + e.message, 'error');
+  }
+}
+
+function renderDiagnosisSuggestions(suggestions, investigations, red_flags) {
+  var el = document.getElementById('ai-dx-suggestions');
+  if (!el || !suggestions || !suggestions.length) return;
+
+  var html = '<div style="padding:10px 14px;border-bottom:0.5px solid rgba(99,102,241,0.3)">'
+    + '<div style="font-size:10px;font-weight:700;color:#a5b4fc;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px">✨ AI Suggestions — click to select</div>'
+    + '<div style="display:flex;flex-wrap:wrap;gap:8px">';
+
+  suggestions.forEach(function(s) {
+    var conf_color = s.confidence === 'high' ? '#00C49A' : s.confidence === 'medium' ? '#ef9f27' : '#a5b4fc';
+    html += '<button onclick="selectDiagnosis(\'' + s.name.replace(/'/g,"\\'") + '\',\'' + (s.icd||'') + '\')" '
+      + 'style="background:rgba(99,102,241,0.15);border:0.5px solid rgba(99,102,241,0.5);color:#e0e7ff;padding:7px 12px;border-radius:8px;cursor:pointer;font-size:12px;text-align:left">'
+      + '<div style="font-weight:700">' + s.name + '</div>'
+      + '<div style="font-size:10px;color:' + conf_color + ';margin-top:2px">' + (s.icd||'') + ' · ' + s.confidence + ' confidence</div>'
+      + '</button>';
+  });
+
+  html += '</div>';
+
+  if (investigations && investigations.length) {
+    html += '<div style="margin-top:10px;font-size:11px;color:rgba(240,250,247,0.6)">'
+      + '🔬 Suggested tests: ' + investigations.join(', ')
+      + ' <button onclick="addAILabTests(' + JSON.stringify(investigations) + ')" style="background:rgba(0,196,154,0.15);border:0.5px solid var(--teal);color:var(--teal);padding:3px 8px;border-radius:6px;cursor:pointer;font-size:11px;margin-left:6px">Add all</button>'
+      + '</div>';
+  }
+
+  if (red_flags) {
+    html += '<div style="margin-top:8px;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);border-radius:8px;padding:8px 10px;font-size:11px;color:#fca5a5">'
+      + '⚠️ ' + red_flags + '</div>';
+  }
+
+  html += '<button onclick="document.getElementById(\'ai-dx-suggestions\').style.display=\'none\'" '
+    + 'style="position:absolute;top:8px;right:10px;background:none;border:none;color:rgba(240,250,247,0.4);cursor:pointer;font-size:16px">×</button>';
+  html += '</div>';
+
+  el.style.display = 'block';
+  el.style.position = 'relative';
+  el.innerHTML = html;
+}
+
+function selectDiagnosis(name, icd) {
+  var dx = document.getElementById('vr_dx');
+  var icdEl = document.getElementById('vr_icd');
+  if (dx) dx.value = name;
+  if (icdEl && icd) icdEl.value = icd;
+  document.getElementById('ai-dx-suggestions').style.display = 'none';
+  showToast('Diagnosis selected: ' + name, 'success');
+}
+
+function addAILabTests(tests) {
+  tests.forEach(function(t) {
+    visitLabRows.push({ test: t, instructions: '' });
+  });
+  if (typeof renderLabTable === 'function') renderLabTable();
+  showToast(tests.length + ' lab tests added', 'success');
+}
+
+async function aiDraftPrescription() {
+  var dx = document.getElementById('vr_dx')?.value?.trim();
+  var cc = document.getElementById('vr_complaint')?.value?.trim();
+  var age = activeVisitPatient?.age || '';
+  var gender = activeVisitPatient?.gender || '';
+  var allergies = document.getElementById('vr_allergies')?.value?.trim();
+  var dept = document.getElementById('vr_dept')?.value || 'General Medicine';
+
+  if (!dx) { showToast('Please enter a diagnosis first', 'error'); return; }
+  if (!checkAICap()) { showToast('AI limit reached (100/month). Resets next month.', 'error'); return; }
+
+  setAIBtnLoading('ai-rx-btn', true);
+
+  try {
+    var payload = {
+      diagnosis: dx,
+      chief_complaint: cc,
+      patient_age: age,
+      patient_gender: gender,
+      allergies: allergies,
+      department: dept,
+      existing_drugs: visitRxRows.map(function(r){ return r.drug; })
+    };
+
+    var data = await apiCall('/ai/draft-prescription', 'POST', payload);
+    setAIBtnLoading('ai-rx-btn', false);
+
+    if (!data.success) { showToast('AI error: ' + data.message, 'error'); return; }
+
+    incrementAICount();
+    renderAIPrescription(data.prescription, data.advice, data.warnings);
+  } catch(e) {
+    setAIBtnLoading('ai-rx-btn', false);
+    showToast('AI unavailable: ' + e.message, 'error');
+  }
+}
+
+function renderAIPrescription(drugs, advice, warnings) {
+  if (!drugs || !drugs.length) { showToast('AI could not generate prescription for this diagnosis', 'error'); return; }
+
+  // Show confirmation modal before adding
+  var modal = document.getElementById('aiRxConfirmModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'aiRxConfirmModal';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:9000;align-items:center;justify-content:center;padding:20px';
+    document.body.appendChild(modal);
+  }
+
+  var drugsHTML = drugs.map(function(d,i) {
+    return '<tr style="border-bottom:0.5px solid rgba(99,102,241,0.15)">'
+      + '<td style="padding:8px;font-size:13px;font-weight:600;color:#e0e7ff">' + d.drug + '</td>'
+      + '<td style="padding:8px;font-size:12px;color:rgba(240,250,247,0.7)">' + (d.strength||'') + '</td>'
+      + '<td style="padding:8px;font-size:12px;color:rgba(240,250,247,0.7)">' + (d.dose||'1 tablet') + '</td>'
+      + '<td style="padding:8px;font-size:12px;color:rgba(240,250,247,0.7)">' + (d.freq||'') + '</td>'
+      + '<td style="padding:8px;font-size:12px;color:rgba(240,250,247,0.7)">' + (d.duration||'') + '</td>'
+      + '<td style="padding:8px;font-size:11px;color:rgba(240,250,247,0.5)">' + (d.instructions||'') + '</td>'
+      + '</tr>';
+  }).join('');
+
+  modal.innerHTML = '<div style="background:#0D1412;border:0.5px solid rgba(99,102,241,0.4);border-radius:20px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto">'
+    + '<div style="padding:18px 22px;border-bottom:0.5px solid rgba(99,102,241,0.3);background:linear-gradient(135deg,rgba(99,102,241,0.2),rgba(139,92,246,0.1))">'
+    + '<div style="font-size:16px;font-weight:700;color:#e0e7ff">✨ AI Generated Prescription</div>'
+    + '<div style="font-size:12px;color:rgba(165,180,252,0.8);margin-top:3px">Review carefully before adding to patient record</div>'
+    + '</div>'
+    + '<div style="padding:18px 22px">'
+    + (warnings ? '<div style="background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);border-radius:8px;padding:10px 12px;margin-bottom:14px;font-size:12px;color:#fca5a5">⚠️ ' + warnings + '</div>' : '')
+    + '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="background:rgba(99,102,241,0.1)">'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Drug</th>'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Strength</th>'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Dose</th>'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Frequency</th>'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Duration</th>'
+    + '<th style="padding:8px;text-align:left;font-size:10px;color:#a5b4fc;text-transform:uppercase">Instructions</th>'
+    + '</tr></thead><tbody>' + drugsHTML + '</tbody></table>'
+    + (advice ? '<div style="margin-top:14px;background:rgba(0,196,154,0.08);border:0.5px solid rgba(0,196,154,0.3);border-radius:8px;padding:10px 12px;font-size:13px;color:rgba(240,250,247,0.8)"><b>Advice:</b> ' + advice + '</div>' : '')
+    + '</div>'
+    + '<div style="padding:14px 22px;border-top:0.5px solid rgba(99,102,241,0.2);display:flex;gap:10px;justify-content:flex-end">'
+    + '<button onclick="document.getElementById(\'aiRxConfirmModal\').style.display=\'none\'" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Discard</button>'
+    + '<button onclick="applyAIPrescription(' + JSON.stringify(drugs).replace(/'/g,"\\'") + ',\'' + (advice||'').replace(/'/g,"\\'") + '\')" style="padding:10px 24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer">✓ Add to Prescription</button>'
+    + '</div>'
+    + '</div>';
+
+  modal.style.display = 'flex';
+}
+
+function applyAIPrescription(drugs, advice) {
+  drugs.forEach(function(d) {
+    visitRxRows.push({
+      drug:         d.drug,
+      strength:     d.strength || '',
+      dose:         d.dose || '1 tablet',
+      freq:         d.freq || 'Twice daily',
+      duration:     d.duration || '5 days',
+      instructions: d.instructions || ''
+    });
+  });
+  if (typeof renderRxTable === 'function') renderRxTable();
+  if (advice) {
+    var advEl = document.getElementById('vr_advice');
+    if (advEl && !advEl.value) advEl.value = advice;
+  }
+  document.getElementById('aiRxConfirmModal').style.display = 'none';
+  showToast(drugs.length + ' medicines added from AI draft ✓', 'success');
+}
+
+// CSS for spin animation
+var aiStyle = document.createElement('style');
+aiStyle.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
+document.head.appendChild(aiStyle);
 
 </script>
 </body>
