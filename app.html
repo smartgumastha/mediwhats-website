@@ -283,6 +283,18 @@ tr:hover td{background:rgba(255,255,255,0.02)}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>
           Teleconsult
         </div>
+        <div class="nav-item" onclick="showScreen('investigations',this);loadInvestigations()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11m0 0H5a2 2 0 0 1-2-2V9m6 5h10a2 2 0 0 0 2-2V9m-6 5v6m0 0H9m6 0h2"/></svg>
+          Investigations
+        </div>
+        <div class="nav-item" onclick="showScreen('billing',this);loadBilling()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Billing
+        </div>
+        <div class="nav-item" onclick="showScreen('settings',this);loadSettings()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </div>
       </div>
     </div>
     <div class="sidebar-bottom">
@@ -707,6 +719,120 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 
 <!-- PATIENT RECORD PANEL -->
+<!-- INVESTIGATIONS SCREEN -->
+<div id="screen-investigations" class="screen" style="display:none;padding:28px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Investigations</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="showInvTab('orders')" id="inv-tab-orders" style="padding:8px 18px;border-radius:8px;border:0.5px solid var(--teal);background:var(--teal);color:#000;font-weight:700;cursor:pointer;font-size:13px">Orders</button>
+      <button onclick="showInvTab('results')" id="inv-tab-results" style="padding:8px 18px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Results</button>
+      <button onclick="openNewOrderModal()" style="padding:8px 18px;border-radius:8px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);font-weight:700;cursor:pointer;font-size:13px">+ New Order</button>
+    </div>
+  </div>
+  <div id="inv-tab-content-orders">
+    <div id="inv-orders-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading orders...</div>
+    </div>
+  </div>
+  <div id="inv-tab-content-results" style="display:none">
+    <div id="inv-results-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading results...</div>
+    </div>
+  </div>
+</div>
+
+<!-- BILLING SCREEN -->
+<div id="screen-billing" class="screen" style="display:none;padding:28px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Billing</div>
+    <button onclick="openNewBillModal()" style="padding:10px 22px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px">+ New Bill</button>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px" id="billing-stats">
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Today</div>
+      <div style="font-size:22px;font-weight:700;color:var(--teal)" id="bill-today">₹0</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">This Month</div>
+      <div style="font-size:22px;font-weight:700;color:#F0FAF7" id="bill-month">₹0</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Pending</div>
+      <div style="font-size:22px;font-weight:700;color:#ef9f27" id="bill-pending">₹0</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Total Bills</div>
+      <div style="font-size:22px;font-weight:700;color:#F0FAF7" id="bill-count">0</div>
+    </div>
+  </div>
+  <div id="bills-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
+    <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading bills...</div>
+  </div>
+</div>
+
+<!-- SETTINGS SCREEN -->
+<div id="screen-settings" class="screen" style="display:none;padding:28px">
+  <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700;margin-bottom:20px">Hospital Settings</div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px">
+
+    <!-- Logo Upload -->
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;padding:20px;grid-column:1/-1">
+      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px">Clinic / Hospital Logo</div>
+      <div style="display:flex;align-items:center;gap:20px">
+        <div id="logo-preview" style="width:100px;height:100px;border:2px dashed rgba(0,196,154,0.3);border-radius:12px;display:flex;align-items:center;justify-content:center;color:rgba(240,250,247,0.4);font-size:12px;overflow:hidden">No Logo</div>
+        <div>
+          <input type="file" id="logo-file" accept="image/*" onchange="previewLogo(this)" style="display:none">
+          <button onclick="document.getElementById('logo-file').click()" style="padding:8px 16px;border:0.5px solid var(--teal);border-radius:8px;background:rgba(0,196,154,0.1);color:var(--teal);cursor:pointer;font-size:13px;font-weight:600;display:block;margin-bottom:8px">Upload Logo</button>
+          <div style="font-size:11px;color:rgba(240,250,247,0.4)">PNG or JPG, max 200KB<br>Appears on prescriptions and bills</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clinic Details -->
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;padding:20px">
+      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px">Clinic Details</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Clinic / Hospital Name</label><input id="set_name" class="form-input" style="width:100%" placeholder="Dr. Sharma's Clinic"></div>
+        <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Registration Number</label><input id="set_reg" class="form-input" style="width:100%" placeholder="MCI/State registration number"></div>
+        <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Phone</label><input id="set_phone" class="form-input" style="width:100%" placeholder="040-12345678"></div>
+        <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Email</label><input id="set_email" class="form-input" style="width:100%" placeholder="clinic@email.com"></div>
+        <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Website</label><input id="set_website" class="form-input" style="width:100%" placeholder="www.clinic.com"></div>
+      </div>
+    </div>
+
+    <!-- Address & Tax -->
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;padding:20px">
+      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px">Address & Tax</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Address</label><textarea id="set_address" rows="2" class="form-input" style="width:100%;resize:none" placeholder="Street address"></textarea></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">City</label><input id="set_city" class="form-input" style="width:100%" placeholder="Hyderabad"></div>
+          <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">State</label><input id="set_state" class="form-input" style="width:100%" placeholder="Telangana"></div>
+        </div>
+        <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">GSTIN</label><input id="set_gstin" class="form-input" style="width:100%" placeholder="36AABCU9603R1Z2"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">UHID Prefix</label><input id="set_uhid_prefix" class="form-input" style="width:100%" placeholder="VH" maxlength="6"></div>
+          <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Preview</label><div id="set_uhid_preview" style="padding:8px 10px;background:rgba(0,196,154,0.08);border-radius:8px;font-size:13px;color:var(--teal);font-weight:600">VH-26-0001</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bill Settings -->
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;padding:20px;grid-column:1/-1">
+      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px">Bill & Prescription Footer</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Terms & Conditions (on bill)</label><textarea id="set_bill_terms" rows="3" class="form-input" style="width:100%;resize:vertical" placeholder="All payments are non-refundable..."></textarea></div>
+        <div><label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:4px">Bill Footer Note</label><textarea id="set_bill_footer" rows="3" class="form-input" style="width:100%;resize:vertical" placeholder="Thank you for visiting us. Get well soon!"></textarea></div>
+      </div>
+    </div>
+
+    <!-- Save button -->
+    <div style="grid-column:1/-1">
+      <button onclick="saveSettings()" style="padding:12px 32px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:15px;font-family:'Cabinet Grotesk',sans-serif">Save Settings</button>
+    </div>
+  </div>
+</div>
+
 <div id="prPanel" style="display:none;position:fixed;inset:0;background:#080C0B;z-index:3000;flex-direction:column;overflow:hidden">
   <!-- Header -->
   <div style="background:#0D1412;border-bottom:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
@@ -1248,6 +1374,9 @@ function showScreen(name, navEl) {
   document.getElementById('screen-' + name).classList.add('active');
   if (name === 'patients') loadPatients();
   if (name === 'teleconsult') loadTeleconsult();
+  if (name === 'investigations') loadInvestigations();
+  if (name === 'billing') loadBilling();
+  if (name === 'settings') loadSettings();
   if (navEl) navEl.classList.add('active');
   var titles = {dashboard:'Dashboard',patients:'Patients',appointments:'Appointments',ipd:'IPD & Bed Management',billing:'Billing',staff:'Staff Management'};
   var actions = {dashboard:'New appointment',patients:'Register patient',appointments:'Book appointment',ipd:'Admit patient',billing:'New bill',staff:'Add staff'};
@@ -2609,6 +2738,498 @@ function applyAIPrescription(drugs, advice) {
 var aiStyle = document.createElement('style');
 aiStyle.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
 document.head.appendChild(aiStyle);
+
+
+// ===== SETTINGS =====
+var hospitalSettings = {};
+
+async function loadSettings() {
+  try {
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/settings');
+    if (!data.success) return;
+    var h = data.data;
+    hospitalSettings = h;
+    var fields = {
+      'set_name': h.name, 'set_reg': h.reg_number, 'set_phone': h.phone,
+      'set_email': h.email, 'set_website': h.website, 'set_address': h.address,
+      'set_city': h.city, 'set_state': h.state, 'set_gstin': h.gstin,
+      'set_uhid_prefix': h.uhid_prefix || 'VH',
+      'set_bill_terms': h.bill_terms, 'set_bill_footer': h.bill_footer
+    };
+    Object.keys(fields).forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el && fields[id]) el.value = fields[id];
+    });
+    if (h.logo_url) {
+      var prev = document.getElementById('logo-preview');
+      prev.innerHTML = '<img src="' + h.logo_url + '" style="width:100%;height:100%;object-fit:contain">';
+    }
+    updateUHIDPreview();
+  } catch(e) { showToast('Failed to load settings', 'error'); }
+}
+
+function updateUHIDPreview() {
+  var prefix = (document.getElementById('set_uhid_prefix')?.value || 'VH').toUpperCase();
+  var yr = new Date().getFullYear().toString().slice(-2);
+  document.getElementById('set_uhid_preview').textContent = prefix + '-' + yr + '-0001';
+}
+
+function previewLogo(input) {
+  if (!input.files || !input.files[0]) return;
+  var file = input.files[0];
+  if (file.size > 300000) { showToast('Image too large. Max 200KB', 'error'); return; }
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var b64 = e.target.result;
+    document.getElementById('logo-preview').innerHTML = '<img src="' + b64 + '" style="width:100%;height:100%;object-fit:contain">';
+    // Auto-upload
+    apiCall('/hospitals/' + mwHospitalId + '/settings/logo', 'POST', { logo_base64: b64, type: 'logo' })
+      .then(function(d) { if (d.success) showToast('Logo uploaded ✓', 'success'); });
+  };
+  reader.readAsDataURL(file);
+}
+
+document.addEventListener('input', function(e) {
+  if (e.target && e.target.id === 'set_uhid_prefix') updateUHIDPreview();
+});
+
+async function saveSettings() {
+  var payload = {
+    name:         document.getElementById('set_name')?.value?.trim(),
+    reg_number:   document.getElementById('set_reg')?.value?.trim(),
+    phone:        document.getElementById('set_phone')?.value?.trim(),
+    email:        document.getElementById('set_email')?.value?.trim(),
+    website:      document.getElementById('set_website')?.value?.trim(),
+    address:      document.getElementById('set_address')?.value?.trim(),
+    city:         document.getElementById('set_city')?.value?.trim(),
+    state:        document.getElementById('set_state')?.value?.trim(),
+    gstin:        document.getElementById('set_gstin')?.value?.trim(),
+    uhid_prefix:  document.getElementById('set_uhid_prefix')?.value?.trim().toUpperCase(),
+    bill_terms:   document.getElementById('set_bill_terms')?.value?.trim(),
+    bill_footer:  document.getElementById('set_bill_footer')?.value?.trim()
+  };
+  var data = await apiCall('/hospitals/' + mwHospitalId + '/settings', 'PUT', payload);
+  if (data.success) {
+    showToast('Settings saved ✓', 'success');
+    Object.assign(hospitalSettings, payload);
+  } else {
+    showToast('Error: ' + data.message, 'error');
+  }
+}
+
+// ===== BILLING =====
+var billsData = [];
+
+async function loadBilling() {
+  try {
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/bills');
+    if (!data.success) return;
+    billsData = data.data || [];
+    renderBillsList(billsData);
+    updateBillingStats(billsData);
+  } catch(e) { showToast('Failed to load bills', 'error'); }
+}
+
+function updateBillingStats(bills) {
+  var today = new Date().toISOString().split('T')[0];
+  var todayTotal = 0, monthTotal = 0, pendingTotal = 0;
+  var thisMonth = today.substring(0,7);
+  bills.forEach(function(b) {
+    var amt = parseFloat(b.total) || 0;
+    if (b.bill_date === today) todayTotal += amt;
+    if ((b.bill_date || '').startsWith(thisMonth)) monthTotal += amt;
+    if (b.payment_status === 'pending') pendingTotal += parseFloat(b.balance) || 0;
+  });
+  var fmt = function(n) { return '₹' + n.toLocaleString('en-IN'); };
+  document.getElementById('bill-today').textContent  = fmt(todayTotal);
+  document.getElementById('bill-month').textContent  = fmt(monthTotal);
+  document.getElementById('bill-pending').textContent = fmt(pendingTotal);
+  document.getElementById('bill-count').textContent  = bills.length;
+}
+
+function renderBillsList(bills) {
+  var el = document.getElementById('bills-list');
+  if (!bills.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No bills yet. Click + New Bill to create one.</div>';
+    return;
+  }
+  var rows = bills.map(function(b) {
+    var name = ((b.first_name||'') + ' ' + (b.last_name||'')).trim() || 'Walk-in';
+    var statusColor = b.payment_status === 'paid' ? '#00C49A' : b.payment_status === 'partial' ? '#ef9f27' : '#ef4444';
+    return '<tr>'
+      + '<td style="padding:10px 14px;font-weight:600;color:var(--teal)">' + (b.bill_number||'—') + '</td>'
+      + '<td style="padding:10px 14px">' + name + '</td>'
+      + '<td style="padding:10px 14px;color:rgba(240,250,247,0.6)">' + (b.bill_date||'—') + '</td>'
+      + '<td style="padding:10px 14px">' + (b.bill_type||'OPD') + '</td>'
+      + '<td style="padding:10px 14px;font-weight:700">₹' + parseFloat(b.total||0).toLocaleString('en-IN') + '</td>'
+      + '<td style="padding:10px 14px"><span style="color:' + statusColor + ';font-weight:600;font-size:12px">' + (b.payment_status||'paid').toUpperCase() + '</span></td>'
+      + '<td style="padding:10px 14px;display:flex;gap:6px">'
+      + '<button class="action-btn" onclick="printBill(\'' + b.id + '\')">Print</button>'
+      + '<button class="action-btn" onclick="viewBill(\'' + b.id + '\')">View</button>'
+      + '</td></tr>';
+  }).join('');
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Bill No.</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Patient</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Date</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Type</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Amount</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Status</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Actions</th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+function openNewBillModal() {
+  // Build quick bill modal
+  var modal = document.getElementById('newBillModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'newBillModal';
+    modal.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:5000;align-items:center;justify-content:center;padding:20px';
+    modal.innerHTML = buildNewBillForm();
+    document.body.appendChild(modal);
+  }
+  modal.style.display = 'flex';
+  // Set today's date
+  var today = new Date().toISOString().split('T')[0];
+  var df = document.getElementById('bill_date');
+  if (df) df.value = today;
+  renderBillItems();
+}
+
+var billItems = [];
+
+function buildNewBillForm() {
+  return '<div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:20px;width:100%;max-width:680px;max-height:90vh;overflow-y:auto">'
+    + '<div style="padding:18px 22px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between;align-items:center">'
+    + '<div style="font-size:16px;font-weight:700">New Bill</div>'
+    + '<button onclick="document.getElementById(\'newBillModal\').style.display=\'none\'" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:20px;cursor:pointer">×</button>'
+    + '</div><div style="padding:20px">'
+    // Patient search
+    + '<div style="margin-bottom:14px"><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Patient (search by name/MRN)</label>'
+    + '<input id="bill_patient_search" type="text" class="form-input" style="width:100%" placeholder="Search patient..." oninput="searchBillPatient(this.value)">'
+    + '<div id="bill_patient_suggestions" style="display:none;background:#111A18;border:0.5px solid rgba(0,196,154,0.3);border-radius:8px;margin-top:4px;max-height:150px;overflow-y:auto"></div>'
+    + '<input type="hidden" id="bill_patient_id"></div>'
+    // Bill type and date
+    + '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:14px">'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Bill Type</label>'
+    + '<select id="bill_type" class="form-select" style="width:100%"><option>OPD</option><option>IPD</option><option>Lab</option><option>Pharmacy</option><option>Procedure</option></select></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Date</label>'
+    + '<input id="bill_date" type="date" class="form-input" style="width:100%"></div>'
+    + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Payment Mode</label>'
+    + '<select id="bill_payment_mode" class="form-select" style="width:100%"><option>Cash</option><option>UPI</option><option>Card</option><option>Cheque</option><option>Insurance</option></select></div>'
+    + '</div>'
+    // Items
+    + '<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
+    + '<label style="font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase">Bill Items</label>'
+    + '<button onclick="addBillItem()" style="padding:4px 12px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:6px;cursor:pointer;font-size:12px">+ Add Item</button>'
+    + '</div><div id="bill-items-list"></div></div>'
+    // Totals
+    + '<div style="background:#080C0B;border-radius:10px;padding:14px;margin-bottom:14px">'
+    + '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:rgba(240,250,247,0.6)">Subtotal</span><span id="bill_subtotal" style="font-weight:600">₹0</span></div>'
+    + '<div style="display:flex;justify-content:space-between;margin-bottom:6px;align-items:center"><span style="font-size:13px;color:rgba(240,250,247,0.6)">Discount</span><input id="bill_discount" type="number" value="0" oninput="recalcBill()" style="width:80px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 8px;color:#F0FAF7;font-size:12px;text-align:right"></div>'
+    + '<div style="display:flex;justify-content:space-between;margin-bottom:6px;align-items:center"><span style="font-size:13px;color:rgba(240,250,247,0.6)">GST %</span><input id="bill_gst_pct" type="number" value="0" oninput="recalcBill()" style="width:60px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 8px;color:#F0FAF7;font-size:12px;text-align:right"></div>'
+    + '<div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:13px;color:rgba(240,250,247,0.6)">GST Amount</span><span id="bill_gst_amt" style="font-weight:600">₹0</span></div>'
+    + '<div style="display:flex;justify-content:space-between;padding-top:8px;border-top:0.5px solid rgba(0,196,154,0.2)"><span style="font-size:15px;font-weight:700">Total</span><span id="bill_total" style="font-size:18px;font-weight:700;color:var(--teal)">₹0</span></div>'
+    + '</div>'
+    + '<div style="display:flex;gap:10px;justify-content:flex-end">'
+    + '<button onclick="document.getElementById(\'newBillModal\').style.display=\'none\'" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Cancel</button>'
+    + '<button onclick="saveBill(false)" style="padding:10px 20px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:10px;font-weight:700;cursor:pointer">Save</button>'
+    + '<button onclick="saveBill(true)" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer">Save & Print</button>'
+    + '</div></div></div>';
+}
+
+function addBillItem() {
+  billItems.push({ description: '', qty: 1, rate: 0, amount: 0 });
+  renderBillItems();
+}
+
+function renderBillItems() {
+  var el = document.getElementById('bill-items-list');
+  if (!el) return;
+  if (!billItems.length) {
+    el.innerHTML = '<div style="padding:12px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">No items. Click + Add Item.</div>';
+    return;
+  }
+  var html = '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr><th style="text-align:left;padding:4px 6px;font-size:10px;color:rgba(240,250,247,0.5)">Description</th>'
+    + '<th style="text-align:right;padding:4px 6px;font-size:10px;color:rgba(240,250,247,0.5)">Qty</th>'
+    + '<th style="text-align:right;padding:4px 6px;font-size:10px;color:rgba(240,250,247,0.5)">Rate</th>'
+    + '<th style="text-align:right;padding:4px 6px;font-size:10px;color:rgba(240,250,247,0.5)">Amount</th>'
+    + '<th></th></tr></thead><tbody>';
+  billItems.forEach(function(item, i) {
+    html += '<tr>'
+      + '<td style="padding:4px 6px"><input value="' + item.description + '" onchange="billItems['+i+'].description=this.value" class="form-input" style="width:100%;padding:5px 8px;font-size:12px" placeholder="Consultation fee / Medicine / Test"></td>'
+      + '<td style="padding:4px 6px"><input type="number" value="' + item.qty + '" onchange="billItems['+i+'].qty=parseInt(this.value)||1;billItems['+i+'].amount=billItems['+i+'].qty*billItems['+i+'].rate;renderBillItems();recalcBill()" style="width:50px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 6px;color:#F0FAF7;font-size:12px;text-align:right"></td>'
+      + '<td style="padding:4px 6px"><input type="number" value="' + item.rate + '" onchange="billItems['+i+'].rate=parseFloat(this.value)||0;billItems['+i+'].amount=billItems['+i+'].qty*billItems['+i+'].rate;renderBillItems();recalcBill()" style="width:80px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:5px 6px;color:#F0FAF7;font-size:12px;text-align:right"></td>'
+      + '<td style="padding:4px 6px;text-align:right;font-size:13px;font-weight:600">₹' + ((item.qty||1)*(item.rate||0)).toFixed(0) + '</td>'
+      + '<td style="padding:4px 6px"><button onclick="billItems.splice('+i+',1);renderBillItems();recalcBill()" style="background:rgba(239,68,68,0.15);border:none;color:#ef4444;border-radius:4px;padding:3px 7px;cursor:pointer;font-size:11px">×</button></td>'
+      + '</tr>';
+  });
+  el.innerHTML = html + '</tbody></table>';
+  recalcBill();
+}
+
+function recalcBill() {
+  var subtotal = billItems.reduce(function(s,i){ return s + (i.qty||1)*(i.rate||0); }, 0);
+  var discount = parseFloat(document.getElementById('bill_discount')?.value) || 0;
+  var gstPct   = parseFloat(document.getElementById('bill_gst_pct')?.value) || 0;
+  var taxable  = subtotal - discount;
+  var gstAmt   = gstPct > 0 ? parseFloat((taxable * gstPct / 100).toFixed(2)) : 0;
+  var total    = taxable + gstAmt;
+  var fmt = function(n) { return '₹' + n.toLocaleString('en-IN'); };
+  var st = document.getElementById('bill_subtotal'); if (st) st.textContent = fmt(subtotal);
+  var ga = document.getElementById('bill_gst_amt'); if (ga) ga.textContent = fmt(gstAmt);
+  var tt = document.getElementById('bill_total'); if (tt) tt.textContent = fmt(total);
+}
+
+function searchBillPatient(val) {
+  var s = document.getElementById('bill_patient_suggestions');
+  if (!val || val.length < 2) { s.style.display='none'; return; }
+  var matches = (window.patientsData||[]).filter(function(p) {
+    var n = ((p.first_name||'') + ' ' + (p.last_name||'')).toLowerCase();
+    return n.includes(val.toLowerCase()) || (p.mrn||'').toLowerCase().includes(val.toLowerCase());
+  }).slice(0,5);
+  if (!matches.length) { s.style.display='none'; return; }
+  s.innerHTML = matches.map(function(p) {
+    var name = ((p.first_name||'') + ' ' + (p.last_name||'')).trim();
+    return '<div onclick="selectBillPatient(\'' + p.patient_id + '\',\'' + name.replace(/'/g,'') + '\')" style="padding:8px 12px;cursor:pointer;font-size:13px;border-bottom:0.5px solid rgba(0,196,154,0.1)" onmouseover="this.style.background=\'rgba(0,196,154,0.08)\'" onmouseout="this.style.background=\'none\'">'
+      + '<div style="font-weight:600">' + name + '</div>'
+      + '<div style="font-size:11px;color:rgba(240,250,247,0.5)">' + p.mrn + ' · ' + p.phone + '</div>'
+      + '</div>';
+  }).join('');
+  s.style.display = 'block';
+}
+
+function selectBillPatient(id, name) {
+  document.getElementById('bill_patient_id').value = id;
+  document.getElementById('bill_patient_search').value = name;
+  document.getElementById('bill_patient_suggestions').style.display = 'none';
+}
+
+async function saveBill(print) {
+  var patId = document.getElementById('bill_patient_id')?.value;
+  if (!billItems.length) { showToast('Add at least one item', 'error'); return; }
+  var subtotal = billItems.reduce(function(s,i){ return s+(i.qty||1)*(i.rate||0); }, 0);
+  var discount = parseFloat(document.getElementById('bill_discount')?.value)||0;
+  var gstPct   = parseFloat(document.getElementById('bill_gst_pct')?.value)||0;
+  var taxable  = subtotal - discount;
+  var gstAmt   = gstPct > 0 ? parseFloat((taxable*gstPct/100).toFixed(2)) : 0;
+  var total    = taxable + gstAmt;
+  var payload  = {
+    patient_id:     patId || null,
+    bill_date:      document.getElementById('bill_date')?.value,
+    bill_type:      document.getElementById('bill_type')?.value,
+    payment_mode:   document.getElementById('bill_payment_mode')?.value,
+    payment_status: 'paid',
+    items:          billItems.map(function(i){ return { description:i.description, qty:i.qty||1, rate:i.rate||0, amount:(i.qty||1)*(i.rate||0) }; }),
+    discount:       discount,
+    gst_percent:    gstPct,
+    paid:           total
+  };
+  var data = await apiCall('/hospitals/' + mwHospitalId + '/bills', 'POST', payload);
+  if (!data.success) { showToast('Error: '+data.message, 'error'); return; }
+  showToast('Bill #' + data.data.bill_number + ' created ✓', 'success');
+  billItems = [];
+  document.getElementById('newBillModal').style.display = 'none';
+  loadBilling();
+  if (print) printBillHTML(data.data.bill_number, payload, data.data);
+}
+
+function printBillHTML(billNo, payload, result) {
+  var h = hospitalSettings;
+  var patName = document.getElementById('bill_patient_search')?.value || 'Walk-in Patient';
+  var items   = payload.items;
+  var rowsHTML = items.map(function(item, i) {
+    return '<tr><td style="padding:8px;border:1px solid #dde">' + (i+1) + '</td>'
+      + '<td style="padding:8px;border:1px solid #dde">' + item.description + '</td>'
+      + '<td style="padding:8px;border:1px solid #dde;text-align:right">' + item.qty + '</td>'
+      + '<td style="padding:8px;border:1px solid #dde;text-align:right">₹' + item.rate.toFixed(2) + '</td>'
+      + '<td style="padding:8px;border:1px solid #dde;text-align:right">₹' + item.amount.toFixed(2) + '</td></tr>';
+  }).join('');
+  var subtotal = items.reduce(function(s,i){ return s+i.amount; },0);
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill ' + billNo + '</title>'
+    + '<style>body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#1a1a1a;font-size:13px}'
+    + '.header{display:flex;justify-content:space-between;border-bottom:3px solid #00C49A;padding-bottom:14px;margin-bottom:16px}'
+    + '.logo-area{font-size:24px;font-weight:800;color:#00C49A}.logo-area span{color:#1a1a1a}'
+    + '@media print{.no-print{display:none}body{-webkit-print-color-adjust:exact}}</style></head><body>'
+    + '<div class="no-print" style="position:fixed;top:16px;right:16px;display:flex;gap:10px">'
+    + '<button onclick="window.print()" style="background:#00C49A;color:#000;border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer">🖨 Print / Save PDF</button>'
+    + '<button onclick="window.close()" style="background:#eee;border:none;padding:10px 16px;border-radius:8px;cursor:pointer">Close</button></div>'
+    + '<div class="header">'
+    + '<div class="logo-area">' + (h.logo_url ? '<img src="'+h.logo_url+'" style="height:60px;margin-bottom:4px"><br>' : '') + (h.name||'MediWhats Clinic') + '<div style="font-size:12px;font-weight:400;color:#555">' + (h.address||'') + (h.city?', '+h.city:'') + '</div>'
+    + '<div style="font-size:11px;color:#777">' + (h.phone||'') + (h.gstin?' | GSTIN: '+h.gstin:'') + '</div></div>'
+    + '<div style="text-align:right"><div style="font-size:20px;font-weight:700">TAX INVOICE</div>'
+    + '<div style="font-size:13px;margin-top:4px">Bill No: <b>' + billNo + '</b></div>'
+    + '<div style="font-size:12px;color:#555">Date: ' + payload.bill_date + '</div>'
+    + '<div style="font-size:12px;color:#555">Mode: ' + payload.payment_mode + '</div></div></div>'
+    + '<div style="margin-bottom:14px;padding:10px;background:#f0faf7;border-radius:8px">'
+    + '<b>Bill To:</b> ' + patName + '</div>'
+    + '<table style="width:100%;border-collapse:collapse;margin-bottom:16px"><thead><tr style="background:#e8faf5">'
+    + '<th style="padding:8px;border:1px solid #dde;text-align:left">#</th>'
+    + '<th style="padding:8px;border:1px solid #dde;text-align:left">Description</th>'
+    + '<th style="padding:8px;border:1px solid #dde;text-align:right">Qty</th>'
+    + '<th style="padding:8px;border:1px solid #dde;text-align:right">Rate</th>'
+    + '<th style="padding:8px;border:1px solid #dde;text-align:right">Amount</th>'
+    + '</tr></thead><tbody>' + rowsHTML + '</tbody></table>'
+    + '<div style="margin-left:auto;width:260px">'
+    + '<div style="display:flex;justify-content:space-between;padding:4px 0">Subtotal<span>₹'+subtotal.toFixed(2)+'</span></div>'
+    + (payload.discount > 0 ? '<div style="display:flex;justify-content:space-between;padding:4px 0;color:#e24b4a">Discount<span>- ₹'+payload.discount.toFixed(2)+'</span></div>' : '')
+    + (payload.gst_percent > 0 ? '<div style="display:flex;justify-content:space-between;padding:4px 0">GST ('+payload.gst_percent+'%)<span>₹'+result.gst_amount+'</span></div>' : '')
+    + '<div style="display:flex;justify-content:space-between;padding:8px 0;border-top:2px solid #333;font-size:16px;font-weight:700">TOTAL<span style="color:#00C49A">₹'+result.total+'</span></div>'
+    + '</div>'
+    + (h.bill_terms ? '<div style="margin-top:20px;padding:10px;background:#fff8e1;border-radius:8px;font-size:11px;color:#777"><b>Terms & Conditions:</b><br>' + h.bill_terms + '</div>' : '')
+    + (h.bill_footer ? '<div style="margin-top:10px;text-align:center;font-size:12px;color:#888">' + h.bill_footer + '</div>' : '')
+    + '</body></html>';
+  var win = window.open('', '_blank', 'width=850,height:750');
+  win.document.write(html);
+  win.document.close();
+}
+
+async function printBill(billId) {
+  var data = await apiCall('/hospitals/' + mwHospitalId + '/bills/' + billId);
+  if (!data.success) { showToast('Failed to load bill', 'error'); return; }
+  var b = data.data;
+  var h = { name: b.hospital_name, address: b.hospital_address, phone: b.hospital_phone, gstin: b.hospital_gstin, logo_url: b.logo_url, bill_terms: b.bill_terms, bill_footer: b.bill_footer, city: b.hospital_city };
+  var items = Array.isArray(b.items) ? b.items : JSON.parse(b.items||'[]');
+  var patName = ((b.first_name||'') + ' ' + (b.last_name||'')).trim() || 'Patient';
+  var rowsHTML = items.map(function(item,i){
+    return '<tr><td style="padding:8px;border:1px solid #dde">'+(i+1)+'</td>'
+      + '<td style="padding:8px;border:1px solid #dde">'+item.description+'</td>'
+      + '<td style="padding:8px;border:1px solid #dde;text-align:right">'+item.qty+'</td>'
+      + '<td style="padding:8px;border:1px solid #dde;text-align:right">₹'+parseFloat(item.rate).toFixed(2)+'</td>'
+      + '<td style="padding:8px;border:1px solid #dde;text-align:right">₹'+parseFloat(item.amount).toFixed(2)+'</td></tr>';
+  }).join('');
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Bill '+b.bill_number+'</title>'
+    + '<style>body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#1a1a1a;font-size:13px}@media print{.no-print{display:none}}</style></head><body>'
+    + '<div class="no-print" style="position:fixed;top:16px;right:16px"><button onclick="window.print()" style="background:#00C49A;color:#000;border:none;padding:10px 20px;border-radius:8px;font-weight:700;cursor:pointer">🖨 Print</button></div>'
+    + '<div style="display:flex;justify-content:space-between;border-bottom:3px solid #00C49A;padding-bottom:14px;margin-bottom:16px">'
+    + '<div><b style="font-size:20px;color:#00C49A">'+(h.name||'Clinic')+'</b><br><span style="font-size:12px;color:#555">'+(h.address||'')+(h.city?', '+h.city:'')+'</span><br>'
+    + '<span style="font-size:11px;color:#777">'+(h.phone||'')+(h.gstin?' | GSTIN: '+h.gstin:'')+'</span></div>'
+    + '<div style="text-align:right"><b style="font-size:18px">TAX INVOICE</b><br>Bill No: <b>'+b.bill_number+'</b><br>'
+    + '<span style="font-size:12px;color:#555">'+b.bill_date+'</span></div></div>'
+    + '<div style="margin-bottom:14px;padding:10px;background:#f0faf7;border-radius:8px"><b>Bill To:</b> '+patName+(b.mrn?' ('+b.mrn+')':'')+'</div>'
+    + '<table style="width:100%;border-collapse:collapse;margin-bottom:16px"><thead><tr style="background:#e8faf5">'
+    + '<th style="padding:8px;border:1px solid #dde">#</th><th style="padding:8px;border:1px solid #dde;text-align:left">Description</th>'
+    + '<th style="padding:8px;border:1px solid #dde;text-align:right">Qty</th><th style="padding:8px;border:1px solid #dde;text-align:right">Rate</th>'
+    + '<th style="padding:8px;border:1px solid #dde;text-align:right">Amount</th></tr></thead><tbody>'+rowsHTML+'</tbody></table>'
+    + '<div style="margin-left:auto;width:260px">'
+    + '<div style="display:flex;justify-content:space-between;padding:8px 0;border-top:2px solid #333;font-size:16px;font-weight:700">TOTAL<span style="color:#00C49A">₹'+parseFloat(b.total).toFixed(2)+'</span></div></div>'
+    + (h.bill_terms?'<div style="margin-top:16px;font-size:11px;color:#777"><b>T&C:</b> '+h.bill_terms+'</div>':'')
+    + '</body></html>';
+  var win = window.open('','_blank','width=850,height:750');
+  win.document.write(html); win.document.close();
+}
+
+function viewBill(billId) { printBill(billId); }
+
+// ===== INVESTIGATIONS =====
+var invOrdersData = [];
+var invResultsData = [];
+
+async function loadInvestigations() {
+  showInvTab('orders');
+  try {
+    var today = new Date().toISOString().split('T')[0];
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/investigations/orders?date=' + today);
+    if (data.success) { invOrdersData = data.data; renderInvOrders(invOrdersData); }
+  } catch(e) {}
+}
+
+function showInvTab(tab) {
+  document.getElementById('inv-tab-content-orders').style.display = tab==='orders'?'block':'none';
+  document.getElementById('inv-tab-content-results').style.display = tab==='results'?'block':'none';
+  document.getElementById('inv-tab-orders').style.background = tab==='orders'?'var(--teal)':'transparent';
+  document.getElementById('inv-tab-orders').style.color = tab==='orders'?'#000':'rgba(240,250,247,0.7)';
+  document.getElementById('inv-tab-results').style.background = tab==='results'?'var(--teal)':'transparent';
+  document.getElementById('inv-tab-results').style.color = tab==='results'?'#000':'rgba(240,250,247,0.7)';
+  if (tab === 'results') loadInvResults();
+}
+
+function renderInvOrders(orders) {
+  var el = document.getElementById('inv-orders-list');
+  if (!orders.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No investigation orders today.</div>';
+    return;
+  }
+  var statusColors = { ordered:'#ef9f27', sample_collected:'#378add', processing:'#8b5cf6', completed:'#00C49A', cancelled:'#ef4444' };
+  var rows = orders.map(function(o) {
+    var name = ((o.first_name||'') + ' ' + (o.last_name||'')).trim();
+    var sc = statusColors[o.status] || '#888';
+    return '<tr>'
+      + '<td style="padding:10px 14px;font-weight:600;color:var(--teal)">' + (o.mrn||'—') + '</td>'
+      + '<td style="padding:10px 14px">' + name + '</td>'
+      + '<td style="padding:10px 14px">' + o.test_name + '</td>'
+      + '<td style="padding:10px 14px"><span style="background:rgba(0,196,154,0.1);color:var(--teal);padding:2px 8px;border-radius:4px;font-size:11px">' + o.dept_type + '</span></td>'
+      + '<td style="padding:10px 14px"><span style="color:' + sc + ';font-size:12px;font-weight:600">' + (o.status||'ordered').toUpperCase() + '</span></td>'
+      + '<td style="padding:10px 14px;display:flex;gap:6px">'
+      + (o.status !== 'completed' ? '<button class="action-btn" onclick="openEnterResultModal(\'' + o.id + '\',\'' + o.patient_id + '\',\'' + o.test_name.replace(/'/g,'') + '\',\'' + (o.dept_type||'LAB') + '\')">Enter Result</button>' : '<span style="color:var(--teal);font-size:12px">✓ Done</span>')
+      + '</td></tr>';
+  }).join('');
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">MRN</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Patient</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Test</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Dept</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Status</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Action</th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+async function loadInvResults() {
+  try {
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/investigations/results?reviewed=false');
+    if (data.success) { invResultsData = data.data; renderInvResults(invResultsData); }
+  } catch(e) {}
+}
+
+function renderInvResults(results) {
+  var el = document.getElementById('inv-results-list');
+  if (!results.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No pending results to review.</div>';
+    return;
+  }
+  var rows = results.map(function(r) {
+    var name = ((r.first_name||'') + ' ' + (r.last_name||'')).trim();
+    var statusColor = r.overall_status === 'abnormal' ? '#ef4444' : r.overall_status === 'borderline' ? '#ef9f27' : '#00C49A';
+    return '<tr>'
+      + '<td style="padding:10px 14px">' + name + '</td>'
+      + '<td style="padding:10px 14px;font-weight:600">' + r.test_name + '</td>'
+      + '<td style="padding:10px 14px;color:rgba(240,250,247,0.6)">' + (r.result_date||'—') + '</td>'
+      + '<td style="padding:10px 14px"><span style="color:' + statusColor + ';font-weight:600;font-size:12px">' + (r.overall_status||'pending').toUpperCase() + '</span></td>'
+      + '<td style="padding:10px 14px;max-width:200px;font-size:12px;color:rgba(240,250,247,0.7)">' + (r.ai_summary||'').substring(0,80) + (r.ai_summary && r.ai_summary.length>80?'...':'') + '</td>'
+      + '<td style="padding:10px 14px;display:flex;gap:6px">'
+      + '<button class="action-btn" onclick="dispatchInvResult(\'' + r.id + '\',\'' + (r.phone||'') + '\')">Send to Patient</button>'
+      + '</td></tr>';
+  }).join('');
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Patient</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Test</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Date</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Status</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">AI Summary</th>'
+    + '<th style="padding:10px 14px;text-align:left;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Action</th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table>';
+}
+
+async function dispatchInvResult(resultId, patientPhone) {
+  var phone = patientPhone || prompt('Enter patient WhatsApp number:');
+  if (!phone) return;
+  var data = await apiCall('/hospitals/' + mwHospitalId + '/investigations/results/' + resultId + '/dispatch', 'POST', { patient_phone: phone });
+  if (data.success) { showToast('Results sent to patient ✓', 'success'); loadInvResults(); }
+  else showToast('Error: ' + data.message, 'error');
+}
+
+function openEnterResultModal(orderId, patientId, testName, deptType) {
+  showToast('Result entry coming soon', 'success');
+}
+
+function openNewOrderModal() {
+  showToast('Order from patient EMR → Lab tab', 'success');
+}
 
 </script>
 </body>
