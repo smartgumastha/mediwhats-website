@@ -1397,7 +1397,7 @@ function openEMRById(patientId) {
 function renderPatients(list) {
   var el = document.getElementById('patients-list');
   if (!list.length) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.5)">No patients yet.</div>';
+    el.innerHTML = '<div style="padding:40px;text-align:center">No patients yet.</div>';
     return;
   }
   var tbody = '';
@@ -1407,7 +1407,7 @@ function renderPatients(list) {
     var age = p.age ? (p.age + (p.gender ? p.gender[0].toUpperCase() : '')) : '-';
     var mrn = p.mrn || ('VH-' + new Date().getFullYear() + '-' + String(p.patient_id||'').slice(-5));
     var lv = p.last_visit_at ? new Date(Number(p.last_visit_at)).toLocaleDateString('en-IN') : '-';
-    tbody += '<tr data-pid="' + p.patient_id + '">'
+    tbody += '<tr>'
       + '<td style="color:var(--teal);font-weight:600">' + mrn + '</td>'
       + '<td class="td-name">' + name + '</td>'
       + '<td>' + age + '</td>'
@@ -1415,18 +1415,11 @@ function renderPatients(list) {
       + '<td>' + lv + '</td>'
       + '<td><span class="badge badge-green">Active</span></td>'
       + '<td style="display:flex;gap:6px">'
-      + '<button class="action-btn pt-view">View</button>'
-      + '<button class="action-btn pt-visit" style="background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">+ Visit</button>'
+      + '<button class="action-btn" data-action="view" data-pid="' + p.patient_id + '">View</button>'
+      + '<button class="action-btn" data-action="visit" data-pid="' + p.patient_id + '" data-name="' + name.replace(/"/g,'') + '" data-phone="' + (p.phone||'').replace(/"/g,'') + '" style="background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">+ Visit</button>'
       + '</td></tr>';
   }
   el.innerHTML = '<table><thead><tr><th>MRN</th><th>Patient</th><th>Age</th><th>Phone</th><th>Last visit</th><th>Status</th><th>Action</th></tr></thead><tbody>' + tbody + '</tbody></table>';
-  el.querySelectorAll('tr[data-pid]').forEach(function(row) {
-    var pid = row.getAttribute('data-pid');
-    var vBtn = row.querySelector('.pt-view');
-    var rBtn = row.querySelector('.pt-visit');
-    if (vBtn) vBtn.addEventListener('click', function(){ viewPatient(pid); });
-    if (rBtn) rBtn.addEventListener('click', function(){ openEMRById(pid); });
-  });
 }
 
 // Search patients
@@ -1475,6 +1468,15 @@ async function registerPatient() {
 
 // ===== PATIENT VIEW/EDIT =====
 var activePatientId = null;
+
+document.addEventListener('click', function(e) {
+  var btn = e.target.closest('button[data-action]');
+  if (!btn) return;
+  var action = btn.getAttribute('data-action');
+  var pid    = btn.getAttribute('data-pid');
+  if (action === 'view')  viewPatient(pid);
+  if (action === 'visit') openEMR(pid, btn.getAttribute('data-name')||'Patient', btn.getAttribute('data-phone')||'');
+});
 
 function viewPatient(patientId) {
   activePatientId = patientId;
