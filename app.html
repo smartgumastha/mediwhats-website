@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773958079 -->
+<!-- MediWhats v23 BUILD:1773959608 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1346,24 +1346,22 @@ async function doLogin() {
 }
 
 function applyRoleAccess(role) {
-  var access = {
-    HOSPITAL_ADMIN: ['dashboard','patients','appointments','ipd','billing'],
-    DOCTOR:         ['dashboard','patients','appointments','ipd','billing'],
-    RECEPTIONIST:   ['dashboard','patients','appointments'],
-    BILLING:        ['dashboard','billing'],
-    LAB:            ['dashboard'],
-    PHARMACY:       ['dashboard','billing'],
-  };
-  var allowed = access[role] || ['dashboard'];
-  document.querySelectorAll('.nav-item').forEach(function(item) { item.style.display=''; });
+  document.querySelectorAll('.nav-item').forEach(function(item) {
+    item.style.display = '';
+  });
 }
+
 
 function showScreen(name, navEl) {
   var btnLabels = {dashboard:'New appointment',patients:'Register patient',appointments:'New appointment',newbilling:'New bill',investigations:'New order',settings:'Save Settings',teleconsult:'New consult'};
   var lbl = document.getElementById('topbar-action-text'); if (lbl) lbl.textContent = btnLabels[name]||'New';
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
+  // Aliases
+  if (name === 'billing') name = 'newbilling';
+  var screenEl = document.getElementById('screen-' + name);
+  if (!screenEl) { console.warn('Screen not found:', name); return; }
+  screenEl.classList.add('active');
   if (name === 'patients') loadPatients();
   if (name === 'teleconsult') loadTeleconsult();
   if (name === 'newbilling') loadBilling();
