@@ -720,7 +720,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 
 <!-- PATIENT RECORD PANEL -->
 <!-- INVESTIGATIONS SCREEN -->
-<div id="screen-investigations" class="screen" style="display:none;padding:28px">
+<div id="screen-investigations" class="screen" style="padding:28px">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
     <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Investigations</div>
     <div style="display:flex;gap:10px">
@@ -742,7 +742,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 
 <!-- BILLING SCREEN -->
-<div id="screen-billing" class="screen" style="display:none;padding:28px">
+<div id="screen-billing" class="screen" style="padding:28px">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
     <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Billing</div>
     <button onclick="openNewBillModal()" style="padding:10px 22px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px">+ New Bill</button>
@@ -771,7 +771,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 
 <!-- SETTINGS SCREEN -->
-<div id="screen-settings" class="screen" style="display:none;padding:28px">
+<div id="screen-settings" class="screen" style="padding:28px">
   <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700;margin-bottom:20px">Hospital Settings</div>
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;max-width:900px">
 
@@ -2907,7 +2907,11 @@ function buildNewBillForm() {
     + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Date</label>'
     + '<input id="bill_date" type="date" class="form-input" style="width:100%"></div>'
     + '<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Payment Mode</label>'
-    + '<select id="bill_payment_mode" class="form-select" style="width:100%"><option>Cash</option><option>UPI</option><option>Card</option><option>Cheque</option><option>Insurance</option></select></div>'
+    + '<select id="bill_payment_mode" onchange="togglePaymentRef()" class="form-select" style="width:100%"><option>Cash</option><option>UPI</option><option>Card</option><option>Cheque</option><option>Insurance</option><option>Pending</option></select></div>'
+    + '</div>'
+    + '<div style="margin-bottom:14px" id="payment_ref_row">'
+    + '<label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Reference / Transaction ID</label>'
+    + '<input id="bill_ref" type="text" class="form-input" style="width:100%" placeholder="UPI ref / Card last 4 / Insurance policy no / Cheque no">'
     + '</div>'
     // Items
     + '<div style="margin-bottom:14px"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">'
@@ -2960,9 +2964,17 @@ function renderBillItems() {
   recalcBill();
 }
 
+function togglePaymentRef() {
+  var mode = document.getElementById('bill_payment_mode')?.value;
+  var row = document.getElementById('payment_ref_row');
+  if (row) row.style.display = (mode === 'Cash') ? 'none' : 'block';
+}
+
 function recalcBill() {
   var subtotal = billItems.reduce(function(s,i){ return s + (i.qty||1)*(i.rate||0); }, 0);
-  var discount = parseFloat(document.getElementById('bill_discount')?.value) || 0;
+  var discVal  = parseFloat(document.getElementById('bill_discount')?.value) || 0;
+  var discType = document.getElementById('bill_disc_type')?.value || 'amount';
+  var discount = discType === 'percent' ? parseFloat((subtotal * discVal / 100).toFixed(2)) : discVal;
   var gstPct   = parseFloat(document.getElementById('bill_gst_pct')?.value) || 0;
   var taxable  = subtotal - discount;
   var gstAmt   = gstPct > 0 ? parseFloat((taxable * gstPct / 100).toFixed(2)) : 0;
@@ -2976,6 +2988,13 @@ function recalcBill() {
 function searchBillPatient(val) {
   var s = document.getElementById('bill_patient_suggestions');
   if (!val || val.length < 2) { s.style.display='none'; return; }
+  // Load patients if not loaded
+  if (!window.patientsData || !window.patientsData.length) {
+    apiCall('/hospitals/' + mwHospitalId + '/patients').then(function(d) {
+      if (d.success) { window.patientsData = d.data; searchBillPatient(val); }
+    });
+    return;
+  }
   var matches = (window.patientsData||[]).filter(function(p) {
     var n = ((p.first_name||'') + ' ' + (p.last_name||'')).toLowerCase();
     return n.includes(val.toLowerCase()) || (p.mrn||'').toLowerCase().includes(val.toLowerCase());
@@ -3006,12 +3025,16 @@ async function saveBill(print) {
   var taxable  = subtotal - discount;
   var gstAmt   = gstPct > 0 ? parseFloat((taxable*gstPct/100).toFixed(2)) : 0;
   var total    = taxable + gstAmt;
+  var discVal  = parseFloat(document.getElementById('bill_discount')?.value)||0;
+  var discType = document.getElementById('bill_disc_type')?.value||'amount';
+  var payMode  = document.getElementById('bill_payment_mode')?.value;
   var payload  = {
     patient_id:     patId || null,
     bill_date:      document.getElementById('bill_date')?.value,
     bill_type:      document.getElementById('bill_type')?.value,
-    payment_mode:   document.getElementById('bill_payment_mode')?.value,
-    payment_status: 'paid',
+    payment_mode:   payMode,
+    payment_status: payMode === 'Pending' ? 'pending' : 'paid',
+    notes:          document.getElementById('bill_ref')?.value || '',
     items:          billItems.map(function(i){ return { description:i.description, qty:i.qty||1, rate:i.rate||0, amount:(i.qty||1)*(i.rate||0) }; }),
     discount:       discount,
     gst_percent:    gstPct,
