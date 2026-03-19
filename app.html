@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773959608 -->
+<!-- MediWhats v23 BUILD:1773960328 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1466,25 +1466,7 @@ async function removeStaff(userId) {
 }
 
 // Show staff section only for HOSPITAL_ADMIN
-function applyRoleAccess(role) {
-  var access = {
-    HOSPITAL_ADMIN: ['dashboard','patients','appointments','ipd','billing','staff'],
-    DOCTOR:         ['dashboard','patients','appointments','ipd','billing'],
-    RECEPTIONIST:   ['dashboard','patients','appointments'],
-    BILLING:        ['dashboard','billing'],
-    LAB:            ['dashboard'],
-    PHARMACY:       ['dashboard','billing'],
-  };
-  var allowed = access[role] || ['dashboard'];
-  if (allowed.includes('staff')) {
-    document.getElementById('staffNavSection').style.display = 'block';
-  }
-  document.querySelectorAll('.nav-item').forEach(item => {
-    var screen = item.getAttribute('onclick') || '';
-    var match = screen.match(/'([^']+)'/);
-    if (match && !allowed.includes(match[1])) item.style.display = 'none';
-  });
-}
+
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape') {
