@@ -1166,16 +1166,16 @@ function selectRole(btn, role) {
 }
 
 async function doLogin() {
-  const email = document.querySelector('#loginWrap input[type="email"]').value;
-  const password = document.querySelector('#loginWrap input[type="password"]').value;
+  var email = document.querySelector('#loginWrap input[type="email"]').value;
+  var password = document.querySelector('#loginWrap input[type="password"]').value;
   if (!email || !password) { alert('Please enter email and password'); return; }
   try {
-    const res = await fetch('https://smartgumastha-backend-production.up.railway.app/api/auth/login', {
+    var res = await fetch('https://smartgumastha-backend-production.up.railway.app/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
     });
-    const data = await res.json();
+    var data = await res.json();
     if (data.success && data.data.token) {
       // Block super admin from hospital app
       if (data.data.role === 'SUPER_ADMIN') {
@@ -1187,7 +1187,7 @@ async function doLogin() {
       mwToken = data.data.token;
       mwUser = data.data;
       mwHospitalId = data.data.hospital_id || 1;
-      const role = data.data.role || 'DOCTOR';
+      var role = data.data.role || 'DOCTOR';
       currentRole = role;
       document.getElementById('loginWrap').style.display = 'none';
       document.getElementById('app').classList.add('visible');
@@ -1210,7 +1210,7 @@ async function doLogin() {
 }
 
 function applyRoleAccess(role) {
-  const access = {
+  var access = {
     HOSPITAL_ADMIN: ['dashboard','patients','appointments','ipd','billing'],
     DOCTOR:         ['dashboard','patients','appointments','ipd','billing'],
     RECEPTIONIST:   ['dashboard','patients','appointments'],
@@ -1218,10 +1218,10 @@ function applyRoleAccess(role) {
     LAB:            ['dashboard'],
     PHARMACY:       ['dashboard','billing'],
   };
-  const allowed = access[role] || ['dashboard'];
+  var allowed = access[role] || ['dashboard'];
   document.querySelectorAll('.nav-item').forEach(item => {
-    const screen = item.getAttribute('onclick') || '';
-    const match = screen.match(/'([^']+)'/);
+    var screen = item.getAttribute('onclick') || '';
+    var match = screen.match(/'([^']+)'/);
     if (match && !allowed.includes(match[1])) {
       item.style.display = 'none';
     }
@@ -1235,16 +1235,16 @@ function showScreen(name, navEl) {
   if (name === 'patients') loadPatients();
   if (name === 'teleconsult') loadTeleconsult();
   if (navEl) navEl.classList.add('active');
-  const titles = {dashboard:'Dashboard',patients:'Patients',appointments:'Appointments',ipd:'IPD & Bed Management',billing:'Billing',staff:'Staff Management'};
-  const actions = {dashboard:'New appointment',patients:'Register patient',appointments:'Book appointment',ipd:'Admit patient',billing:'New bill',staff:'Add staff'};
+  var titles = {dashboard:'Dashboard',patients:'Patients',appointments:'Appointments',ipd:'IPD & Bed Management',billing:'Billing',staff:'Staff Management'};
+  var actions = {dashboard:'New appointment',patients:'Register patient',appointments:'Book appointment',ipd:'Admit patient',billing:'New bill',staff:'Add staff'};
   if (name === 'staff') loadStaff();
   document.getElementById('topbarTitle').textContent = titles[name] || name;
   document.getElementById('topbarActionBtn').innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ${actions[name] || 'New'}`;
 }
 
 function handleTopbarAction() {
-  const screen = document.querySelector('.screen.active').id.replace('screen-','');
-  const modals = {dashboard:'apptModal',patients:'registerModal',appointments:'apptModal',ipd:'apptModal',billing:'registerModal'};
+  var screen = document.querySelector('.screen.active').id.replace('screen-','');
+  var modals = {dashboard:'apptModal',patients:'registerModal',appointments:'apptModal',ipd:'apptModal',billing:'registerModal'};
   if (modals[screen]) openModal(modals[screen]);
 }
 
@@ -1258,31 +1258,31 @@ function toggleTheme() {
 }
 
 function showToast(msg) {
-  const t = document.getElementById('toast');
+  var t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 
-const API_BASE = 'https://smartgumastha-backend-production.up.railway.app/api';
+var API_BASE = 'https://smartgumastha-backend-production.up.railway.app/api';
 let mwToken = localStorage.getItem('mw_token') || '';
 let mwUser = JSON.parse(localStorage.getItem('mw_user') || '{}');
 let mwHospitalId = mwUser.hospital_id || 1;
 
 async function apiCall(path, method='GET', body=null) {
-  const token = localStorage.getItem('mw_token') || '';
-  const opts = { method, headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } };
+  var token = localStorage.getItem('mw_token') || '';
+  var opts = { method, headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' } };
   if (body) opts.body = JSON.stringify(body);
-  const res = await fetch(API_BASE + path, opts);
+  var res = await fetch(API_BASE + path, opts);
   return res.json();
 }
 
 async function loadStaff() {
   try {
-    const data = await apiCall('/hospitals/' + mwHospitalId + '/staff');
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/staff');
     if (!data.success) { document.getElementById('staffTable').innerHTML = '<div style="padding:24px;text-align:center;color:var(--gray)">No staff found.</div>'; return; }
-    const staff = data.data;
+    var staff = data.data;
     if (!staff.length) { document.getElementById('staffTable').innerHTML = '<div style="padding:24px;text-align:center;color:var(--gray)">No staff yet. Add your first staff member.</div>'; return; }
     let html = '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Role</th><th>Status</th><th>Action</th></tr></thead><tbody>';
     staff.forEach(s => {
@@ -1294,11 +1294,11 @@ async function loadStaff() {
 }
 
 async function addStaff() {
-  const btn = document.getElementById('addStaffBtn');
-  const result = document.getElementById('addStaffResult');
+  var btn = document.getElementById('addStaffBtn');
+  var result = document.getElementById('addStaffResult');
   btn.textContent = 'Creating...';
-  const nameParts = document.getElementById('sf_name').value.trim().split(' ');
-  const body = {
+  var nameParts = document.getElementById('sf_name').value.trim().split(' ');
+  var body = {
     first_name: nameParts[0] || '',
     last_name: nameParts.slice(1).join(' ') || '',
     email: document.getElementById('sf_email').value,
@@ -1306,7 +1306,7 @@ async function addStaff() {
     role_master_id: parseInt(document.getElementById('sf_role').value)
   };
   try {
-    const data = await apiCall('/hospitals/' + mwHospitalId + '/staff', 'POST', body);
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/staff', 'POST', body);
     result.style.display = 'block';
     if (data.success) {
       result.innerHTML = '<div style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);border-radius:10px;padding:12px;font-size:13px;color:var(--teal)">' + data.message + '<br>Temp password: ' + data.data.temp_password + '</div>';
@@ -1321,13 +1321,13 @@ async function addStaff() {
 
 async function removeStaff(userId) {
   if (!confirm('Remove this staff member?')) return;
-  const data = await apiCall('/hospitals/' + mwHospitalId + '/staff/' + userId, 'DELETE');
+  var data = await apiCall('/hospitals/' + mwHospitalId + '/staff/' + userId, 'DELETE');
   if (data.success) { showToast('Staff removed'); loadStaff(); }
 }
 
 // Show staff section only for HOSPITAL_ADMIN
 function applyRoleAccess(role) {
-  const access = {
+  var access = {
     HOSPITAL_ADMIN: ['dashboard','patients','appointments','ipd','billing','staff'],
     DOCTOR:         ['dashboard','patients','appointments','ipd','billing'],
     RECEPTIONIST:   ['dashboard','patients','appointments'],
@@ -1335,13 +1335,13 @@ function applyRoleAccess(role) {
     LAB:            ['dashboard'],
     PHARMACY:       ['dashboard','billing'],
   };
-  const allowed = access[role] || ['dashboard'];
+  var allowed = access[role] || ['dashboard'];
   if (allowed.includes('staff')) {
     document.getElementById('staffNavSection').style.display = 'block';
   }
   document.querySelectorAll('.nav-item').forEach(item => {
-    const screen = item.getAttribute('onclick') || '';
-    const match = screen.match(/'([^']+)'/);
+    var screen = item.getAttribute('onclick') || '';
+    var match = screen.match(/'([^']+)'/);
     if (match && !allowed.includes(match[1])) item.style.display = 'none';
   });
 }
@@ -1353,7 +1353,7 @@ document.addEventListener('keydown', e => {
 });
 
 function updateRoleModules(roleId) {
-  const map = {
+  var map = {
     '3':  'Patients, Appointments, IPD, Billing',
     '4':  'Patients, Appointments, Reception',
     '5':  'Billing, Payments',
@@ -1365,7 +1365,7 @@ function updateRoleModules(roleId) {
     '11': 'Laboratory, Sample Collection',
     '12': 'Inventory, Store Management',
   };
-  const hint = document.getElementById('roleModulesHint');
+  var hint = document.getElementById('roleModulesHint');
   if (hint) hint.textContent = 'Access: ' + (map[roleId] || 'Basic access');
 }
 // ===== PATIENTS =====
@@ -1727,7 +1727,7 @@ function cancelTcConsult(id) {
 // ===== EMR VISIT RECORDS =====
 // Add this entire block before </script> in app.html
 
-const DRUGS = [
+var DRUGS = [
   'Paracetamol','Dolo 650','Ibuprofen','Aspirin','Diclofenac',
   'Amoxicillin','Azithromycin','Ciprofloxacin','Metronidazole','Doxycycline',
   'Pantoprazole','Omeprazole','Ranitidine','Domperidone','Ondansetron',
@@ -1743,7 +1743,7 @@ const DRUGS = [
   'Augmentin','Cefixime','Levofloxacin'
 ];
 
-const LAB_TESTS = [
+var LAB_TESTS = [
   'CBC (Complete Blood Count)','ESR','Blood Group & Rh',
   'Blood Sugar Fasting','Blood Sugar PP','Blood Sugar Random','HbA1c',
   'LFT (Liver Function Test)','KFT (Kidney Function Test)',
@@ -1759,10 +1759,10 @@ const LAB_TESTS = [
   'Vitamin D','Vitamin B12','Iron Studies'
 ];
 
-const DEPTS = ['General Medicine','Ophthalmology','Dental','Gynaecology','Paediatrics','ENT','Orthopaedics','Dermatology'];
-const FREQ  = ['Once daily','Twice daily','Thrice daily','Four times daily','At night','In the morning','SOS (as needed)'];
-const DOSE  = ['1 tablet','1/2 tablet','2 tablets','5ml','10ml','1 capsule','2 capsules','1 drop','2 drops'];
-const DUR   = ['3 days','5 days','7 days','10 days','14 days','1 month','3 months','Continuous'];
+var DEPTS = ['General Medicine','Ophthalmology','Dental','Gynaecology','Paediatrics','ENT','Orthopaedics','Dermatology'];
+var FREQ  = ['Once daily','Twice daily','Thrice daily','Four times daily','At night','In the morning','SOS (as needed)'];
+var DOSE  = ['1 tablet','1/2 tablet','2 tablets','5ml','10ml','1 capsule','2 capsules','1 drop','2 drops'];
+var DUR   = ['3 days','5 days','7 days','10 days','14 days','1 month','3 months','Continuous'];
 
 var activeVisitPatient = null;
 var visitRxRows   = [];
