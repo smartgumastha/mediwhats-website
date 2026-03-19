@@ -2526,7 +2526,16 @@ async function aiDraftPrescription() {
   }
 }
 
+var _pendingAIDrugs = [];
+var _pendingAIAdvice = '';
+
+function applyPendingAIPrescription() {
+  applyAIPrescription(_pendingAIDrugs, _pendingAIAdvice);
+}
+
 function renderAIPrescription(drugs, advice, warnings) {
+  _pendingAIDrugs = drugs || [];
+  _pendingAIAdvice = advice || '';
   if (!drugs || !drugs.length) { showToast('AI could not generate prescription for this diagnosis', 'error'); return; }
 
   // Show confirmation modal before adding
@@ -2569,7 +2578,7 @@ function renderAIPrescription(drugs, advice, warnings) {
     + '</div>'
     + '<div style="padding:14px 22px;border-top:0.5px solid rgba(99,102,241,0.2);display:flex;gap:10px;justify-content:flex-end">'
     + '<button onclick="document.getElementById(\'aiRxConfirmModal\').style.display=\'none\'" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Discard</button>'
-    + '<button onclick="applyAIPrescription(' + JSON.stringify(drugs).replace(/'/g,"\\'") + ',\'' + (advice||'').replace(/'/g,"\\'") + '\')" style="padding:10px 24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer">✓ Add to Prescription</button>'
+        + '<button onclick="applyPendingAIPrescription()" style="padding:10px 24px;background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer">✓ Add to Prescription</button>'
     + '</div>'
     + '</div>';
 
