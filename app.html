@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773972571 -->
+<!-- MediWhats v23 BUILD:1773976419 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -703,7 +703,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 
 <!-- RESULT ENTRY MODAL -->
 <div id="resultEntryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:6000;align-items:center;justify-content:center;padding:20px">
-  <div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:20px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto">
+  <div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:20px;width:100%;max-width:920px;max-height:92vh;overflow-y:auto">
     <div style="padding:16px 22px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0D1412;z-index:10">
       <div>
         <div style="font-size:16px;font-weight:700" id="rem-test-name">Enter Results</div>
@@ -4120,6 +4120,71 @@ var LAB_MASTER = {
       { name:'RDT P. falciparum',      unit:'',     normal_m:'Negative', normal_f:'Negative', normal_child:'Negative',low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'Positive — falciparum malaria' },
       { name:'RDT P. vivax',           unit:'',     normal_m:'Negative', normal_f:'Negative', normal_child:'Negative',low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'Positive — vivax malaria' }
     ]
+  },
+  BSPP: {
+    name: 'Blood Sugar PP (2hr)', dept_type: 'LAB', category: 'Biochemistry',
+    vacutainer_color: 'grey', method: 'Hexokinase or GOD-PAP enzymatic',
+    fasting_required: false,
+    params: [
+      { name:'Glucose (2hr PP)', unit:'mg/dL', normal_m:'<140', normal_f:'<140', normal_child:'<140', low:'0', high:'140', crit_low:'40', crit_high:'500' }
+    ]
+  },
+  BSR: {
+    name: 'Blood Sugar Random', dept_type: 'LAB', category: 'Biochemistry',
+    vacutainer_color: 'grey', method: 'Hexokinase or GOD-PAP enzymatic',
+    fasting_required: false,
+    params: [
+      { name:'Glucose (Random)', unit:'mg/dL', normal_m:'<140', normal_f:'<140', normal_child:'<140', low:'0', high:'200', crit_low:'40', crit_high:'500' }
+    ]
+  },
+  CRP: {
+    name: 'CRP (C-Reactive Protein)', dept_type: 'LAB', category: 'Biochemistry',
+    vacutainer_color: 'yellow', method: 'Turbidimetry / Immunoturbidimetry',
+    fasting_required: false,
+    params: [
+      { name:'CRP', unit:'mg/L', normal_m:'<5.0', normal_f:'<5.0', normal_child:'<5.0', low:'0', high:'5.0', crit_low:'', crit_high:'200' }
+    ]
+  },
+  ESR: {
+    name: 'ESR', dept_type: 'LAB', category: 'Haematology',
+    vacutainer_color: 'purple', method: 'Westergren method (standard)',
+    fasting_required: false,
+    params: [
+      { name:'ESR', unit:'mm/hr', normal_m:'0-15', normal_f:'0-20', normal_child:'0-10', low:'0', high:'15', crit_low:'', crit_high:'' }
+    ]
+  },
+  DENGUE_AB: {
+    name: 'Dengue IgM/IgG', dept_type: 'LAB', category: 'Serology',
+    vacutainer_color: 'yellow', method: 'ELISA or Rapid ICT',
+    fasting_required: false,
+    params: [
+      { name:'Dengue IgM', unit:'', normal_m:'Negative', normal_f:'Negative', normal_child:'Negative', low:'', high:'', crit_low:'', crit_high:'' },
+      { name:'Dengue IgG', unit:'', normal_m:'Negative', normal_f:'Negative', normal_child:'Negative', low:'', high:'', crit_low:'', crit_high:'' }
+    ]
+  },
+  HCV: {
+    name: 'Anti-HCV (Hepatitis C)', dept_type: 'LAB', category: 'Serology',
+    vacutainer_color: 'red', method: 'ELISA (3rd/4th generation) or CLIA',
+    fasting_required: false,
+    params: [
+      { name:'Anti-HCV', unit:'', normal_m:'Negative', normal_f:'Negative', normal_child:'Negative', low:'', high:'', crit_low:'', crit_high:'' }
+    ]
+  },
+  HIV: {
+    name: 'HIV 1 & 2', dept_type: 'LAB', category: 'Serology',
+    vacutainer_color: 'red', method: 'ELISA (4th gen) or CLIA — HIV Ag/Ab combo',
+    fasting_required: false,
+    params: [
+      { name:'HIV 1 & 2 Antibody', unit:'', normal_m:'Negative', normal_f:'Negative', normal_child:'Negative', low:'', high:'', crit_low:'', crit_high:'' }
+    ]
+  },
+  UPT: {
+    name: 'Pregnancy Test (Urine Beta hCG)', dept_type: 'LAB', category: 'Urine',
+    vacutainer_color: 'white_container', method: 'Immunochromatographic rapid test (ICT)',
+    fasting_required: false,
+    params: [
+      { name:'Beta hCG (Urine)', unit:'', normal_m:'Negative', normal_f:'Negative', normal_child:'Negative', low:'', high:'', crit_low:'', crit_high:'' }
+    ]
   }
 };
 
@@ -4931,29 +4996,90 @@ async function openResultEntry(orderId) {
   document.getElementById('saveResultEntry').onclick=function(){ submitResultEntry(); };
 }
 
-function getLabMasterParams(testCode, patientGender, patientAge) {
+function getLabMasterParams(testCode, patientGender, patientAge, testName) {
   if (!window.LAB_MASTER) return null;
-  var master = window.LAB_MASTER[testCode];
+
+  var master = null;
+
+  // 1. Direct code match
+  if (testCode) master = window.LAB_MASTER[testCode.toUpperCase()];
+
+  // 2. Normalised code match (remove spaces, dashes, slashes)
+  if (!master && testCode) {
+    var norm = testCode.toUpperCase().replace(/[\s\-\/]/g,'_');
+    master = window.LAB_MASTER[norm];
+  }
+
+  // 3. Test name fuzzy match (scan all masters)
+  if (!master && testName) {
+    var nameLow = testName.toLowerCase();
+    for (var key in window.LAB_MASTER) {
+      var m = window.LAB_MASTER[key];
+      var mName = (m.name||'').toLowerCase();
+      // Check contains or partial match
+      if (mName === nameLow ||
+          mName.indexOf(nameLow) >= 0 ||
+          nameLow.indexOf(mName) >= 0 ||
+          // Match abbreviation: "CBC" in "Complete Blood Count (CBC)"
+          nameLow.indexOf(key.toLowerCase()) >= 0 ||
+          // Common aliases
+          (nameLow.indexOf('widal') >= 0 && key === 'WIDAL') ||
+          (nameLow.indexOf('lipid') >= 0 && key === 'LIPID') ||
+          (nameLow.indexOf('kidney') >= 0 && key === 'KFT') ||
+          (nameLow.indexOf('liver') >= 0 && key === 'LFT') ||
+          (nameLow.indexOf('thyroid') >= 0 && key === 'TFT') ||
+          (nameLow.indexOf('dengue ns1') >= 0 && key === 'DENGUE_NS1') ||
+          (nameLow.indexOf('hba1c') >= 0 && key === 'HBA1C') ||
+          (nameLow.indexOf('haemoglobin a1c') >= 0 && key === 'HBA1C') ||
+          (nameLow.indexOf('malaria') >= 0 && key === 'MP') ||
+          (nameLow.indexOf('urine routine') >= 0 && key === 'URE') ||
+          (nameLow.indexOf('blood sugar fasting') >= 0 && key === 'BSF') ||
+          (nameLow.indexOf('fasting glucose') >= 0 && key === 'BSF') ||
+          (nameLow.indexOf('blood sugar pp') >= 0 && key === 'BSPP') ||
+          (nameLow.indexOf('prothrombin') >= 0 && key === 'PT_INR') ||
+          (nameLow.indexOf('pt/inr') >= 0 && key === 'PT_INR') ||
+          (nameLow.indexOf('aptt') >= 0 && key === 'APTT') ||
+          (nameLow.indexOf('vitamin d') >= 0 && key === 'VIT_D') ||
+          (nameLow.indexOf('vitamin b12') >= 0 && key === 'B12') ||
+          (nameLow.indexOf('hbsag') >= 0 && key === 'HBSAG') ||
+          (nameLow.indexOf('hepatitis b') >= 0 && key === 'HBSAG')) {
+        master = m;
+        break;
+      }
+    }
+  }
+
   if (!master || !master.params) return null;
+
   var isChild = patientAge && parseInt(patientAge) < 18;
   var isMale  = !patientGender || patientGender.toLowerCase().indexOf('f') !== 0;
   return master.params.map(function(p) {
-    var range = isChild ? (p.normal_child||p.normal_m) : (isMale ? p.normal_m : p.normal_f);
-    return Object.assign({}, p, { normal: range||p.normal_m||'' });
+    var range = isChild ? (p.normal_child||p.normal_m||p.normal_male) : (isMale ? (p.normal_m||p.normal_male) : (p.normal_f||p.normal_female));
+    return Object.assign({}, p, { normal: range || p.normal_m || p.normal_male || '' });
   });
 }
 
 function buildParamInputs(params, order) {
   var el = document.getElementById('rem-params-list'); if(!el) return;
   var testCode = order && order.test_code ? order.test_code.toUpperCase() : '';
+  var testName = order && order.test_name ? order.test_name : '';
   var patient = window.patientsData && order && order.patient_id
     ? (window.patientsData||[]).find(function(p){ return String(p.patient_id)===String(order.patient_id); })
     : null;
-  var richParams = getLabMasterParams(testCode, patient ? patient.gender : null, patient ? patient.age : null);
+  var richParams = getLabMasterParams(testCode, patient ? patient.gender : null, patient ? patient.age : null, testName);
   var finalParams = richParams || (params && params.length ? params : null);
   window.currentParamSet = finalParams || [];
 
-  var masterData = window.LAB_MASTER && window.LAB_MASTER[testCode];
+  var masterData = (window.LAB_MASTER && window.LAB_MASTER[testCode]) ||
+    (function(){
+      if (!window.LAB_MASTER || !testName) return null;
+      var nl = testName.toLowerCase();
+      for (var k in window.LAB_MASTER) {
+        var mn = (window.LAB_MASTER[k].name||'').toLowerCase();
+        if (mn===nl || mn.indexOf(nl)>=0 || nl.indexOf(mn)>=0 || nl.indexOf(k.toLowerCase())>=0) return window.LAB_MASTER[k];
+      }
+      return null;
+    })();
   var methodHTML = '';
   if (masterData) {
     methodHTML = '<div style="background:rgba(127,119,221,0.1);border:0.5px solid rgba(127,119,221,0.3);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px">'
