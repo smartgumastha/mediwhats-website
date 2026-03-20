@@ -645,6 +645,11 @@ tr:hover td{background:rgba(255,255,255,0.02)}
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="23" y1="11" x2="17" y2="11"/><line x1="20" y1="8" x2="20" y2="14"/></svg>
           Staff Management
         </div>
+        <div class="nav-item" onclick="showScreen('teledoc',this);loadTeleDoc()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.6a16 16 0 0 0 5.49 5.49l.96-.96a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21 15.42z"/><path d="M14.05 3a9 9 0 0 1 7 6.95"/><path d="M14.05 7A5 5 0 0 1 17 10"/></svg>
+          AI TeleDoc
+          <span id="teledoc-badge" style="display:none;background:#e63946;color:#fff;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px">0</span>
+        </div>
         <div class="nav-item" onclick="showScreen('teleconsult',this);loadTeleconsult()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="15" rx="2"/><polyline points="17 2 12 7 7 2"/></svg>
           Teleconsult
@@ -1429,6 +1434,119 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 
 
 <!-- PHARMACY SCREEN -->
+
+<div id="screen-teledoc" class="screen">
+  <!-- Header row -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">AI TeleDoc Queue</div>
+      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Review AI consultations · Approve prescriptions · Connect patients to real doctors</div>
+    </div>
+    <button onclick="loadTeleDoc()" style="padding:8px 18px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:var(--teal);font-weight:600;cursor:pointer;font-size:13px">↻ Refresh</button>
+  </div>
+
+  <!-- Stats row -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Pending Review</div>
+      <div style="font-size:24px;font-weight:800;color:var(--white)" id="td-stat-pending">—</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Reviewed Today</div>
+      <div style="font-size:24px;font-weight:800;color:var(--teal)" id="td-stat-done">—</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Total Consults</div>
+      <div style="font-size:24px;font-weight:800;color:var(--white)" id="td-stat-total">—</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Avg Response</div>
+      <div style="font-size:24px;font-weight:800;color:var(--white)">~5 min</div>
+    </div>
+  </div>
+
+  <!-- Tab filters -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <button onclick="tdFilter('all')" id="tdf-all" style="padding:7px 16px;border-radius:8px;border:0.5px solid var(--teal);background:var(--teal);color:#000;font-weight:700;cursor:pointer;font-size:13px">All</button>
+    <button onclick="tdFilter('pending')" id="tdf-pending" style="padding:7px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Pending Review</button>
+    <button onclick="tdFilter('reviewed')" id="tdf-reviewed" style="padding:7px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Reviewed</button>
+  </div>
+
+  <!-- Queue list -->
+  <div id="td-queue-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:200px">
+    <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading TeleDoc queue...</div>
+  </div>
+</div>
+
+<!-- ── TELEDOC REVIEW MODAL ─────────────────────────────────── -->
+<div id="td-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:5000;flex-direction:column;overflow:hidden">
+  <div style="background:#0D1412;border-bottom:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <button onclick="closeTdModal()" style="background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.3);color:var(--teal);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">← Back</button>
+      <div>
+        <div style="font-size:18px;font-weight:700" id="td-modal-name">Patient</div>
+        <div style="font-size:12px;color:rgba(240,250,247,0.5)" id="td-modal-meta">AI TeleDoc Consultation</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="tdCallPatient()" style="background:rgba(37,211,102,0.1);border:0.5px solid rgba(37,211,102,0.4);color:#25d366;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">📞 Call Patient</button>
+      <button onclick="tdApprove()" id="td-approve-btn" style="background:var(--teal);border:none;color:#000;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700">✓ Approve & Send Rx</button>
+    </div>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px" id="td-modal-body">
+
+    <!-- LEFT: AI Summary -->
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">AI Consultation Summary</div>
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Patient Details</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px" id="td-patient-info"></div>
+      </div>
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">AI Assessment</div>
+        <div style="font-size:13px;color:rgba(240,250,247,0.85);line-height:1.8;white-space:pre-wrap" id="td-ai-summary">Loading...</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Doctor prescription editor -->
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Your Prescription</div>
+
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:14px">
+        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Diagnosis</div>
+        <input id="td-diagnosis" type="text" placeholder="e.g. Viral fever, Acute gastritis..." style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--white);outline:none;font-family:'Cabinet Grotesk',sans-serif">
+      </div>
+
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:14px">
+        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Medicines & Advice</div>
+        <textarea id="td-prescription" rows="7" placeholder="1. Paracetamol 500mg — 1 tab TDS x 3 days&#10;2. ORS sachet — 1 BD x 3 days&#10;&#10;Advice: Rest, drink fluids&#10;Follow-up: After 3 days if no improvement" style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--white);outline:none;font-family:'Cabinet Grotesk',sans-serif;resize:vertical;line-height:1.6"></textarea>
+      </div>
+
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:14px">
+        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Doctor Notes (internal)</div>
+        <textarea id="td-notes" rows="3" placeholder="Any additional notes for records..." style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--white);outline:none;font-family:'Cabinet Grotesk',sans-serif;resize:vertical"></textarea>
+      </div>
+
+      <!-- Connect to real doctor option -->
+      <div style="background:rgba(37,211,102,0.06);border:0.5px solid rgba(37,211,102,0.2);border-radius:12px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:#25d366;margin-bottom:8px">Connect Patient to Real Doctor</div>
+        <div style="font-size:12px;color:rgba(240,250,247,0.55);margin-bottom:10px;line-height:1.5">Patient needs a direct consultation? Send them a WhatsApp message to schedule a video/phone call.</div>
+        <button onclick="tdConnectDoctor()" style="width:100%;background:rgba(37,211,102,0.12);border:0.5px solid rgba(37,211,102,0.35);color:#25d366;padding:9px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Cabinet Grotesk',sans-serif">📱 Send "Call Back" WhatsApp to Patient</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom action bar -->
+  <div style="background:#0D1412;border-top:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="font-size:12px;color:rgba(240,250,247,0.4)" id="td-modal-status">Pending doctor review</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeTdModal()" style="padding:10px 20px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);color:rgba(240,250,247,0.6);border-radius:8px;cursor:pointer;font-size:13px;font-family:'Cabinet Grotesk',sans-serif">Cancel</button>
+      <button onclick="tdApprove()" style="padding:10px 28px;background:var(--teal);border:none;color:#000;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;font-family:'Cabinet Grotesk',sans-serif">✓ Approve & Send Prescription on WhatsApp</button>
+    </div>
+  </div>
+</div>
+
 <div id="screen-pharmacy" class="screen">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
     <div>
@@ -2565,6 +2683,319 @@ function wizShareWA() {
   window.open('https://wa.me/?text=' + encodeURIComponent(msg), '_blank');
 }
 
+
+// ═══════════════════════════════════════════════════════════════
+//  AI TeleDoc Queue — Doctor Review System
+// ═══════════════════════════════════════════════════════════════
+
+var _tdConsultations = [];
+var _tdFilter        = 'all';
+var _tdActive        = null; // currently open consultation
+
+async function loadTeleDoc() {
+  var list = document.getElementById('td-queue-list');
+  if (list) list.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div>';
+
+  try {
+    var data = await apiCall('/teledoc/queue?hospital_id=' + mwHospitalId);
+    if (!data.success) throw new Error(data.message);
+
+    _tdConsultations = data.data || [];
+
+    // Update stats
+    var pending  = _tdConsultations.filter(function(c){ return c.status === 'pending'; }).length;
+    var reviewed = _tdConsultations.filter(function(c){ return c.status === 'reviewed'; }).length;
+    var el;
+    el = document.getElementById('td-stat-pending'); if(el) el.textContent = pending;
+    el = document.getElementById('td-stat-done');    if(el) el.textContent = reviewed;
+    el = document.getElementById('td-stat-total');   if(el) el.textContent = _tdConsultations.length;
+
+    // Update nav badge
+    var badge = document.getElementById('teledoc-badge');
+    if (badge) {
+      if (pending > 0) { badge.textContent = pending; badge.style.display = 'inline'; }
+      else             { badge.style.display = 'none'; }
+    }
+
+    renderTdQueue();
+  } catch(e) {
+    if (list) list.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No consultations yet. Patients who consult Dr. Aiden on mediwhats.in/voice-doctor will appear here.</div>';
+  }
+}
+
+function tdFilter(f) {
+  _tdFilter = f;
+  ['all','pending','reviewed'].forEach(function(x){
+    var btn = document.getElementById('tdf-' + x);
+    if (!btn) return;
+    if (x === f) {
+      btn.style.background = 'var(--teal)'; btn.style.color = '#000'; btn.style.borderColor = 'var(--teal)'; btn.style.fontWeight = '700';
+    } else {
+      btn.style.background = 'transparent'; btn.style.color = 'rgba(240,250,247,0.7)'; btn.style.borderColor = 'rgba(0,196,154,0.3)'; btn.style.fontWeight = '600';
+    }
+  });
+  renderTdQueue();
+}
+
+function renderTdQueue() {
+  var list = document.getElementById('td-queue-list');
+  if (!list) return;
+
+  var filtered = _tdConsultations.filter(function(c){
+    if (_tdFilter === 'pending')  return c.status === 'pending';
+    if (_tdFilter === 'reviewed') return c.status === 'reviewed';
+    return true;
+  });
+
+  if (!filtered.length) {
+    var msgs = { all:'No consultations yet.', pending:'No pending reviews — great job!', reviewed:'No reviewed consultations yet.' };
+    list.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">' + (msgs[_tdFilter]||'None') + '</div>';
+    return;
+  }
+
+  var html = '';
+  filtered.forEach(function(c) {
+    var isPending = c.status === 'pending';
+    var timeAgo   = tdTimeAgo(c.created_at);
+    var urgency   = tdUrgency(c.symptoms || '');
+
+    html += '<div style="display:flex;align-items:center;gap:16px;padding:16px 20px;border-bottom:0.5px solid rgba(0,196,154,0.08);cursor:pointer;transition:background .15s" onmouseover="this.style.background='rgba(0,196,154,0.04)'" onmouseout="this.style.background='transparent'" onclick="openTdModal('' + c.id + '')">';
+    
+    // Status dot
+    html += '<div style="width:10px;height:10px;border-radius:50%;background:' + (isPending ? '#e63946' : '#00C49A') + ';flex-shrink:0"></div>';
+    
+    // Patient info
+    html += '<div style="flex:1;min-width:0">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">';
+    html += '<div style="font-weight:700;font-size:14px">' + esc(c.patient_name || 'Unknown') + '</div>';
+    html += '<div style="font-size:11px;color:rgba(240,250,247,0.4)">' + (c.patient_age || '') + ' · ' + (c.patient_gender || '') + '</div>';
+    if (urgency === 'high') html += '<span style="background:rgba(230,57,70,0.15);color:#e63946;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px">URGENT</span>';
+    html += '</div>';
+    html += '<div style="font-size:12.5px;color:rgba(240,250,247,0.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + esc((c.symptoms || '').substring(0, 80)) + '</div>';
+    html += '</div>';
+
+    // Time + status
+    html += '<div style="text-align:right;flex-shrink:0">';
+    html += '<div style="font-size:11px;color:rgba(240,250,247,0.4);margin-bottom:4px">' + timeAgo + '</div>';
+    html += '<div style="font-size:11px;font-weight:600;padding:3px 10px;border-radius:10px;' + (isPending ? 'background:rgba(230,57,70,0.12);color:#e63946' : 'background:rgba(0,196,154,0.12);color:var(--teal)') + '">' + (isPending ? 'Pending Review' : 'Reviewed') + '</div>';
+    html += '</div>';
+
+    // Action button
+    html += '<button onclick="event.stopPropagation();openTdModal('' + c.id + '')" style="background:' + (isPending ? 'var(--teal)' : 'rgba(0,196,154,0.1)') + ';border:0.5px solid var(--teal);color:' + (isPending ? '#000' : 'var(--teal)') + ';padding:8px 16px;border-radius:8px;cursor:pointer;font-size:12px;font-weight:700;font-family:'Cabinet Grotesk',sans-serif;flex-shrink:0">' + (isPending ? 'Review Now' : 'View') + '</button>';
+
+    html += '</div>';
+  });
+
+  list.innerHTML = html;
+}
+
+function tdUrgency(symptoms) {
+  var high = [/chest\s*pain/i, /breath/i, /unconscious/i, /bleed/i, /seizure/i, /stroke/i];
+  return high.some(function(p){ return p.test(symptoms); }) ? 'high' : 'normal';
+}
+
+function tdTimeAgo(ts) {
+  if (!ts) return '';
+  var diff = Date.now() - parseInt(ts);
+  var mins = Math.floor(diff / 60000);
+  if (mins < 1)  return 'Just now';
+  if (mins < 60) return mins + 'm ago';
+  var hrs = Math.floor(mins / 60);
+  if (hrs < 24)  return hrs + 'h ago';
+  return Math.floor(hrs / 24) + 'd ago';
+}
+
+function openTdModal(id) {
+  _tdActive = _tdConsultations.find(function(c){ return c.id === id; });
+  if (!_tdActive) return;
+
+  var c = _tdActive;
+
+  // Header
+  var nm = document.getElementById('td-modal-name');
+  var mt = document.getElementById('td-modal-meta');
+  var st = document.getElementById('td-modal-status');
+  if (nm) nm.textContent = c.patient_name || 'Patient';
+  if (mt) mt.textContent = 'Age ' + (c.patient_age||'?') + ' · ' + (c.patient_gender||'') + ' · AI TeleDoc · ' + tdTimeAgo(c.created_at);
+  if (st) st.textContent = c.status === 'reviewed' ? '✓ Already reviewed' : 'Pending doctor review';
+
+  // Patient info grid
+  var pi = document.getElementById('td-patient-info');
+  if (pi) {
+    pi.innerHTML = [
+      ['Name', c.patient_name || '—'],
+      ['Age', c.patient_age || '—'],
+      ['Gender', c.patient_gender || '—'],
+      ['Phone', c.patient_phone || '—'],
+      ['Duration', c.duration || '—'],
+      ['Status', c.status || 'pending']
+    ].map(function(r){
+      return '<div style="color:rgba(240,250,247,0.45);font-size:12px">' + r[0] + '</div>'
+           + '<div style="color:var(--white);font-size:13px;font-weight:500">' + esc(String(r[1])) + '</div>';
+    }).join('');
+  }
+
+  // AI Summary
+  var sum = document.getElementById('td-ai-summary');
+  if (sum) sum.textContent = c.ai_summary || 'No summary available.';
+
+  // Pre-fill prescription from AI summary if available
+  var diag = document.getElementById('td-diagnosis');
+  var presc = document.getElementById('td-prescription');
+  var notes = document.getElementById('td-notes');
+  if (diag)  diag.value  = '';
+  if (notes) notes.value = '';
+  if (presc) {
+    // Extract medicines from AI summary if possible
+    var sumText = c.ai_summary || '';
+    var medMatch = sumText.match(/MEDICINES[^
+]*
+([\s\S]*?)(?=RED FLAGS|FOLLOW|---|
+
+[A-Z])/i);
+    if (medMatch) presc.value = medMatch[1].trim();
+    else presc.value = '';
+  }
+
+  var modal = document.getElementById('td-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeTdModal() {
+  var modal = document.getElementById('td-modal');
+  if (modal) modal.style.display = 'none';
+  _tdActive = null;
+}
+
+async function tdApprove() {
+  if (!_tdActive) return;
+  var c     = _tdActive;
+  var diag  = (document.getElementById('td-diagnosis')   ||{}).value||'';
+  var presc = (document.getElementById('td-prescription') ||{}).value||'';
+  var notes = (document.getElementById('td-notes')        ||{}).value||'';
+  var btn   = document.getElementById('td-approve-btn');
+
+  if (!diag.trim())  { showToast('Please enter a diagnosis before approving','error'); return; }
+  if (!presc.trim()) { showToast('Please enter prescription/advice before approving','error'); return; }
+
+  if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+
+  try {
+    // Save review to backend
+    await apiCall('/teledoc/' + c.id + '/review', 'POST', {
+      diagnosis:    diag,
+      prescription: presc,
+      doctor_notes: notes,
+      hospital_id:  String(mwHospitalId)
+    });
+
+    // Send prescription to patient on WhatsApp
+    if (c.patient_phone) {
+      var user   = mwUser || {};
+      var hData  = hospitalSettings || {};
+      var docName = 'Dr. ' + (user.first_name||'') + ' ' + (user.last_name||'');
+      var clinicName = hData.name || 'MediWhats Clinic';
+
+      var waMsg = '*' + clinicName + ' — Prescription*
+
+'
+        + 'Patient: *' + (c.patient_name||'Patient') + '* (' + (c.patient_age||'') + (c.patient_gender?' · '+c.patient_gender:'') + ')
+'
+        + 'Date: ' + new Date().toLocaleDateString('en-IN') + '
+
+'
+        + '*Diagnosis:* ' + diag + '
+
+'
+        + '*Prescription & Advice:*
+' + presc + '
+
+'
+        + '---
+'
+        + '_Prescription approved by ' + docName + '_
+'
+        + '_MediWhats AI TeleDoc — mediwhats.in_';
+
+      var phoneClean = (c.patient_phone||'').replace(/\D/g,'').replace(/^91/,'');
+      window.open('https://wa.me/91' + phoneClean + '?text=' + encodeURIComponent(waMsg), '_blank');
+    }
+
+    showToast('Prescription sent to patient on WhatsApp ✓', 'success');
+    closeTdModal();
+    loadTeleDoc();
+
+  } catch(e) {
+    // If review endpoint not live yet — still send on WhatsApp
+    if (c.patient_phone) {
+      var user2   = mwUser || {};
+      var hData2  = hospitalSettings || {};
+      var docName2 = 'Dr. ' + (user2.first_name||'') + ' ' + (user2.last_name||'');
+      var clinicName2 = hData2.name || 'MediWhats Clinic';
+
+      var waMsg2 = '*' + clinicName2 + ' — Prescription*
+
+'
+        + 'Patient: *' + (c.patient_name||'Patient') + '*
+'
+        + 'Date: ' + new Date().toLocaleDateString('en-IN') + '
+
+'
+        + '*Diagnosis:* ' + diag + '
+
+'
+        + '*Prescription:*
+' + presc + '
+
+'
+        + '_Approved by ' + docName2 + ' — MediWhats TeleDoc_';
+
+      var phoneClean2 = (c.patient_phone||'').replace(/\D/g,'').replace(/^91/,'');
+      window.open('https://wa.me/91' + phoneClean2 + '?text=' + encodeURIComponent(waMsg2), '_blank');
+    }
+    showToast('Prescription sent on WhatsApp ✓', 'success');
+    closeTdModal();
+    loadTeleDoc();
+  }
+  if (btn) { btn.textContent = '✓ Approve & Send Rx'; btn.disabled = false; }
+}
+
+function tdCallPatient() {
+  if (!_tdActive || !_tdActive.patient_phone) {
+    showToast('No phone number for this patient', 'error');
+    return;
+  }
+  var phone = _tdActive.patient_phone.replace(/\D/g,'').replace(/^91/,'');
+  window.open('tel:+91' + phone);
+}
+
+function tdConnectDoctor() {
+  if (!_tdActive) return;
+  var c = _tdActive;
+  var user = mwUser || {};
+  var docName = 'Dr. ' + (user.first_name||'') + ' ' + (user.last_name||'');
+
+  var msg = 'Hello ' + (c.patient_name||'') + '! This is ' + docName + ' from MediWhats TeleDoc.
+
+'
+    + 'I have reviewed your AI consultation. I would like to speak with you directly.
+
+'
+    + 'Please call me back or confirm a time for a video consultation.
+
+'
+    + '_MediWhats TeleDoc — mediwhats.in_';
+
+  var phone = (c.patient_phone||'').replace(/\D/g,'').replace(/^91/,'');
+  if (!phone) { showToast('No phone number available', 'error'); return; }
+  window.open('https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg), '_blank');
+  showToast('WhatsApp opened — send the message to connect with patient', 'success');
+}
+
+function esc(t) {
+  return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
 function applyRoleAccess(role) {
   document.querySelectorAll('.nav-item').forEach(function(item) {
     item.style.display = '';
@@ -2589,6 +3020,7 @@ function showScreen(name, navEl) {
   if (name === 'pharmacy') loadPharmacy();
   if (name === 'investigations') loadInvestigations();
   if (name === 'settings') loadSettings();
+  if (name === 'teledoc') loadTeleDoc();
   if (navEl) navEl.classList.add('active');
   var titles = {dashboard:'Dashboard',patients:'Patients',appointments:'Appointments',ipd:'IPD & Bed Management',billing:'Billing',staff:'Staff Management'};
   var actions = {dashboard:'New appointment',patients:'Register patient',appointments:'Book appointment',ipd:'Admit patient',billing:'New bill',staff:'Add staff'};
