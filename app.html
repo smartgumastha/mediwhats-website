@@ -1678,6 +1678,203 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 
 <!-- PATIENT RECORD PANEL -->
 
+<div id="prPanel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:3000;flex-direction:column;overflow:hidden">
+  <!-- Header -->
+  <div style="background:#0D1412;border-bottom:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <button onclick="closePatientRecord()" style="background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.3);color:var(--teal);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">&#8592; Back</button>
+      <div>
+        <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:18px;font-weight:700" id="prPatientName">Patient</div>
+        <div style="font-size:12px;color:rgba(240,250,247,0.5)">Patient Records</div>
+      </div>
+    </div>
+    <button onclick="newVisit()" style="background:var(--teal);color:#000;border:none;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;font-family:'Cabinet Grotesk',sans-serif">+ New Visit</button>
+  </div>
+
+  <!-- Body: History left + Form right -->
+  <div style="display:grid;grid-template-columns:280px 1fr;flex:1;overflow:hidden">
+
+    <!-- Visit History Sidebar -->
+    <div style="background:#080C0B;border-right:0.5px solid rgba(0,196,154,0.15);overflow-y:auto;padding:16px">
+      <div style="font-size:11px;font-weight:700;color:rgba(240,250,247,0.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">Visit History</div>
+      <div id="prHistory"><div style="color:rgba(240,250,247,0.4);font-size:13px;text-align:center;padding:20px">Loading...</div></div>
+    </div>
+
+    <!-- EMR Form -->
+    <div style="overflow-y:auto;padding:24px" id="prForm">
+      <!-- Tab navigation -->
+      <div style="display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap">
+        <button id="prtab-subjective"  class="pr-tab active" onclick="switchPrTab('subjective')">Subjective</button>
+        <button id="prtab-vitals"      class="pr-tab" onclick="switchPrTab('vitals')">Vitals</button>
+        <button id="prtab-examination" class="pr-tab" onclick="switchPrTab('examination')">Examination</button>
+        <button id="prtab-diagnosis"   class="pr-tab" onclick="switchPrTab('diagnosis')">Diagnosis</button>
+        <button id="prtab-prescription" class="pr-tab" onclick="switchPrTab('prescription')">Prescription</button>
+        <button id="prtab-lab"         class="pr-tab" onclick="switchPrTab('lab')">Lab / Radiology</button>
+        <button id="prtab-followup"    class="pr-tab" onclick="switchPrTab('followup')">Follow-up</button>
+        <button id="prtab-dept"        class="pr-tab" onclick="switchPrTab('dept');loadDeptSection(document.getElementById('vr_dept').value,{})">Dept-Specific</button>
+      </div>
+
+      <!-- Visit meta row -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:20px;padding:14px;background:#0D1412;border-radius:12px;border:0.5px solid rgba(0,196,154,0.15)">
+        <div>
+          <label class="vr-label">Department</label>
+          <select id="vr_dept" class="form-select" onchange="loadDeptSection(this.value,{})"><option>General Medicine</option><option>Ophthalmology</option><option>Dental</option><option>Gynaecology</option><option>Paediatrics</option><option>ENT</option><option>Orthopaedics</option><option>Dermatology</option></select>
+        </div>
+        <div><label class="vr-label">Date</label><input id="vr_date" type="date" class="form-input" style="width:100%"></div>
+        <div>
+          <label class="vr-label">Visit Type</label>
+          <select id="vr_type" class="form-select"><option>OPD</option><option>IPD</option><option>Teleconsult</option><option>Follow-up</option></select>
+        </div>
+        <div style="display:flex;align-items:flex-end">
+          <div style="font-size:11px;color:var(--teal);font-weight:600" id="visit-status-badge">New Visit</div>
+        </div>
+      </div>
+
+      <!-- SECTION: SUBJECTIVE -->
+      <div class="pr-section" id="prsec-subjective">
+        <div class="vr-section-title">Subjective — What the patient tells you</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div><label class="vr-label">Chief Complaint *</label><input id="vr_complaint" class="form-input" style="width:100%" placeholder="Fever, cough, headache..."></div>
+          <div><label class="vr-label">Duration</label><input id="vr_duration" class="form-input" style="width:100%" placeholder="3 days, 1 week..."></div>
+          <div style="grid-column:1/-1"><label class="vr-label">History of Present Illness</label><textarea id="vr_history" class="form-input" rows="3" style="width:100%;resize:vertical" placeholder="Onset, character, progression, associated symptoms..."></textarea></div>
+          <div><label class="vr-label">Known Allergies</label><input id="vr_allergies" class="form-input" style="width:100%" placeholder="Penicillin, Sulfa..."></div>
+          <div><label class="vr-label">Past Surgical History</label><input id="vr_surgical" class="form-input" style="width:100%" placeholder="Appendectomy 2018..."></div>
+        </div>
+      </div>
+
+      <!-- SECTION: VITALS -->
+      <div class="pr-section" id="prsec-vitals" style="display:none">
+        <div class="vr-section-title">Objective — Vitals</div>
+        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+          <div>
+            <label class="vr-label">Blood Pressure</label>
+            <div style="display:flex;align-items:center;gap:6px">
+              <input id="vr_bp_s" type="number" class="form-input" style="width:70px;text-align:center" placeholder="120">
+              <span style="color:rgba(240,250,247,0.4)">/</span>
+              <input id="vr_bp_d" type="number" class="form-input" style="width:70px;text-align:center" placeholder="80">
+              <span style="font-size:11px;color:rgba(240,250,247,0.4)">mmHg</span>
+            </div>
+          </div>
+          <div><label class="vr-label">Temperature (&#8451;)</label><input id="vr_temp" type="number" step="0.1" class="form-input" style="width:100%" placeholder="98.6"></div>
+          <div><label class="vr-label">Pulse (bpm)</label><input id="vr_pulse" type="number" class="form-input" style="width:100%" placeholder="72"></div>
+          <div><label class="vr-label">SpO2 (%)</label><input id="vr_spo2" type="number" class="form-input" style="width:100%" placeholder="98"></div>
+          <div><label class="vr-label">Weight (kg)</label><input id="vr_weight" type="number" step="0.1" class="form-input" style="width:100%" placeholder="70" oninput="calcBMI()"></div>
+          <div><label class="vr-label">Height (cm)</label><input id="vr_height" type="number" class="form-input" style="width:100%" placeholder="170" oninput="calcBMI()"></div>
+          <div style="display:flex;align-items:flex-end"><div style="font-size:18px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="vr_bmi_display">BMI: —</div><input type="hidden" id="vr_bmi_val"></div>
+        </div>
+      </div>
+
+      <!-- SECTION: EXAMINATION -->
+      <div class="pr-section" id="prsec-examination" style="display:none">
+        <div class="vr-section-title">Objective — Physical Examination</div>
+        <textarea id="vr_exam" class="form-input" rows="8" style="width:100%;resize:vertical;font-family:monospace;font-size:13px" placeholder="General: Conscious, oriented, afebrile&#10;CVS: S1 S2 heard, no murmur&#10;RS: Clear, no wheeze&#10;Abdomen: Soft, non-tender&#10;CNS: No focal deficit"></textarea>
+      </div>
+
+      <!-- SECTION: DIAGNOSIS -->
+      <div class="pr-section" id="prsec-diagnosis" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="vr-section-title" style="margin:0">Assessment — Diagnosis</div>
+          <button onclick="aiSuggestDiagnosis()" style="padding:7px 16px;background:rgba(127,119,221,0.15);border:0.5px solid #7F77DD;color:#AFA9EC;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px">
+            <span style="font-size:14px">✨</span> AI Suggest Diagnosis
+          </button>
+        </div>
+        <div id="ai-diagnosis-suggestions" style="display:none;margin-bottom:14px"></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div style="grid-column:1/-1"><label class="vr-label">Primary Diagnosis *</label><input id="vr_dx" class="form-input" style="width:100%" placeholder="Acute viral fever"></div>
+          <div><label class="vr-label">Secondary Diagnosis</label><input id="vr_dx2" class="form-input" style="width:100%" placeholder="Upper respiratory tract infection"></div>
+          <div><label class="vr-label">ICD-10 Code</label><input id="vr_icd" class="form-input" style="width:100%" placeholder="J06.9"></div>
+        </div>
+      </div>
+
+      <!-- SECTION: PRESCRIPTION -->
+      <div class="pr-section" id="prsec-prescription" style="display:none">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="vr-section-title" style="margin:0">Plan — Prescription</div>
+          <button onclick="aiDraftPrescription()" style="padding:7px 16px;background:rgba(127,119,221,0.15);border:0.5px solid #7F77DD;color:#AFA9EC;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px">
+            <span style="font-size:14px">✨</span> AI Draft Rx
+          </button>
+        </div>
+        <div id="ai-rx-review-panel" style="display:none;margin-bottom:14px"></div>
+        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+          <select id="rx-drug-select" class="form-select" style="width:220px">
+            <option value="">Select drug...</option><option>Paracetamol</option><option>Dolo 650</option><option>Ibuprofen</option><option>Aspirin</option><option>Diclofenac</option><option>Amoxicillin</option><option>Azithromycin</option><option>Ciprofloxacin</option><option>Metronidazole</option><option>Doxycycline</option><option>Pantoprazole</option><option>Omeprazole</option><option>Domperidone</option><option>Ondansetron</option><option>Metformin</option><option>Glimepiride</option><option>Amlodipine</option><option>Atenolol</option><option>Telmisartan</option><option>Atorvastatin</option><option>Cetirizine</option><option>Levocetrizine</option><option>Montelukast</option><option>Salbutamol</option><option>Multivitamin</option><option>Vitamin D3</option><option>Calcium</option><option>Iron</option><option>Folic Acid</option><option>Augmentin</option><option>Cefixime</option><option>Levofloxacin</option></select>
+          <button onclick="addRxRow(document.getElementById('rx-drug-select').value)" style="background:var(--teal);color:#000;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">+ Add</button>
+          <button onclick="addRxRow('')" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px">+ Custom drug</button>
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Drug</th>
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Strength</th>
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Dose</th>
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Frequency</th>
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Duration</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="rx-table-body"></tbody>
+        </table>
+        <div style="margin-top:16px"><label class="vr-label">General Advice</label><textarea id="vr_advice" class="form-input" rows="2" style="width:100%;resize:vertical" placeholder="Drink plenty of fluids, rest, avoid spicy food..."></textarea></div>
+      </div>
+
+      <!-- SECTION: LAB -->
+      <div class="pr-section" id="prsec-lab" style="display:none">
+        <div class="vr-section-title">Plan — Lab & Radiology Requests</div>
+        <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Laboratory Tests</div>
+        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <select id="lab-select" class="form-select" style="width:260px">
+            <option value="">Select test...</option><option>CBC (Complete Blood Count)</option><option>ESR</option><option>Blood Sugar Fasting</option><option>Blood Sugar PP</option><option>Blood Sugar Random</option><option>HbA1c</option><option>LFT</option><option>KFT</option><option>Lipid Profile</option><option>Thyroid Profile (T3/T4/TSH)</option><option>Urine Routine & Microscopy</option><option>Dengue NS1 Antigen</option><option>Malaria Antigen</option><option>Widal Test</option><option>CRP</option><option>Serum Electrolytes</option><option>Vitamin D</option><option>Vitamin B12</option><option>HIV (ELISA)</option><option>HBsAg</option><option>Pregnancy Test (Urine)</option><option>Pap Smear</option></select>
+          <button onclick="addLabRow(document.getElementById('lab-select').value)" style="background:var(--teal);color:#000;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">+ Add</button>
+        </div>
+        <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
+          <thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Test</th>
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Urgency</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="lab-table-body"></tbody>
+        </table>
+        <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Radiology</div>
+        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
+          <select id="rad-select" class="form-select" style="width:260px">
+            <option value="">Select...</option><option>X-Ray Chest (PA view)</option><option>X-Ray KUB</option><option>X-Ray Spine</option><option>X-Ray Hand/Wrist</option><option>USG Abdomen</option><option>USG Pelvis</option><option>USG Thyroid</option><option>2D Echocardiogram</option><option>ECG</option><option>MRI Brain</option><option>CT Scan Head</option><option>DEXA Scan</option></select>
+          <button onclick="addRadRow(document.getElementById('rad-select').value)" style="background:var(--teal);color:#000;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">+ Add</button>
+        </div>
+        <table style="width:100%;border-collapse:collapse">
+          <thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">
+            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Investigation</th>
+            <th></th>
+          </tr></thead>
+          <tbody id="rad-table-body"></tbody>
+        </table>
+      </div>
+
+      <!-- SECTION: FOLLOW-UP -->
+      <div class="pr-section" id="prsec-followup" style="display:none">
+        <div class="vr-section-title">Plan — Follow-up & Instructions</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div><label class="vr-label">Follow-up Date</label><input id="vr_followup" type="date" class="form-input" style="width:100%"></div>
+          <div><label class="vr-label">Referral To</label><input id="vr_referral" class="form-input" style="width:100%" placeholder="Dr. Sharma / Apollo Hospital"></div>
+          <div style="grid-column:1/-1"><label class="vr-label">Follow-up Instructions</label><textarea id="vr_followup_notes" class="form-input" rows="3" style="width:100%;resize:vertical" placeholder="Return if fever persists beyond 3 days, or if any new symptoms develop..."></textarea></div>
+        </div>
+      </div>
+
+      <!-- SECTION: DEPT SPECIFIC -->
+      <div class="pr-section" id="prsec-dept" style="display:none">
+        <div class="vr-section-title">Department-Specific Findings</div>
+        <div id="dept-section"><div style="color:rgba(240,250,247,0.4);font-size:13px;padding:16px;text-align:center">Select department from the top to see specific fields</div></div>
+      </div>
+
+      <!-- Save buttons -->
+      <div style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:0.5px solid rgba(0,196,154,0.15);flex-wrap:wrap">
+        <button onclick="saveVisitRecord(false)" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);padding:12px 20px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px">Save Draft</button>
+        <button onclick="confirmSend()" style="background:var(--teal);color:#000;border:none;padding:12px 24px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">&#10003; Save &amp; Send WhatsApp</button>
+        <button onclick="printVisitRecord()" style="background:rgba(255,255,255,0.06);border:0.5px solid rgba(240,250,247,0.2);color:rgba(240,250,247,0.8);padding:12px 20px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px">&#128438; Print / PDF</button>
+        <button onclick="sendVisitWhatsApp()" style="background:rgba(37,211,102,0.12);border:0.5px solid rgba(37,211,102,0.4);color:#25d366;padding:12px 20px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px">&#128241; Send via WhatsApp</button>
+        <button onclick="closeEMR()" style="background:none;border:0.5px solid rgba(240,250,247,0.15);color:rgba(240,250,247,0.4);padding:12px 16px;border-radius:10px;cursor:pointer;font-size:13px;margin-left:auto">&#215; Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ADD STOCK MODAL -->
 <div id="addStockModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:6000;align-items:center;justify-content:center;padding:20px">
   <div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:16px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto">
