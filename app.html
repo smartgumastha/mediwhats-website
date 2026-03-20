@@ -1,4 +1,4 @@
-<!-- MediWhats v40 BUILD:1774047921 -->
+<!-- MediWhats v40 BUILD:1774048423 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1220,6 +1220,206 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     </div>
   </div>
 </div>
+
+
+
+
+<!-- TELECONSULT -->
+<div class="screen" 
+
+<div id="screen-teledoc" class="screen">
+  <!-- Header row -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">AI TeleDoc Queue</div>
+      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Review AI consultations · Approve prescriptions · Connect patients to real doctors</div>
+    </div>
+    <button onclick="loadTeleDoc()" style="padding:8px 18px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:var(--teal);font-weight:600;cursor:pointer;font-size:13px">↻ Refresh</button>
+  </div>
+
+  <!-- Stats row -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Pending Review</div>
+      <div style="font-size:24px;font-weight:800;color:var(--white)" id="td-stat-pending">—</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Reviewed Today</div>
+      <div style="font-size:24px;font-weight:800;color:var(--teal)" id="td-stat-done">—</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Total Consults</div>
+      <div style="font-size:24px;font-weight:800;color:var(--white)" id="td-stat-total">—</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Avg Response</div>
+      <div style="font-size:24px;font-weight:800;color:var(--white)">~5 min</div>
+    </div>
+  </div>
+
+  <!-- Tab filters -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <button onclick="tdFilter('all')" id="tdf-all" style="padding:7px 16px;border-radius:8px;border:0.5px solid var(--teal);background:var(--teal);color:#000;font-weight:700;cursor:pointer;font-size:13px">All</button>
+    <button onclick="tdFilter('pending')" id="tdf-pending" style="padding:7px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Pending Review</button>
+    <button onclick="tdFilter('reviewed')" id="tdf-reviewed" style="padding:7px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Reviewed</button>
+  </div>
+
+  <!-- Queue list -->
+  <div id="td-queue-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:200px">
+    <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading TeleDoc queue...</div>
+  </div>
+</div>
+
+
+
+<div id="screen-teleconsult" class="screen">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div>
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Teleconsultation</div>
+      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Video consults via WhatsApp or browser link</div>
+    </div>
+    <button onclick="startNewTeleconsult()" style="padding:10px 22px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px">+ New Consult</button>
+  </div>
+
+  <!-- Stats -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Today</div>
+      <div style="font-size:22px;font-weight:700;color:var(--teal);margin-top:4px" id="tc-today-count">0</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Pending</div>
+      <div style="font-size:22px;font-weight:700;color:#ef9f27;margin-top:4px" id="tc-pending-count">0</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">This Month</div>
+      <div style="font-size:22px;font-weight:700;color:#F0FAF7;margin-top:4px" id="tc-month-count">0</div>
+    </div>
+  </div>
+
+  <!-- List -->
+  <div id="tc-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
+    <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading consults...</div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- PHARMACY SCREEN -->
+
+<div id="screen-pharmacy" class="screen">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
+    <div>
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Pharmacy</div>
+      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Inventory &middot; POS Billing &middot; Prescriptions &middot; Audit Log</div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="pharmTab('rx')" id="ptab-rx" class="ptab-btn ptab-on">Prescriptions</button>
+      <button onclick="pharmTab('inventory')" id="ptab-inventory" class="ptab-btn">Inventory</button>
+      <button onclick="pharmTab('billing')" id="ptab-billing" class="ptab-btn">POS Billing</button>
+      <button onclick="pharmTab('audit')" id="ptab-audit" class="ptab-btn">Audit Log</button>
+    </div>
+  </div>
+
+  <div id="ph-rx" class="ph-tab">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <button onclick="pharmRxFilter('pending')" id="prxf-pending" class="ptab-btn ptab-on" style="font-size:12px;padding:6px 14px">Pending</button>
+      <button onclick="pharmRxFilter('dispensed')" id="prxf-dispensed" class="ptab-btn" style="font-size:12px;padding:6px 14px">Dispensed</button>
+      <button onclick="pharmRxFilter('all')" id="prxf-all" class="ptab-btn" style="font-size:12px;padding:6px 14px">All</button>
+      <input id="pharma-rx-search" type="text" placeholder="Search patient or drug..." oninput="pharmRxSearch(this.value)"
+        style="margin-left:auto;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none;min-width:180px">
+    </div>
+    <div id="pharma-orders-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:120px">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading prescriptions...</div>
+    </div>
+  </div>
+
+  <div id="ph-inventory" class="ph-tab" style="display:none">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+      <div class="ph-stat-card"><div class="ph-stat-label">Total Items</div><div class="ph-stat-val" id="inv-total">0</div></div>
+      <div class="ph-stat-card" style="border-color:rgba(230,57,70,0.3)"><div class="ph-stat-label">Low Stock</div><div class="ph-stat-val" id="inv-low" style="color:#e63946">0</div></div>
+      <div class="ph-stat-card" style="border-color:rgba(239,159,39,0.3)"><div class="ph-stat-label">Near Expiry</div><div class="ph-stat-val" id="inv-expiry" style="color:#EF9F27">0</div></div>
+      <div class="ph-stat-card" style="border-color:rgba(0,196,154,0.3)"><div class="ph-stat-label">Stock Value</div><div class="ph-stat-val" id="inv-value" style="color:var(--teal)">&#8377;0</div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <input id="inv-search" type="text" placeholder="Search drug, batch, category..." oninput="pharmInvSearch(this.value)"
+        style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none;flex:1;min-width:180px">
+      <select id="inv-filter" onchange="pharmInvFilter()" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none">
+        <option value="all">All Items</option><option value="low">Low Stock</option><option value="expiry">Near Expiry</option><option value="expired">Expired</option>
+      </select>
+      <button onclick="openAddStockModal()" style="background:var(--teal);border:none;border-radius:8px;padding:8px 16px;color:#000;font-weight:700;cursor:pointer;font-size:13px">+ Add Stock</button>
+      <button onclick="pharmGeneratePO()" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);border-radius:8px;padding:8px 14px;color:var(--teal);font-weight:600;cursor:pointer;font-size:13px">Generate PO</button>
+    </div>
+    <div id="pharma-inv-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:120px">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading inventory...</div>
+    </div>
+  </div>
+
+  <div id="ph-billing" class="ph-tab" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px">
+      <div>
+        <div style="margin-bottom:10px">
+          <input id="pos-search" type="text" placeholder="Search medicine..." oninput="posSearch(this.value)"
+            style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:14px;outline:none">
+          <div id="pos-suggestions" style="display:none;background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;margin-top:4px;max-height:200px;overflow-y:auto;position:relative;z-index:10"></div>
+        </div>
+        <div id="pos-cart" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;min-height:180px;overflow:hidden">
+          <div id="pos-cart-list" style="padding:16px">
+            <div style="text-align:center;color:rgba(240,250,247,0.3);padding:32px;font-size:13px">Search and add medicines</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-weight:700;font-size:14px">Bill Summary</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(240,250,247,0.55)">Subtotal</span><span id="pos-subtotal">&#8377;0.00</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+          <span style="color:rgba(240,250,247,0.55)">Discount</span>
+          <div style="display:flex;gap:5px">
+            <input id="pos-disc" type="number" value="0" min="0" oninput="posRecalc()" style="width:50px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 6px;color:var(--white);font-size:12px;text-align:center;outline:none">
+            <select id="pos-disc-type" onchange="posRecalc()" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px;color:var(--white);font-size:12px;outline:none"><option value="pct">%</option><option value="flat">&#8377;</option></select>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(240,250,247,0.55)">GST</span><span id="pos-gst">&#8377;0.00</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:17px;font-weight:800;padding-top:8px;border-top:0.5px solid rgba(0,196,154,0.2)"><span>Total</span><span id="pos-total" style="color:var(--teal)">&#8377;0.00</span></div>
+        <div>
+          <div style="font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Payment</div>
+          <div style="display:flex;gap:5px">
+            <button class="pos-pay-btn pos-pay-on" id="pp-cash" onclick="posSetPay('cash',this)">Cash</button>
+            <button class="pos-pay-btn" id="pp-upi" onclick="posSetPay('upi',this)">UPI</button>
+            <button class="pos-pay-btn" id="pp-card" onclick="posSetPay('card',this)">Card</button>
+          </div>
+        </div>
+        <button onclick="posBillSave()" style="width:100%;padding:12px;background:var(--teal);border:none;border-radius:10px;color:#000;font-size:14px;font-weight:800;cursor:pointer">Generate Bill</button>
+        <button onclick="posWAReceipt()" style="width:100%;padding:9px;background:rgba(37,211,102,0.1);border:0.5px solid rgba(37,211,102,0.35);border-radius:10px;color:#25d366;font-size:13px;font-weight:600;cursor:pointer">WhatsApp Receipt</button>
+        <button onclick="posClear()" style="width:100%;padding:7px;background:transparent;border:0.5px solid rgba(240,250,247,0.1);border-radius:8px;color:rgba(240,250,247,0.4);font-size:12px;cursor:pointer">Clear</button>
+      </div>
+    </div>
+    <div style="margin-top:14px">
+      <div style="font-size:11px;font-weight:700;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Recent Bills</div>
+      <div id="pos-recent-bills" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">Bills appear here after saving</div>
+    </div>
+  </div>
+
+  <div id="ph-audit" class="ph-tab" style="display:none">
+    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
+      <select id="audit-type" onchange="pharmLoadAudit()" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none">
+        <option value="all">All Events</option><option value="dispensed">Dispensed</option><option value="stock_in">Stock In</option><option value="stock_adj">Adjustment</option><option value="return">Returns</option>
+      </select>
+      <button onclick="pharmExportAudit()" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);border-radius:8px;padding:7px 14px;color:var(--teal);font-size:13px;font-weight:600;cursor:pointer;margin-left:auto">Export CSV</button>
+    </div>
+    <div id="pharma-audit-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:120px">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Dispensing and stock events will appear here.</div>
+    </div>
+  </div>
+</div>
+
 </div>
   </div>
 </div>
@@ -1265,52 +1465,6 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     </div>
     <div class="form-group"><label class="form-label">Chief complaint</label><input class="form-input" placeholder="Fever, BP checkup..."></div>
     <button class="submit-btn" onclick="closeModal('apptModal');showToast('Appointment booked! Patient notified on WhatsApp ✓')">Book + Notify patient</button>
-  </div>
-</div>
-
-<!-- TELECONSULT -->
-<div class="screen" 
-
-<div id="screen-teledoc" class="screen">
-  <!-- Header row -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-    <div>
-      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">AI TeleDoc Queue</div>
-      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Review AI consultations · Approve prescriptions · Connect patients to real doctors</div>
-    </div>
-    <button onclick="loadTeleDoc()" style="padding:8px 18px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:var(--teal);font-weight:600;cursor:pointer;font-size:13px">↻ Refresh</button>
-  </div>
-
-  <!-- Stats row -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
-      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Pending Review</div>
-      <div style="font-size:24px;font-weight:800;color:var(--white)" id="td-stat-pending">—</div>
-    </div>
-    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
-      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Reviewed Today</div>
-      <div style="font-size:24px;font-weight:800;color:var(--teal)" id="td-stat-done">—</div>
-    </div>
-    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
-      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Total Consults</div>
-      <div style="font-size:24px;font-weight:800;color:var(--white)" id="td-stat-total">—</div>
-    </div>
-    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
-      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Avg Response</div>
-      <div style="font-size:24px;font-weight:800;color:var(--white)">~5 min</div>
-    </div>
-  </div>
-
-  <!-- Tab filters -->
-  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-    <button onclick="tdFilter('all')" id="tdf-all" style="padding:7px 16px;border-radius:8px;border:0.5px solid var(--teal);background:var(--teal);color:#000;font-weight:700;cursor:pointer;font-size:13px">All</button>
-    <button onclick="tdFilter('pending')" id="tdf-pending" style="padding:7px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Pending Review</button>
-    <button onclick="tdFilter('reviewed')" id="tdf-reviewed" style="padding:7px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Reviewed</button>
-  </div>
-
-  <!-- Queue list -->
-  <div id="td-queue-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:200px">
-    <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading TeleDoc queue...</div>
   </div>
 </div>
 
@@ -1380,37 +1534,6 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       <button onclick="closeTdModal()" style="padding:10px 20px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);color:rgba(240,250,247,0.6);border-radius:8px;cursor:pointer;font-size:13px;font-family:'Cabinet Grotesk',sans-serif">Cancel</button>
       <button onclick="tdApprove()" style="padding:10px 28px;background:var(--teal);border:none;color:#000;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;font-family:'Cabinet Grotesk',sans-serif">✓ Approve & Send Prescription on WhatsApp</button>
     </div>
-  </div>
-</div>
-
-<div id="screen-teleconsult" class="screen">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-    <div>
-      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Teleconsultation</div>
-      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Video consults via WhatsApp or browser link</div>
-    </div>
-    <button onclick="startNewTeleconsult()" style="padding:10px 22px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px">+ New Consult</button>
-  </div>
-
-  <!-- Stats -->
-  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px">
-    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
-      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Today</div>
-      <div style="font-size:22px;font-weight:700;color:var(--teal);margin-top:4px" id="tc-today-count">0</div>
-    </div>
-    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
-      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Pending</div>
-      <div style="font-size:22px;font-weight:700;color:#ef9f27;margin-top:4px" id="tc-pending-count">0</div>
-    </div>
-    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px">
-      <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">This Month</div>
-      <div style="font-size:22px;font-weight:700;color:#F0FAF7;margin-top:4px" id="tc-month-count">0</div>
-    </div>
-  </div>
-
-  <!-- List -->
-  <div id="tc-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
-    <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading consults...</div>
   </div>
 </div>
 
@@ -1554,121 +1677,6 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 
 <!-- PATIENT RECORD PANEL -->
-
-
-
-
-
-
-
-
-<!-- PHARMACY SCREEN -->
-
-<div id="screen-pharmacy" class="screen">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
-    <div>
-      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Pharmacy</div>
-      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Inventory &middot; POS Billing &middot; Prescriptions &middot; Audit Log</div>
-    </div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button onclick="pharmTab('rx')" id="ptab-rx" class="ptab-btn ptab-on">Prescriptions</button>
-      <button onclick="pharmTab('inventory')" id="ptab-inventory" class="ptab-btn">Inventory</button>
-      <button onclick="pharmTab('billing')" id="ptab-billing" class="ptab-btn">POS Billing</button>
-      <button onclick="pharmTab('audit')" id="ptab-audit" class="ptab-btn">Audit Log</button>
-    </div>
-  </div>
-
-  <div id="ph-rx" class="ph-tab">
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
-      <button onclick="pharmRxFilter('pending')" id="prxf-pending" class="ptab-btn ptab-on" style="font-size:12px;padding:6px 14px">Pending</button>
-      <button onclick="pharmRxFilter('dispensed')" id="prxf-dispensed" class="ptab-btn" style="font-size:12px;padding:6px 14px">Dispensed</button>
-      <button onclick="pharmRxFilter('all')" id="prxf-all" class="ptab-btn" style="font-size:12px;padding:6px 14px">All</button>
-      <input id="pharma-rx-search" type="text" placeholder="Search patient or drug..." oninput="pharmRxSearch(this.value)"
-        style="margin-left:auto;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none;min-width:180px">
-    </div>
-    <div id="pharma-orders-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:120px">
-      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading prescriptions...</div>
-    </div>
-  </div>
-
-  <div id="ph-inventory" class="ph-tab" style="display:none">
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
-      <div class="ph-stat-card"><div class="ph-stat-label">Total Items</div><div class="ph-stat-val" id="inv-total">0</div></div>
-      <div class="ph-stat-card" style="border-color:rgba(230,57,70,0.3)"><div class="ph-stat-label">Low Stock</div><div class="ph-stat-val" id="inv-low" style="color:#e63946">0</div></div>
-      <div class="ph-stat-card" style="border-color:rgba(239,159,39,0.3)"><div class="ph-stat-label">Near Expiry</div><div class="ph-stat-val" id="inv-expiry" style="color:#EF9F27">0</div></div>
-      <div class="ph-stat-card" style="border-color:rgba(0,196,154,0.3)"><div class="ph-stat-label">Stock Value</div><div class="ph-stat-val" id="inv-value" style="color:var(--teal)">&#8377;0</div></div>
-    </div>
-    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
-      <input id="inv-search" type="text" placeholder="Search drug, batch, category..." oninput="pharmInvSearch(this.value)"
-        style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none;flex:1;min-width:180px">
-      <select id="inv-filter" onchange="pharmInvFilter()" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none">
-        <option value="all">All Items</option><option value="low">Low Stock</option><option value="expiry">Near Expiry</option><option value="expired">Expired</option>
-      </select>
-      <button onclick="openAddStockModal()" style="background:var(--teal);border:none;border-radius:8px;padding:8px 16px;color:#000;font-weight:700;cursor:pointer;font-size:13px">+ Add Stock</button>
-      <button onclick="pharmGeneratePO()" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);border-radius:8px;padding:8px 14px;color:var(--teal);font-weight:600;cursor:pointer;font-size:13px">Generate PO</button>
-    </div>
-    <div id="pharma-inv-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:120px">
-      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading inventory...</div>
-    </div>
-  </div>
-
-  <div id="ph-billing" class="ph-tab" style="display:none">
-    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px">
-      <div>
-        <div style="margin-bottom:10px">
-          <input id="pos-search" type="text" placeholder="Search medicine..." oninput="posSearch(this.value)"
-            style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:14px;outline:none">
-          <div id="pos-suggestions" style="display:none;background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;margin-top:4px;max-height:200px;overflow-y:auto;position:relative;z-index:10"></div>
-        </div>
-        <div id="pos-cart" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;min-height:180px;overflow:hidden">
-          <div id="pos-cart-list" style="padding:16px">
-            <div style="text-align:center;color:rgba(240,250,247,0.3);padding:32px;font-size:13px">Search and add medicines</div>
-          </div>
-        </div>
-      </div>
-      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
-        <div style="font-weight:700;font-size:14px">Bill Summary</div>
-        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(240,250,247,0.55)">Subtotal</span><span id="pos-subtotal">&#8377;0.00</span></div>
-        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
-          <span style="color:rgba(240,250,247,0.55)">Discount</span>
-          <div style="display:flex;gap:5px">
-            <input id="pos-disc" type="number" value="0" min="0" oninput="posRecalc()" style="width:50px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 6px;color:var(--white);font-size:12px;text-align:center;outline:none">
-            <select id="pos-disc-type" onchange="posRecalc()" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px;color:var(--white);font-size:12px;outline:none"><option value="pct">%</option><option value="flat">&#8377;</option></select>
-          </div>
-        </div>
-        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(240,250,247,0.55)">GST</span><span id="pos-gst">&#8377;0.00</span></div>
-        <div style="display:flex;justify-content:space-between;font-size:17px;font-weight:800;padding-top:8px;border-top:0.5px solid rgba(0,196,154,0.2)"><span>Total</span><span id="pos-total" style="color:var(--teal)">&#8377;0.00</span></div>
-        <div>
-          <div style="font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Payment</div>
-          <div style="display:flex;gap:5px">
-            <button class="pos-pay-btn pos-pay-on" id="pp-cash" onclick="posSetPay('cash',this)">Cash</button>
-            <button class="pos-pay-btn" id="pp-upi" onclick="posSetPay('upi',this)">UPI</button>
-            <button class="pos-pay-btn" id="pp-card" onclick="posSetPay('card',this)">Card</button>
-          </div>
-        </div>
-        <button onclick="posBillSave()" style="width:100%;padding:12px;background:var(--teal);border:none;border-radius:10px;color:#000;font-size:14px;font-weight:800;cursor:pointer">Generate Bill</button>
-        <button onclick="posWAReceipt()" style="width:100%;padding:9px;background:rgba(37,211,102,0.1);border:0.5px solid rgba(37,211,102,0.35);border-radius:10px;color:#25d366;font-size:13px;font-weight:600;cursor:pointer">WhatsApp Receipt</button>
-        <button onclick="posClear()" style="width:100%;padding:7px;background:transparent;border:0.5px solid rgba(240,250,247,0.1);border-radius:8px;color:rgba(240,250,247,0.4);font-size:12px;cursor:pointer">Clear</button>
-      </div>
-    </div>
-    <div style="margin-top:14px">
-      <div style="font-size:11px;font-weight:700;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Recent Bills</div>
-      <div id="pos-recent-bills" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">Bills appear here after saving</div>
-    </div>
-  </div>
-
-  <div id="ph-audit" class="ph-tab" style="display:none">
-    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
-      <select id="audit-type" onchange="pharmLoadAudit()" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none">
-        <option value="all">All Events</option><option value="dispensed">Dispensed</option><option value="stock_in">Stock In</option><option value="stock_adj">Adjustment</option><option value="return">Returns</option>
-      </select>
-      <button onclick="pharmExportAudit()" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);border-radius:8px;padding:7px 14px;color:var(--teal);font-size:13px;font-weight:600;cursor:pointer;margin-left:auto">Export CSV</button>
-    </div>
-    <div id="pharma-audit-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:120px">
-      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Dispensing and stock events will appear here.</div>
-    </div>
-  </div>
-</div>
 
 <!-- ADD STOCK MODAL -->
 <div id="addStockModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:6000;align-items:center;justify-content:center;padding:20px">
