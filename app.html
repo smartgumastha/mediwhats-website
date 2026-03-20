@@ -1,4 +1,4 @@
-<!-- MediWhats v40 BUILD:1774048423 -->
+<!-- MediWhats v40 BUILD:1774049687 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3179,6 +3179,33 @@ function pharmSaveStock() {
 
 function showPharmaTab(tab){pharmTab(tab==='pending'||tab==='dispensed'?'rx':tab);}
 
+
+
+function posPatientSearch(val) {
+  var sug = document.getElementById('pos-patient-suggestions');
+  if (!sug) return;
+  if (!val || val.length < 2) { sug.style.display='none'; return; }
+  var q = val.toLowerCase();
+  var matches = (patientsData||[]).filter(function(p){
+    var name = ((p.first_name||'')+(p.last_name?' '+p.last_name:'')).toLowerCase();
+    return name.includes(q)||(p.mrn||'').toLowerCase().includes(q)||(p.phone||'').includes(val);
+  }).slice(0,6);
+  if (!matches.length) { sug.style.display='none'; return; }
+  sug.innerHTML = matches.map(function(p){
+    var name = ((p.first_name||'')+(p.last_name?' '+p.last_name:'')).trim();
+    return '<div class="pos-pt-opt" data-id="'+p.patient_id+'" data-name="'+esc(name)+'" style="padding:10px 14px;cursor:pointer;border-bottom:0.5px solid rgba(0,196,154,0.08);font-size:13px"><div style="font-weight:600">'+esc(name)+'</div><div style="font-size:11px;color:rgba(240,250,247,0.45)">'+(p.mrn||'')+' · '+(p.phone||'')+'</div></div>';
+  }).join('');
+  sug.style.display='block';
+  sug.querySelectorAll('.pos-pt-opt').forEach(function(el){
+    el.addEventListener('click',function(){
+      _posPatientId=this.dataset.id;
+      var inp=document.getElementById('pos-patient'); if(inp) inp.value=this.dataset.name;
+      sug.style.display='none';
+    });
+    el.addEventListener('mouseover',function(){this.style.background='rgba(0,196,154,0.08)';});
+    el.addEventListener('mouseout',function(){this.style.background='';});
+  });
+}
 
 function applyRoleAccess(role) {
   document.querySelectorAll('.nav-item').forEach(function(item) {
@@ -7104,6 +7131,113 @@ function getLinkLabReports(patientId) {
   }).catch(function(){ return { orders:[], results:[] }; });
 }
 
+
+
+function pharmBulkUpload() {
+  if (confirm('Click OK to download the CSV template first, or Cancel to upload your file directly.')) {
+    var csv = 'Name,Category,Manufacturer,Batch,Expiry,Qty,Reorder,Cost,MRP,GST,HSN,Schedule,Supplier\nParacetamol 500mg Tab,Tablet,Cipla,B2024001,2025-12-31,100,20,1.20,2.50,5,3004,,MedPlus';
+    var a = document.createElement('a');
+    a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+    a.download = 'pharmacy-upload-template.csv';
+    a.click();
+    return;
+  }
+  var inp = document.getElementById('bulk-upload-input');
+  if (inp) inp.click();
+}
+
+function pharmExportStock() {
+  if (!_pharmInvData.length) { showToast('No inventory to export', 'error'); return; }
+  var headers = ['Name','Category','Manufacturer','Batch','Expiry','Qty','Reorder','Cost','MRP','GST','HSN','Schedule','Supplier'];
+  var rows = _pharmInvData.map(function(i){
+    return [i.name,i.category,i.manufacturer,i.batch,i.expiry,i.qty,i.reorder||0,i.cost||0,i.mrp,i.gst||0,i.hsn||'3004',i.schedule||'',i.supplier||''].map(function(v){return '"'+(v||'')+'"';}).join(',');
+  });
+  var csv = headers.join(',') + '\n' + rows.join('\n');
+  var a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,\uFEFF' + encodeURIComponent(csv);
+  a.download = 'pharmacy-stock-' + new Date().toISOString().split('T')[0] + '.csv';
+  a.click();
+  showToast(_pharmInvData.length + ' items exported \u2713', 'success');
+}
+
+function pharmProcessBulkUpload(input) {
+  var file = input.files[0]; if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var lines = e.target.result.split('\n').filter(function(l){ return l.trim(); });
+    if (lines.length < 2) { showToast('File is empty or invalid', 'error'); return; }
+    var headers = lines[0].split(',').map(function(h){ return h.replace(/"/g,'').trim().toLowerCase(); });
+    var added = 0, errors = 0;
+    for (var i = 1; i < lines.length; i++) {
+      var vals = lines[i].split(',').map(function(v){ return v.replace(/"/g,'').trim(); });
+      var row = {}; headers.forEach(function(h, idx){ row[h] = vals[idx] || ''; });
+      var name = row['name'] || row['drug name'] || row['medicine'];
+      if (!name) { errors++; continue; }
+      var item = {id:Date.now()+i, name:name, category:row['category']||'Tablet', manufacturer:row['manufacturer']||'', batch:row['batch']||('BULK'+Date.now()), expiry:row['expiry']||'', qty:parseInt(row['qty']||0), reorder:parseInt(row['reorder']||10), cost:parseFloat(row['cost']||0), mrp:parseFloat(row['mrp']||0), gst:parseInt(row['gst']||0), hsn:row['hsn']||'3004', schedule:row['schedule']||'', supplier:row['supplier']||''};
+      if (item.qty > 0 && item.mrp > 0) { _pharmInvData.push(item); pharmLogAudit('stock_in', item.qty+'x '+item.name, item.batch); added++; }
+      else errors++;
+    }
+    pharmInvRender(_pharmInvData); pharmInvStats();
+    showToast(added + ' items added, ' + errors + ' skipped', 'success');
+    input.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function pharmMedicineMaster() {
+  var q = prompt('Search Indian Medicine Database (type generic name):\ne.g. paracetamol, amoxicillin, metformin, cetirizine');
+  if (!q || q.trim().length < 3) return;
+  var db = [
+    {name:'Paracetamol 500mg Tab',cat:'Tablet',mfr:'Cipla/Sun/Mankind',mrp:2.5,gst:5,hsn:'3004',sch:''},
+    {name:'Dolo 650mg Tab',cat:'Tablet',mfr:'Micro Labs',mrp:3.5,gst:5,hsn:'3004',sch:''},
+    {name:'Amoxicillin 500mg Cap',cat:'Capsule',mfr:'Cipla/Ranbaxy',mrp:12,gst:12,hsn:'3004',sch:'H'},
+    {name:'Azithromycin 250mg Tab',cat:'Tablet',mfr:'Cipla/Pfizer',mrp:18,gst:12,hsn:'3004',sch:'H'},
+    {name:'Metformin 500mg Tab',cat:'Tablet',mfr:'USV/Cipla',mrp:3.5,gst:5,hsn:'3004',sch:'H'},
+    {name:'Glimepiride 1mg Tab',cat:'Tablet',mfr:'Sanofi/USV',mrp:8,gst:12,hsn:'3004',sch:'H'},
+    {name:'Omeprazole 20mg Cap',cat:'Capsule',mfr:'Dr Reddys/Sun',mrp:5,gst:12,hsn:'3004',sch:'H'},
+    {name:'Pantoprazole 40mg Tab',cat:'Tablet',mfr:'Sun/Cipla',mrp:8,gst:12,hsn:'3004',sch:'H'},
+    {name:'Cetirizine 10mg Tab',cat:'Tablet',mfr:'UCB/Cipla',mrp:2,gst:5,hsn:'3004',sch:''},
+    {name:'Ibuprofen 400mg Tab',cat:'Tablet',mfr:'Abbott/Mankind',mrp:4,gst:5,hsn:'3004',sch:''},
+    {name:'Diclofenac 50mg Tab',cat:'Tablet',mfr:'Novartis/Cipla',mrp:5,gst:12,hsn:'3004',sch:'H'},
+    {name:'Amlodipine 5mg Tab',cat:'Tablet',mfr:'Pfizer/Sun',mrp:6,gst:5,hsn:'3004',sch:'H'},
+    {name:'Atorvastatin 10mg Tab',cat:'Tablet',mfr:'Cipla/Ranbaxy',mrp:8,gst:12,hsn:'3004',sch:'H'},
+    {name:'Losartan 50mg Tab',cat:'Tablet',mfr:'Cipla/Dr Reddys',mrp:10,gst:12,hsn:'3004',sch:'H'},
+    {name:'Metronidazole 400mg Tab',cat:'Tablet',mfr:'Cipla/Alkem',mrp:3,gst:5,hsn:'3004',sch:'H'},
+    {name:'Ciprofloxacin 500mg Tab',cat:'Tablet',mfr:'Cipla/Bayer',mrp:10,gst:12,hsn:'3004',sch:'H'},
+    {name:'Cefixime 200mg Tab',cat:'Tablet',mfr:'Cipla/Alkem',mrp:22,gst:12,hsn:'3004',sch:'H'},
+    {name:'Domperidone 10mg Tab',cat:'Tablet',mfr:'Johnson/Sun',mrp:5,gst:12,hsn:'3004',sch:'H'},
+    {name:'Ondansetron 4mg Tab',cat:'Tablet',mfr:'Sun/Cipla',mrp:12,gst:12,hsn:'3004',sch:'H'},
+    {name:'Tramadol 50mg Cap',cat:'Capsule',mfr:'Sun/Troikaa',mrp:15,gst:12,hsn:'3004',sch:'H1'},
+    {name:'Pregabalin 75mg Cap',cat:'Capsule',mfr:'Pfizer/Sun',mrp:18,gst:12,hsn:'3004',sch:'H'},
+    {name:'Dexamethasone 0.5mg Tab',cat:'Tablet',mfr:'Cipla/Sun',mrp:3,gst:12,hsn:'3004',sch:'H'},
+    {name:'Folic Acid 5mg Tab',cat:'Tablet',mfr:'Mankind/Cipla',mrp:1.5,gst:0,hsn:'3004',sch:''},
+    {name:'Iron + Folic Acid Tab',cat:'Tablet',mfr:'Emcure/Sun',mrp:3,gst:0,hsn:'3004',sch:''},
+    {name:'Vitamin D3 1000IU Cap',cat:'Capsule',mfr:'Pfizer/Sun',mrp:8,gst:12,hsn:'3004',sch:''},
+    {name:'Calcium + Vitamin D3 Tab',cat:'Tablet',mfr:'Ranbaxy/Cipla',mrp:6,gst:12,hsn:'3004',sch:''},
+    {name:'ORS Sachet 21g',cat:'Sachet',mfr:'WHO/Electral',mrp:8,gst:0,hsn:'3005',sch:''},
+    {name:'Salbutamol 100mcg Inhaler',cat:'Inhaler',mfr:'GSK/Cipla',mrp:95,gst:12,hsn:'3004',sch:'H'},
+    {name:'Betadine Solution 100ml',cat:'Liquid',mfr:'Win-Medicare',mrp:55,gst:12,hsn:'3004',sch:''},
+    {name:'Ranitidine 150mg Tab',cat:'Tablet',mfr:'GSK/Sun',mrp:4,gst:5,hsn:'3004',sch:'H'},
+  ];
+  var qlo = q.toLowerCase();
+  var m = db.filter(function(x){ return x.name.toLowerCase().includes(qlo) || x.mfr.toLowerCase().includes(qlo); });
+  if (!m.length) { showToast('No matches found. Try: paracetamol, metformin, amoxicillin, cetirizine', 'error'); return; }
+  var list = m.map(function(x, i){ return (i+1)+'. '+x.name+' ('+x.mfr+') MRP:\u20b9'+x.mrp+(x.sch?' [Sch '+x.sch+']':''); }).join('\n');
+  var sel = prompt('Found ' + m.length + ' matches. Enter number to pre-fill Add Stock form (0=cancel):\n\n' + list);
+  if (!sel) return;
+  var n = parseInt(sel);
+  if (n < 1 || n > m.length) return;
+  var drug = m[n-1];
+  openAddStockModal();
+  setTimeout(function(){
+    var set = function(id,v){ var e=document.getElementById(id); if(e) e.value=v; };
+    set('stk_name', drug.name); set('stk_mfr', drug.mfr);
+    set('stk_mrp', drug.mrp); set('stk_gst', drug.gst); set('stk_hsn', drug.hsn);
+    var sc = document.getElementById('stk_schedule'); if(sc) sc.value = drug.sch||'';
+    var cat = document.getElementById('stk_cat'); if(cat) cat.value = drug.cat;
+    showToast('Drug pre-filled! Add batch number, expiry date, quantity and cost price.', 'success');
+  }, 200);
+}
 
 </script>
 
