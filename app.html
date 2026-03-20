@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773984404 -->
+<!-- MediWhats v23 BUILD:1773986223 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,7 +25,7 @@ body.light{
 }
 
 /* LOGIN */
-#loginWrap,#login-wrap,.login-wrap{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;background:var(--black);position:relative}.login-left{display:flex;align-items:flex-start;justify-content:center;padding:48px 36px;overflow-y:auto;min-height:100vh;position:relative;z-index:2}.login-left-inner{width:100%;max-width:420px;padding:20px 0 60px;margin:auto 0;display:flex;flex-direction:column}.login-right{display:flex;flex-direction:column;justify-content:flex-start;padding:56px 52px;overflow-y:auto;min-height:100vh;background:linear-gradient(160deg,rgba(0,196,154,0.06) 0%,transparent 55%);border-left:0.5px solid rgba(0,196,154,0.1);position:relative;z-index:2}@media(max-width:860px){#loginWrap{grid-template-columns:1fr}.login-right{display:none}.login-left{padding:24px 20px}}.login-right{display:none}}
+#loginWrap{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:var(--black);z-index:9999;overflow-y:auto;scrollbar-width:none}#loginWrap::-webkit-scrollbar{display:none}.login-left{display:contents}.login-left-inner{width:100%;max-width:420px;padding:40px 24px 80px}.login-right{display:none!important}.login-card{width:100%}@media(max-width:860px){.login-left{flex:0 0 100%;padding:32px 24px;justify-content:flex-start;padding-top:48px}.login-right{display:none}}}
 .login-glow{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,196,154,0.08) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
 .login-card{background:transparent;border:none;border-radius:0;padding:0;width:100%;position:relative;z-index:1}
 .login-logo{display:flex;align-items:center;gap:10px;margin-bottom:24px;justify-content:center}
@@ -316,44 +316,75 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 
   <!-- RIGHT: Promotional panel -->
   <div class="login-right">
-    <div style="margin-bottom:36px">
-      <div style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.12em;margin-bottom:10px">Why MediWhats?</div>
-      <div style="font-size:30px;font-weight:800;line-height:1.2;margin-bottom:14px">India's smartest clinic<br><span style="color:var(--teal)">on WhatsApp.</span></div>
-      <div style="font-size:14px;color:rgba(240,250,247,0.55);line-height:1.7;font-weight:300">Complete hospital management — EMR, lab, billing, pharmacy — powered by AI. Prescriptions and reports delivered directly on WhatsApp. No app downloads for patients.</div>
+
+  <div style="margin-bottom:12px">
+    <span style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.14em">MediWhats</span>
+  </div>
+
+  <div style="font-size:36px;font-weight:800;line-height:1.2;margin-bottom:16px;font-family:'Cabinet Grotesk',sans-serif">
+    Run your clinic<br>
+    <span style="color:var(--teal)">smarter, faster.</span>
+  </div>
+
+  <div style="font-size:15px;color:rgba(240,250,247,0.5);line-height:1.7;font-weight:300;margin-bottom:40px;max-width:380px">
+    Complete hospital management powered by AI — delivered on WhatsApp.
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:40px">
+
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(0,196,154,0.12);border:0.5px solid rgba(0,196,154,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#129504;</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:2px">AI diagnosis &amp; prescription</div>
+        <div style="font-size:12px;color:rgba(240,250,247,0.45)">Claude AI in every consultation. Suggests diagnosis, drafts Rx.</div>
+      </div>
     </div>
 
-    <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:36px">
-      <div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:rgba(0,196,154,0.07);border:0.5px solid rgba(0,196,154,0.18);border-radius:12px">
-        <div style="width:36px;height:36px;border-radius:9px;background:rgba(0,196,154,0.18);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">&#129504;</div>
-        <div><div style="font-weight:700;font-size:13px;margin-bottom:2px">AI diagnosis &amp; prescription</div><div style="font-size:12px;color:rgba(240,250,247,0.45);line-height:1.5">Claude AI suggests diagnosis, drafts Rx, checks drug interactions — live in EMR</div></div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:rgba(37,211,102,0.07);border:0.5px solid rgba(37,211,102,0.18);border-radius:12px">
-        <div style="width:36px;height:36px;border-radius:9px;background:rgba(37,211,102,0.18);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">&#128241;</div>
-        <div><div style="font-weight:700;font-size:13px;margin-bottom:2px">WhatsApp delivery &#8212; 98% open rate</div><div style="font-size:12px;color:rgba(240,250,247,0.45);line-height:1.5">Prescriptions, lab reports, bills, reminders sent directly to patient's WhatsApp</div></div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:rgba(245,158,11,0.07);border:0.5px solid rgba(245,158,11,0.18);border-radius:12px">
-        <div style="width:36px;height:36px;border-radius:9px;background:rgba(245,158,11,0.18);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">&#129514;</div>
-        <div><div style="font-weight:700;font-size:13px;margin-bottom:2px">Full LIS &#8212; AI lab interpretation</div><div style="font-size:12px;color:rgba(240,250,247,0.45);line-height:1.5">Barcode labels, vacutainer guide, 50+ test reference ranges, pathologist approval workflow</div></div>
-      </div>
-      <div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:rgba(99,102,241,0.07);border:0.5px solid rgba(99,102,241,0.18);border-radius:12px">
-        <div style="width:36px;height:36px;border-radius:9px;background:rgba(99,102,241,0.18);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0">&#8377;</div>
-        <div><div style="font-weight:700;font-size:13px;margin-bottom:2px">10&#215; cheaper than Practo &amp; MocDoc</div><div style="font-size:12px;color:rgba(240,250,247,0.45);line-height:1.5">From &#8377;999/month. Clinic, Hospital, LIS. Cancel anytime.</div></div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(37,211,102,0.1);border:0.5px solid rgba(37,211,102,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#128241;</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:2px">Reports &amp; Rx on WhatsApp</div>
+        <div style="font-size:12px;color:rgba(240,250,247,0.45)">98% open rate. No app download needed for patients.</div>
       </div>
     </div>
 
-    <div style="display:flex;gap:28px;margin-bottom:28px">
-      <div><div style="font-size:24px;font-weight:800;color:var(--teal);line-height:1">5 min</div><div style="font-size:10px;color:rgba(240,250,247,0.4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px">Setup time</div></div>
-      <div style="width:1px;background:rgba(240,250,247,0.08)"></div>
-      <div><div style="font-size:24px;font-weight:800;color:var(--teal);line-height:1">&#8377;999</div><div style="font-size:10px;color:rgba(240,250,247,0.4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px">Starting price</div></div>
-      <div style="width:1px;background:rgba(240,250,247,0.08)"></div>
-      <div><div style="font-size:24px;font-weight:800;color:var(--teal);line-height:1">AI</div><div style="font-size:10px;color:rgba(240,250,247,0.4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px">Diagnosis built-in</div></div>
-      <div style="width:1px;background:rgba(240,250,247,0.08)"></div>
-      <div><div style="font-size:24px;font-weight:800;color:var(--teal);line-height:1">50+</div><div style="font-size:10px;color:rgba(240,250,247,0.4);text-transform:uppercase;letter-spacing:.06em;margin-top:3px">Lab tests</div></div>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(245,158,11,0.1);border:0.5px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#129514;</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:2px">Full LIS built-in</div>
+        <div style="font-size:12px;color:rgba(240,250,247,0.45)">50+ tests, vacutainer guide, AI lab interpretation, PDF reports.</div>
+      </div>
     </div>
 
-    <div style="padding-top:20px;border-top:0.5px solid rgba(0,196,154,0.12);font-size:12px;color:rgba(240,250,247,0.3)">
-      Questions? <a href="https://wa.me/917993135689?text=Hi, I want to know about MediWhats" target="_blank" style="color:var(--teal);text-decoration:none">WhatsApp +91-7993135689</a> &nbsp;&#183;&nbsp; <a href="mailto:info@mediwhats.in" style="color:var(--teal);text-decoration:none">info@mediwhats.in</a>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="width:40px;height:40px;border-radius:10px;background:rgba(99,102,241,0.1);border:0.5px solid rgba(99,102,241,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#8377;</div>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:2px">From &#8377;999/month</div>
+        <div style="font-size:12px;color:rgba(240,250,247,0.45)">10&#215; cheaper than Practo. Cancel anytime.</div>
+      </div>
     </div>
+
+  </div>
+
+  <div style="display:flex;gap:0;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;overflow:hidden;margin-bottom:32px">
+    <div style="flex:1;padding:16px;text-align:center;border-right:0.5px solid rgba(0,196,154,0.15)">
+      <div style="font-size:22px;font-weight:800;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif">5 min</div>
+      <div style="font-size:11px;color:rgba(240,250,247,0.4);margin-top:2px">Setup time</div>
+    </div>
+    <div style="flex:1;padding:16px;text-align:center;border-right:0.5px solid rgba(0,196,154,0.15)">
+      <div style="font-size:22px;font-weight:800;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif">50+</div>
+      <div style="font-size:11px;color:rgba(240,250,247,0.4);margin-top:2px">Lab tests</div>
+    </div>
+    <div style="flex:1;padding:16px;text-align:center">
+      <div style="font-size:22px;font-weight:800;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif">AI</div>
+      <div style="font-size:11px;color:rgba(240,250,247,0.4);margin-top:2px">Built-in</div>
+    </div>
+  </div>
+
+  <div style="font-size:12px;color:rgba(240,250,247,0.25);line-height:1.8">
+    <a href="https://wa.me/917993135689" target="_blank" style="color:var(--teal);text-decoration:none">&#128172; WhatsApp +91-7993135689</a>
+    &nbsp;&nbsp;&#183;&nbsp;&nbsp;
+    <a href="mailto:info@mediwhats.in" style="color:var(--teal);text-decoration:none">info@mediwhats.in</a>
   </div>
 
 </div>
