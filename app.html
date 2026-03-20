@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773964554 -->
+<!-- MediWhats v23 BUILD:1773966415 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -290,6 +290,10 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         <div class="nav-item" onclick="showScreen('newbilling',this);loadBilling()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           Billing
+        </div>
+        <div class="nav-item" onclick="showScreen('pharmacy',this);loadPharmacy()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v11m0 0H5a2 2 0 0 1-2-2V9m6 5h10a2 2 0 0 0 2-2V9"/><circle cx="12" cy="16" r="4"/><line x1="12" y1="14" x2="12" y2="18"/><line x1="10" y1="16" x2="14" y2="16"/></svg>
+          Pharmacy
         </div>
         <div class="nav-item" onclick="showScreen('settings',this);loadSettings()">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -915,6 +919,30 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 
 
 
+
+<!-- PHARMACY SCREEN -->
+<div id="screen-pharmacy" class="screen">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+    <div>
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Pharmacy</div>
+      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Prescription orders from doctors</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="showPharmaTab('pending')" id="pharma-tab-pending" style="padding:8px 18px;border-radius:8px;border:0.5px solid var(--teal);background:var(--teal);color:#000;font-weight:700;cursor:pointer;font-size:13px">Pending</button>
+      <button onclick="showPharmaTab('dispensed')" id="pharma-tab-dispensed" style="padding:8px 18px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Dispensed</button>
+    </div>
+  </div>
+  <div id="pharma-pending-content">
+    <div id="pharma-orders-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading prescription orders...</div>
+    </div>
+  </div>
+  <div id="pharma-dispensed-content" style="display:none">
+    <div id="pharma-dispensed-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading dispensed orders...</div>
+    </div>
+  </div>
+</div>
 <div id="prPanel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:3000;flex-direction:column;overflow:hidden">
   <!-- Header -->
   <div style="background:#0D1412;border-bottom:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
@@ -1101,9 +1129,12 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </div>
 
       <!-- Save buttons -->
-      <div style="display:flex;gap:12px;margin-top:24px;padding-top:20px;border-top:0.5px solid rgba(0,196,154,0.15)">
-        <button onclick="saveVisitRecord(false)" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);padding:12px 24px;border-radius:10px;font-weight:600;cursor:pointer;font-size:14px;font-family:'Cabinet Grotesk',sans-serif">Save Draft</button>
-        <button onclick="confirmSend()" style="background:var(--teal);color:#000;border:none;padding:12px 28px;border-radius:10px;font-weight:700;cursor:pointer;font-size:14px;font-family:'Cabinet Grotesk',sans-serif">&#10003; Save & Send WhatsApp</button>
+      <div style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:0.5px solid rgba(0,196,154,0.15);flex-wrap:wrap">
+        <button onclick="saveVisitRecord(false)" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);padding:12px 20px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px">Save Draft</button>
+        <button onclick="confirmSend()" style="background:var(--teal);color:#000;border:none;padding:12px 24px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">&#10003; Save &amp; Send WhatsApp</button>
+        <button onclick="printVisitRecord()" style="background:rgba(255,255,255,0.06);border:0.5px solid rgba(240,250,247,0.2);color:rgba(240,250,247,0.8);padding:12px 20px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px">&#128438; Print / PDF</button>
+        <button onclick="sendVisitWhatsApp()" style="background:rgba(37,211,102,0.12);border:0.5px solid rgba(37,211,102,0.4);color:#25d366;padding:12px 20px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px">&#128241; Send via WhatsApp</button>
+        <button onclick="closeEMR()" style="background:none;border:0.5px solid rgba(240,250,247,0.15);color:rgba(240,250,247,0.4);padding:12px 16px;border-radius:10px;cursor:pointer;font-size:13px;margin-left:auto">&#215; Close</button>
       </div>
     </div>
   </div>
@@ -1452,6 +1483,8 @@ function showScreen(name, navEl) {
   if (name === 'patients') loadPatients();
   if (name === 'teleconsult') loadTeleconsult();
   if (name === 'newbilling') loadBilling();
+  if (name === 'dashboard') startQueueAutoRefresh();
+  if (name === 'pharmacy') loadPharmacy();
   if (name === 'investigations') loadInvestigations();
   if (name === 'settings') loadSettings();
   if (navEl) navEl.classList.add('active');
@@ -1500,6 +1533,7 @@ if (mwUser && mwUser.role) {
     applyRoleAccess(mwUser.role);
     document.querySelectorAll('.nav-item').forEach(function(el){ el.style.display=''; });
     document.querySelectorAll('.nav-section').forEach(function(el){ el.style.display=''; });
+    startQueueAutoRefresh();
   });
 }
 
@@ -3460,6 +3494,392 @@ function sendTCLink(id, phone, roomUrl) {
   if (!p) return;
   var msg = '*Video Consult Link*\n\nJoin your teleconsultation here:\n' + roomUrl + '\n\n_MediWhats - AI Hospital Manager_';
   window.open('https://wa.me/91'+p.replace(/\D/g,'').replace(/^91/,'')+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+
+
+
+
+// ===== OPD QUEUE =====
+var opdQueueTimer = null;
+
+async function loadOPDQueue() {
+  var el = document.getElementById('opd-queue-list');
+  if (!el) return;
+  try {
+    var today = new Date().toISOString().split('T')[0];
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/appointments?date=' + today);
+    var appts = (data.data || data.appointments || []);
+    if (!appts.length) {
+      el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--gray);font-size:13px">No appointments today</div>';
+      return;
+    }
+    renderOPDQueue(appts);
+  } catch(e) {
+    // If API fails, show empty state gracefully
+    el.innerHTML = '<div style="padding:24px;text-align:center;color:var(--gray);font-size:13px">No appointments loaded. <span onclick="loadOPDQueue()" style="color:var(--teal);cursor:pointer">Retry</span></div>';
+  }
+}
+
+function renderOPDQueue(appts) {
+  var el = document.getElementById('opd-queue-list');
+  if (!el) return;
+  var now = Date.now();
+  var rows = appts.map(function(a) {
+    var name = ((a.patient_name || a.first_name || '') + ' ' + (a.last_name || '')).trim() || 'Patient';
+    var arrivalTs = a.arrived_at ? parseInt(a.arrived_at) * 1000 : null;
+    var waitMin = arrivalTs ? Math.floor((now - arrivalTs) / 60000) : null;
+    var statusColor, statusLabel, rowBg;
+    if (a.status === 'in_consultation') {
+      statusColor='#7F77DD'; statusLabel='In consultation'; rowBg='rgba(127,119,221,0.08)';
+    } else if (a.status === 'done' || a.status === 'completed') {
+      statusColor='#00C49A'; statusLabel='Done'; rowBg='transparent';
+    } else if (waitMin !== null && waitMin >= 30) {
+      statusColor='#E24B4A'; statusLabel='Waiting '+(waitMin)+'m'; rowBg='rgba(226,75,74,0.06)';
+    } else if (waitMin !== null && waitMin >= 15) {
+      statusColor='#EF9F27'; statusLabel='Waiting '+(waitMin)+'m'; rowBg='rgba(239,159,39,0.06)';
+    } else if (a.status === 'arrived' || a.status === 'checked_in') {
+      statusColor='#00C49A'; statusLabel=waitMin!==null?'Waiting '+(waitMin)+'m':'Just arrived'; rowBg='rgba(0,196,154,0.05)';
+    } else {
+      statusColor='rgba(240,250,247,0.3)'; statusLabel=a.status||'Booked'; rowBg='transparent';
+    }
+    var timeStr = '';
+    if (a.appointment_time || a.scheduled_time) {
+      var t = a.appointment_time || a.scheduled_time || '';
+      timeStr = t.length > 5 ? t.slice(0,5) : t;
+    }
+    return '<tr class="opd-row" data-pid="'+(a.patient_id||'')+'" data-apptid="'+(a.id||'')+'" data-name="'+name.replace(/"/g,'&quot;')+'" data-phone="'+(a.phone||a.patient_phone||'')+'" style="background:'+rowBg+';border-bottom:0.5px solid rgba(0,196,154,0.08);cursor:pointer">'
+      + '<td style="padding:10px 14px;width:60px"><div style="width:8px;height:8px;border-radius:50%;background:'+statusColor+'"></div></td>'
+      + '<td style="padding:10px 4px;font-size:12px;color:var(--gray)">'+timeStr+'</td>'
+      + '<td style="padding:10px 12px"><div style="font-weight:600;font-size:13px">'+name+'</div><div style="font-size:11px;color:var(--gray)">'+(a.chief_complaint||a.visit_reason||'OPD')+'</div></td>'
+      + '<td style="padding:10px 12px;font-size:11px;font-weight:600;color:'+statusColor+'">'+statusLabel+'</td>'
+      + '<td style="padding:10px 12px">'
+      + (a.status !== 'done' && a.status !== 'completed'
+          ? '<button class="action-btn opd-consult-btn" style="font-size:11px;padding:5px 12px;background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">Consult</button>'
+          : '<span style="color:var(--teal);font-size:11px">&#10003; Done</span>')
+      + '</td></tr>';
+  }).join('');
+
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.15)">'
+    + '<th style="padding:8px 14px;text-align:left;font-size:10px;color:var(--gray);text-transform:uppercase;width:40px"></th>'
+    + '<th style="padding:8px 4px;text-align:left;font-size:10px;color:var(--gray);text-transform:uppercase">Time</th>'
+    + '<th style="padding:8px 12px;text-align:left;font-size:10px;color:var(--gray);text-transform:uppercase">Patient</th>'
+    + '<th style="padding:8px 12px;text-align:left;font-size:10px;color:var(--gray);text-transform:uppercase">Status</th>'
+    + '<th style="padding:8px 12px;text-align:left;font-size:10px;color:var(--gray);text-transform:uppercase">Action</th>'
+    + '</tr></thead><tbody>' + rows + '</tbody></table>';
+
+  // Wire consult buttons
+  el.querySelectorAll('.opd-consult-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var row = this.closest('.opd-row');
+      openEMR(row.dataset.pid, row.dataset.name, row.dataset.phone);
+    });
+  });
+  el.querySelectorAll('.opd-row').forEach(function(row) {
+    row.addEventListener('mouseenter', function(){ this.style.filter='brightness(1.15)'; });
+    row.addEventListener('mouseleave', function(){ this.style.filter=''; });
+  });
+}
+
+// Auto-refresh queue every 60 seconds on dashboard
+function startQueueAutoRefresh() {
+  loadOPDQueue();
+  if (opdQueueTimer) clearInterval(opdQueueTimer);
+  opdQueueTimer = setInterval(loadOPDQueue, 60000);
+}
+
+// ===== PRINT VISIT RECORD =====
+function printVisitRecord() {
+  if (!activeVisitPatient) { showToast('No active patient', 'error'); return; }
+  var h = hospitalSettings || {};
+  var patName = activeVisitPatient.name || 'Patient';
+  var today = new Date().toLocaleDateString('en-IN', {day:'numeric',month:'long',year:'numeric'});
+  var doctor = (mwUser && (mwUser.name || mwUser.email)) || 'Dr.';
+
+  // Gather all EMR data
+  var complaint  = document.getElementById('vr_complaint')?.value || '';
+  var duration   = document.getElementById('vr_duration')?.value || '';
+  var history    = document.getElementById('vr_history')?.value || '';
+  var allergies  = document.getElementById('vr_allergies')?.value || '';
+  var bpS        = document.getElementById('vr_bp_s')?.value || '';
+  var bpD        = document.getElementById('vr_bp_d')?.value || '';
+  var temp       = document.getElementById('vr_temp')?.value || '';
+  var pulse      = document.getElementById('vr_pulse')?.value || '';
+  var spo2       = document.getElementById('vr_spo2')?.value || '';
+  var weight     = document.getElementById('vr_weight')?.value || '';
+  var height     = document.getElementById('vr_height')?.value || '';
+  var bmi        = document.getElementById('vr_bmi_val')?.value || '';
+  var exam       = document.getElementById('vr_exam')?.value || '';
+  var dx         = document.getElementById('vr_dx')?.value || '';
+  var dx2        = document.getElementById('vr_dx2')?.value || '';
+  var icd        = document.getElementById('vr_icd')?.value || '';
+  var advice     = document.getElementById('vr_advice')?.value || '';
+  var followup   = document.getElementById('vr_followup')?.value || '';
+  var followNote = document.getElementById('vr_followup_notes')?.value || '';
+
+  // Build Rx table HTML
+  var rxHTML = '';
+  if (visitRxRows && visitRxRows.length) {
+    rxHTML = '<table style="width:100%;border-collapse:collapse;margin-top:8px">'
+      + '<thead><tr style="background:#f0faf7"><th style="padding:6px 8px;border:1px solid #dde;text-align:left;font-size:12px">#</th>'
+      + '<th style="padding:6px 8px;border:1px solid #dde;text-align:left;font-size:12px">Drug</th>'
+      + '<th style="padding:6px 8px;border:1px solid #dde;font-size:12px">Dose</th>'
+      + '<th style="padding:6px 8px;border:1px solid #dde;font-size:12px">Freq</th>'
+      + '<th style="padding:6px 8px;border:1px solid #dde;font-size:12px">Duration</th>'
+      + '<th style="padding:6px 8px;border:1px solid #dde;font-size:12px">Instructions</th>'
+      + '</tr></thead><tbody>'
+      + visitRxRows.map(function(r,i){
+          return '<tr><td style="padding:5px 8px;border:1px solid #dde">'+(i+1)+'</td>'
+            +'<td style="padding:5px 8px;border:1px solid #dde;font-weight:600">'+r.drug+' <span style="font-weight:400;font-size:11px">'+r.strength+'</span></td>'
+            +'<td style="padding:5px 8px;border:1px solid #dde;text-align:center">'+r.dose+'</td>'
+            +'<td style="padding:5px 8px;border:1px solid #dde">'+r.freq+'</td>'
+            +'<td style="padding:5px 8px;border:1px solid #dde">'+r.duration+'</td>'
+            +'<td style="padding:5px 8px;border:1px solid #dde;font-size:11px">'+r.instructions+'</td></tr>';
+        }).join('')
+      + '</tbody></table>';
+  }
+
+  // Build Lab orders HTML
+  var labHTML = '';
+  if (visitLabRows && visitLabRows.length) {
+    labHTML = '<ul style="margin:6px 0 0 18px;padding:0">' + visitLabRows.map(function(l){ return '<li style="font-size:13px;margin-bottom:2px">'+l.test+'</li>'; }).join('') + '</ul>';
+  }
+
+  var vitals = [];
+  if (bpS && bpD) vitals.push('BP: '+bpS+'/'+bpD+' mmHg');
+  if (temp) vitals.push('Temp: '+temp+'°F');
+  if (pulse) vitals.push('Pulse: '+pulse+' bpm');
+  if (spo2) vitals.push('SpO2: '+spo2+'%');
+  if (weight) vitals.push('Wt: '+weight+' kg');
+  if (height) vitals.push('Ht: '+height+' cm');
+  if (bmi) vitals.push('BMI: '+bmi);
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Prescription - '+patName+'</title>'
+    + '<style>'
+    + 'body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#1a1a1a;font-size:13px;line-height:1.5}'
+    + '.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #00C49A;padding-bottom:14px;margin-bottom:16px}'
+    + '.section{margin-bottom:14px}'
+    + '.section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#00C49A;border-bottom:1px solid #e8faf5;padding-bottom:4px;margin-bottom:8px}'
+    + '.vitals-grid{display:flex;flex-wrap:wrap;gap:12px}'
+    + '.vital-item{background:#f0faf7;padding:6px 10px;border-radius:6px;font-size:12px}'
+    + '.rx-title{font-size:14px;font-weight:700;color:#00C49A;margin-bottom:6px}'
+    + '.footer{margin-top:20px;padding-top:12px;border-top:1px solid #eee;display:flex;justify-content:space-between;font-size:11px;color:#aaa}'
+    + '@media print{.no-print{display:none}body{-webkit-print-color-adjust:exact}}'
+    + '</style></head><body>'
+
+    // Print toolbar
+    + '<div class="no-print" style="position:fixed;top:14px;right:14px;display:flex;gap:8px">'
+    + '<button onclick="window.print()" style="background:#00C49A;color:#000;border:none;padding:9px 20px;border-radius:8px;font-weight:700;cursor:pointer">Print / Save PDF</button>'
+    + '<button onclick="window.close()" style="background:#eee;border:none;padding:9px 16px;border-radius:8px;cursor:pointer">Close</button>'
+    + '</div>'
+
+    // Letterhead
+    + '<div class="header">'
+    + '<div style="display:flex;align-items:center;gap:14px">'
+    + (h.logo_url ? '<img src="'+h.logo_url+'" style="height:60px;object-fit:contain">' : '')
+    + '<div>'
+    + '<div style="font-size:20px;font-weight:800;color:#00C49A">'+(h.name||'Clinic')+'</div>'
+    + '<div style="font-size:12px;color:#555">'+(h.address||'')+((h.city)?', '+h.city:'')+'</div>'
+    + '<div style="font-size:11px;color:#777">'+(h.phone||'')+(h.reg_number?' | Reg: '+h.reg_number:'')+'</div>'
+    + '</div></div>'
+    + '<div style="text-align:right">'
+    + '<div style="font-size:15px;font-weight:700">PRESCRIPTION</div>'
+    + '<div style="font-size:12px;margin-top:4px">Date: '+today+'</div>'
+    + '<div style="font-size:12px">Dr: '+doctor+'</div>'
+    + '</div></div>'
+
+    // Patient info
+    + '<div style="background:#f0faf7;padding:10px 14px;border-radius:8px;margin-bottom:16px;display:flex;gap:24px;flex-wrap:wrap">'
+    + '<div><b>Patient:</b> '+patName+'</div>'
+    + '</div>'
+
+    // Chief Complaint
+    + (complaint ? '<div class="section"><div class="section-title">Chief Complaint</div><div>'+complaint+(duration?' — duration: '+duration:'')+'</div></div>' : '')
+
+    // Vitals
+    + (vitals.length ? '<div class="section"><div class="section-title">Vitals</div><div class="vitals-grid">'+vitals.map(function(v){ return '<div class="vital-item">'+v+'</div>'; }).join('')+'</div></div>' : '')
+
+    // Examination
+    + (exam ? '<div class="section"><div class="section-title">Examination</div><div>'+exam+'</div></div>' : '')
+
+    // Diagnosis
+    + (dx ? '<div class="section"><div class="section-title">Diagnosis</div><div style="font-size:15px;font-weight:700;color:#1a1a1a">'+dx+'</div>'+(dx2?'<div style="font-size:13px;color:#555;margin-top:2px">+ '+dx2+'</div>':'')+(icd?'<div style="font-size:11px;color:#888;margin-top:2px">ICD-10: '+icd+'</div>':'')+'</div>' : '')
+
+    // Prescription
+    + (visitRxRows && visitRxRows.length ? '<div class="section"><div class="rx-title">Rx</div>'+rxHTML+'</div>' : '')
+
+    // Lab orders
+    + (visitLabRows && visitLabRows.length ? '<div class="section"><div class="section-title">Investigations ordered</div>'+labHTML+'</div>' : '')
+
+    // Advice
+    + (advice ? '<div class="section"><div class="section-title">Advice</div><div>'+advice+'</div></div>' : '')
+
+    // Follow-up
+    + (followup ? '<div class="section"><div class="section-title">Follow-up</div><div><b>Date:</b> '+followup+(followNote?' — '+followNote:'')+'</div></div>' : '')
+
+    // Signature area
+    + '<div style="margin-top:24px;display:flex;justify-content:flex-end"><div style="text-align:center;min-width:200px">'
+    + (h.doctor_signature_url ? '<img src="'+h.doctor_signature_url+'" style="height:50px;object-fit:contain;margin-bottom:4px"><br>' : '<div style="height:50px;border-bottom:1px solid #333;margin-bottom:4px"></div>')
+    + '<div style="font-size:12px;font-weight:600">'+doctor+'</div>'
+    + (h.reg_number?'<div style="font-size:11px;color:#777">Reg: '+h.reg_number+'</div>':'')
+    + '</div></div>'
+
+    + '<div class="footer">'
+    + '<span>MediWhats — AI Hospital Manager</span>'
+    + '<span>Generated: '+new Date().toLocaleString('en-IN')+'</span>'
+    + '</div>'
+    + '</body></html>';
+
+  var win = window.open('', '_blank', 'width=860,height=750');
+  if (win) { win.document.write(html); win.document.close(); }
+}
+
+function sendVisitWhatsApp() {
+  if (!activeVisitPatient) return;
+  var phone = activeVisitPatient.phone;
+  if (!phone) { phone = prompt('Enter patient WhatsApp number:'); }
+  if (!phone) return;
+  var patName = activeVisitPatient.name || 'Patient';
+  var h = hospitalSettings || {};
+  var dx = document.getElementById('vr_dx')?.value || '';
+  var advice = document.getElementById('vr_advice')?.value || '';
+  var followup = document.getElementById('vr_followup')?.value || '';
+  var rxList = (visitRxRows||[]).map(function(r,i){ return (i+1)+'. '+r.drug+' '+r.strength+' — '+r.freq+' for '+r.duration; }).join('\n');
+  var labList = (visitLabRows||[]).map(function(l,i){ return (i+1)+'. '+l.test; }).join('\n');
+
+  var msg = '*'+(h.name||'MediWhats')+' — Prescription*\n\n'
+    + 'Patient: *'+patName+'*\n'
+    + 'Date: '+new Date().toLocaleDateString('en-IN')+'\n\n'
+    + (dx ? '*Diagnosis:* '+dx+'\n\n' : '')
+    + (rxList ? '*Medicines:*\n'+rxList+'\n\n' : '')
+    + (labList ? '*Tests ordered:*\n'+labList+'\n\n' : '')
+    + (advice ? '*Advice:* '+advice+'\n\n' : '')
+    + (followup ? '*Follow-up:* '+followup+'\n\n' : '')
+    + '_Please collect medicines from pharmacy and show this message._\n\n'
+    + '_MediWhats — AI Hospital Manager_';
+
+  var clean = phone.replace(/\D/g,'').replace(/^91/,'');
+  window.open('https://wa.me/91'+clean+'?text='+encodeURIComponent(msg), '_blank');
+  showToast('Opening WhatsApp...', 'success');
+}
+
+function closeEMR() {
+  var panel = document.getElementById('prPanel');
+  if (panel) panel.style.display = 'none';
+  activeVisitPatient = null;
+  editingVisitId = null;
+}
+
+
+
+
+
+// ===== PHARMACY =====
+async function loadPharmacy() {
+  showPharmaTab('pending');
+  var el = document.getElementById('pharma-orders-list');
+  try {
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/patients/visits/recent?has_prescription=true');
+    if (data.success && data.data) {
+      renderPharmaOrders(data.data.filter(function(v){ return v.prescription && JSON.parse(v.prescription||'[]').length > 0 && v.pharmacy_status !== 'dispensed'; }));
+    } else {
+      if (el) el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No pending prescription orders.</div>';
+    }
+  } catch(e) {
+    if (el) el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No pending prescription orders.</div>';
+  }
+}
+
+function showPharmaTab(tab) {
+  document.getElementById('pharma-pending-content').style.display = tab==='pending'?'block':'none';
+  document.getElementById('pharma-dispensed-content').style.display = tab==='dispensed'?'block':'none';
+  var pb=document.getElementById('pharma-tab-pending');
+  var db=document.getElementById('pharma-tab-dispensed');
+  if(pb){ pb.style.background=tab==='pending'?'var(--teal)':'transparent'; pb.style.color=tab==='pending'?'#000':'rgba(240,250,247,0.7)'; }
+  if(db){ db.style.background=tab==='dispensed'?'var(--teal)':'transparent'; db.style.color=tab==='dispensed'?'#000':'rgba(240,250,247,0.7)'; }
+}
+
+function renderPharmaOrders(visits) {
+  var el = document.getElementById('pharma-orders-list'); if(!el) return;
+  if (!visits || !visits.length) {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No pending prescription orders.</div>';
+    return;
+  }
+  var rows = visits.map(function(v) {
+    var rx = [];
+    try { rx = JSON.parse(v.prescription || '[]'); } catch(e){}
+    var name = ((v.patient_first_name||'') + ' ' + (v.patient_last_name||'')).trim() || 'Patient';
+    var drugs = rx.map(function(r){ return r.drug + (r.strength?' '+r.strength:''); }).join(', ');
+    return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+      + '<td style="padding:10px 14px"><div style="font-weight:600">'+name+'</div><div style="font-size:11px;color:rgba(240,250,247,0.4)">'+(v.patient_mrn||v.mrn||'')+'</div></td>'
+      + '<td style="padding:10px 14px;font-size:12px;color:rgba(240,250,247,0.7)">'+(v.diagnosis_primary||'')+'</td>'
+      + '<td style="padding:10px 14px;font-size:12px;color:rgba(240,250,247,0.6);max-width:200px">'+drugs+'</td>'
+      + '<td style="padding:10px 14px;font-size:12px;color:rgba(240,250,247,0.5)">'+(v.visit_date||'')+'</td>'
+      + '<td style="padding:10px 14px"><button class="action-btn pharma-view-btn" data-vid="'+v.id+'" style="font-size:11px;padding:5px 12px;background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">View &amp; Dispense</button></td>'
+      + '</tr>';
+  }).join('');
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    + '<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2);background:rgba(0,196,154,0.04)">'
+    + ['Patient','Diagnosis','Medicines','Date','Action'].map(function(h){ return '<th style="padding:10px 14px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">'+h+'</th>'; }).join('')
+    + '</tr></thead><tbody>' + rows + '</tbody></table>';
+  el.querySelectorAll('.pharma-view-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ openDispenseModal(this.dataset.vid); });
+  });
+}
+
+async function openDispenseModal(visitId) {
+  var data = await apiCall('/hospitals/' + mwHospitalId + '/patients/undefined/visits/' + visitId);
+  if (!data.success) { showToast('Failed to load prescription','error'); return; }
+  var v = data.data;
+  var rx = [];
+  try { rx = JSON.parse(v.prescription || '[]'); } catch(e){}
+  var name = ((v.patient_first_name||'') + ' ' + (v.patient_last_name||'')).trim() || 'Patient';
+
+  var modal = document.getElementById('dispenseModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'dispenseModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:6000;display:flex;align-items:center;justify-content:center;padding:20px';
+    document.body.appendChild(modal);
+  }
+
+  var rxRows = rx.map(function(r,i) {
+    return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.08)">'
+      + '<td style="padding:8px 12px"><input type="checkbox" id="disp-'+i+'" checked style="width:16px;height:16px;cursor:pointer"></td>'
+      + '<td style="padding:8px 12px;font-weight:600;font-size:13px">'+r.drug+' '+r.strength+'</td>'
+      + '<td style="padding:8px 12px;font-size:12px;color:rgba(240,250,247,0.6)">'+r.dose+'</td>'
+      + '<td style="padding:8px 12px;font-size:12px;color:rgba(240,250,247,0.6)">'+r.freq+' / '+r.duration+'</td>'
+      + '</tr>';
+  }).join('');
+
+  modal.innerHTML = '<div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:16px;width:90%;max-width:540px;max-height:80vh;overflow-y:auto">'
+    + '<div style="padding:16px 20px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between;align-items:center">'
+    + '<div><div style="font-weight:700;font-size:15px">Dispense Medicines</div><div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">'+name+'</div></div>'
+    + '<button id="closeDispenseModal" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:20px;cursor:pointer">&#215;</button>'
+    + '</div>'
+    + '<div style="padding:16px 20px">'
+    + '<table style="width:100%;border-collapse:collapse"><thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.15)">'
+    + '<th style="padding:8px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.4);text-transform:uppercase">Give</th>'
+    + '<th style="padding:8px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.4);text-transform:uppercase">Medicine</th>'
+    + '<th style="padding:8px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.4);text-transform:uppercase">Dose</th>'
+    + '<th style="padding:8px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.4);text-transform:uppercase">Frequency</th>'
+    + '</tr></thead><tbody>' + rxRows + '</tbody></table>'
+    + '</div>'
+    + '<div style="padding:14px 20px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end">'
+    + '<button id="cancelDispense" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Cancel</button>'
+    + '<button id="confirmDispense" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer">Mark as Dispensed</button>'
+    + '</div></div>';
+
+  modal.style.display = 'flex';
+  document.getElementById('closeDispenseModal').onclick = function(){ modal.style.display='none'; };
+  document.getElementById('cancelDispense').onclick = function(){ modal.style.display='none'; };
+  document.getElementById('confirmDispense').onclick = function(){
+    showToast('Medicines dispensed \u2713', 'success');
+    modal.style.display = 'none';
+    loadPharmacy();
+  };
 }
 
 
