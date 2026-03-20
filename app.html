@@ -27,6 +27,12 @@ body.light{
 /* LOGIN */
 #loginWrap{position:fixed;top:0;left:0;right:0;bottom:0;display:flex;align-items:center;justify-content:center;background:var(--black);z-index:9999;overflow-y:auto;scrollbar-width:none}#loginWrap::-webkit-scrollbar{display:none}.login-left{display:contents}.login-left-inner{width:100%;max-width:420px;padding:40px 24px 80px}.login-right{display:none!important}.login-card{width:100%}@media(max-width:860px){.login-left{flex:0 0 100%;padding:32px 24px;justify-content:flex-start;padding-top:48px}.login-right{display:none}}}
 .login-glow{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(0,196,154,0.08) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+#loginRetryBar{display:none;background:rgba(245,158,11,0.08);border:0.5px solid rgba(245,158,11,0.3);border-radius:8px;padding:12px 14px;margin-bottom:14px;flex-direction:column;gap:8px}
+#loginRetryBar.show{display:flex}
+.retry-bar-top{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#fbbf24}
+.retry-bar-note{font-size:11.5px;color:rgba(251,191,36,0.6);line-height:1.5}
+.retry-track{height:4px;background:rgba(245,158,11,0.15);border-radius:4px;overflow:hidden}
+.retry-fill{height:100%;background:#f59e0b;border-radius:4px;width:0%;transition:width 1s linear}
 .login-card{background:transparent;border:none;border-radius:0;padding:0;width:100%;position:relative;z-index:1}
 .login-logo{display:flex;align-items:center;gap:10px;margin-bottom:24px;justify-content:center}
 .login-logo-icon{width:44px;height:44px;background:var(--teal);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-weight:800;font-size:17px;color:#000}
@@ -199,7 +205,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <body>
 
 <!-- LOGIN -->
-<div class="login-w<div id="loginWrap">
+<div id="loginWrap">
   <div class="login-glow"></div>
 
   <!-- LEFT: Auth forms -->
@@ -231,13 +237,18 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       <input class="form-input" type="password" id="loginPassword" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div id="loginError" style="display:none;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);border-radius:8px;padding:10px 12px;font-size:13px;color:#fca5a5;margin-bottom:14px"></div>
+    <div id="loginRetryBar">
+      <div class="retry-bar-top"><span>⏳ Server waking up — retrying automatically</span><span id="retryCountdown">30s</span></div>
+      <div class="retry-track"><div class="retry-fill" id="retryFill"></div></div>
+      <div class="retry-bar-note">Railway free tier sleeps when idle. First login takes ~30 seconds. Hang tight!</div>
+    </div>
     <button class="login-btn" id="loginBtn" onclick="doLogin()">Sign in to MediWhats</button>
     <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--gray)">
       New to MediWhats?
       <span onclick="showAuth('signup')" style="color:var(--teal);cursor:pointer;font-weight:700;margin-left:4px">Start free trial &#8594;</span>
     </div>
     <div style="text-align:center;margin-top:10px;font-size:11px;color:rgba(240,250,247,0.3)">
-      Questions? <a href="https://wa.me/917993135689?text=Hi, I want to know about MediWhats" target="_blank" style="color:var(--teal);text-decoration:none">WhatsApp us</a> &#183; <a href="mailto:info@mediwhats.in" style="color:var(--teal);text-decoration:none">info@mediwhats.in</a>
+      Questions? <a href="https://wa.me/917993135689?text=Hi, I want to know about MediWhats" target="_blank" style="color:var(--teal);text-decoration:none">WhatsApp us</a> &#183; <a href="/cdn-cgi/l/email-protection#21484f474e614c44454856494055520f484f" style="color:var(--teal);text-decoration:none"><span class="__cf_email__" data-cfemail="4b22252d240b262e2f223c232a3f38652225">[email&#160;protected]</span></a>
     </div>
   </div>
 
@@ -266,7 +277,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <div id="signupSuccess" style="display:none;background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.4);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--teal);margin-bottom:14px;line-height:1.6"></div>
     <button class="login-btn" id="signupBtn" onclick="doSignup()">Create free account &#8594;</button>
     <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--gray)">Already have an account? <span onclick="showAuth('login')" style="color:var(--teal);cursor:pointer;font-weight:700;margin-left:4px">Sign in</span></div>
-    <div style="text-align:center;margin-top:8px;font-size:11px;color:rgba(240,250,247,0.3)"><a href="mailto:info@mediwhats.in" style="color:var(--teal);text-decoration:none">info@mediwhats.in</a> &#183; +91-7993135689</div>
+    <div style="text-align:center;margin-top:8px;font-size:11px;color:rgba(240,250,247,0.3)"><a href="/cdn-cgi/l/email-protection#6801060e0728050d0c011f00091c1b460106" style="color:var(--teal);text-decoration:none"><span class="__cf_email__" data-cfemail="a4cdcac2cbe4c9c1c0cdd3ccc5d0d78acdca">[email&#160;protected]</span></a> &#183; +91-7993135689</div>
   </div>
 
   <!-- FORGOT PASSWORD PANEL -->
@@ -312,82 +323,10 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     <div id="resetSuccess" style="display:none;background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.4);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--teal);margin-bottom:14px"></div>
     <button class="login-btn" id="resetBtn" onclick="doResetPassword()">Update password</button>
     <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--gray)"><span onclick="showAuth('login')" style="color:var(--teal);cursor:pointer;font-weight:700">&#8592; Back to login</span></div>
-  </div>
-
-  <!-- RIGHT: Promotional panel -->
-  <div class="login-right">
-
-  <div style="margin-bottom:12px">
-    <span style="font-size:11px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:0.14em">MediWhats</span>
-  </div>
-
-  <div style="font-size:36px;font-weight:800;line-height:1.2;margin-bottom:16px;font-family:'Cabinet Grotesk',sans-serif">
-    Run your clinic<br>
-    <span style="color:var(--teal)">smarter, faster.</span>
-  </div>
-
-  <div style="font-size:15px;color:rgba(240,250,247,0.5);line-height:1.7;font-weight:300;margin-bottom:40px;max-width:380px">
-    Complete hospital management powered by AI — delivered on WhatsApp.
-  </div>
-
-  <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:40px">
-
-    <div style="display:flex;align-items:center;gap:14px">
-      <div style="width:40px;height:40px;border-radius:10px;background:rgba(0,196,154,0.12);border:0.5px solid rgba(0,196,154,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#129504;</div>
-      <div>
-        <div style="font-size:14px;font-weight:700;margin-bottom:2px">AI diagnosis &amp; prescription</div>
-        <div style="font-size:12px;color:rgba(240,250,247,0.45)">Claude AI in every consultation. Suggests diagnosis, drafts Rx.</div>
-      </div>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:14px">
-      <div style="width:40px;height:40px;border-radius:10px;background:rgba(37,211,102,0.1);border:0.5px solid rgba(37,211,102,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#128241;</div>
-      <div>
-        <div style="font-size:14px;font-weight:700;margin-bottom:2px">Reports &amp; Rx on WhatsApp</div>
-        <div style="font-size:12px;color:rgba(240,250,247,0.45)">98% open rate. No app download needed for patients.</div>
-      </div>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:14px">
-      <div style="width:40px;height:40px;border-radius:10px;background:rgba(245,158,11,0.1);border:0.5px solid rgba(245,158,11,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#129514;</div>
-      <div>
-        <div style="font-size:14px;font-weight:700;margin-bottom:2px">Full LIS built-in</div>
-        <div style="font-size:12px;color:rgba(240,250,247,0.45)">50+ tests, vacutainer guide, AI lab interpretation, PDF reports.</div>
-      </div>
-    </div>
-
-    <div style="display:flex;align-items:center;gap:14px">
-      <div style="width:40px;height:40px;border-radius:10px;background:rgba(99,102,241,0.1);border:0.5px solid rgba(99,102,241,0.25);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">&#8377;</div>
-      <div>
-        <div style="font-size:14px;font-weight:700;margin-bottom:2px">From &#8377;999/month</div>
-        <div style="font-size:12px;color:rgba(240,250,247,0.45)">10&#215; cheaper than Practo. Cancel anytime.</div>
-      </div>
-    </div>
-
-  </div>
-
-  <div style="display:flex;gap:0;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;overflow:hidden;margin-bottom:32px">
-    <div style="flex:1;padding:16px;text-align:center;border-right:0.5px solid rgba(0,196,154,0.15)">
-      <div style="font-size:22px;font-weight:800;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif">5 min</div>
-      <div style="font-size:11px;color:rgba(240,250,247,0.4);margin-top:2px">Setup time</div>
-    </div>
-    <div style="flex:1;padding:16px;text-align:center;border-right:0.5px solid rgba(0,196,154,0.15)">
-      <div style="font-size:22px;font-weight:800;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif">50+</div>
-      <div style="font-size:11px;color:rgba(240,250,247,0.4);margin-top:2px">Lab tests</div>
-    </div>
-    <div style="flex:1;padding:16px;text-align:center">
-      <div style="font-size:22px;font-weight:800;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif">AI</div>
-      <div style="font-size:11px;color:rgba(240,250,247,0.4);margin-top:2px">Built-in</div>
-    </div>
-  </div>
-
-  <div style="font-size:12px;color:rgba(240,250,247,0.25);line-height:1.8">
-    <a href="https://wa.me/917993135689" target="_blank" style="color:var(--teal);text-decoration:none">&#128172; WhatsApp +91-7993135689</a>
-    &nbsp;&nbsp;&#183;&nbsp;&nbsp;
-    <a href="mailto:info@mediwhats.in" style="color:var(--teal);text-decoration:none">info@mediwhats.in</a>
-  </div>
-
-</div>
+  </div><!-- /authReset -->
+  </div><!-- /login-left-inner -->
+  </div><!-- /login-left -->
+</div><!-- /loginWrap -->
 
 <!-- APP -->
 <div class="app" id="app">
@@ -1710,7 +1649,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ===== AUTH ROUTING & FUNCTIONS =====
 function initAuthRouting() {
   var full = (window.location.pathname + window.location.hash + window.location.search).toLowerCase();
@@ -1987,36 +1926,82 @@ async function doResetPassword() {
   if (btn) { btn.textContent = 'Update password'; btn.disabled = false; }
 }
 
-// ── UPDATED doLogin — proper error display ────────────────────────
+// ── LOGIN + RAILWAY COLD-START RETRY ─────────────────────────────
 
-let currentRole = 'Doctor';
-let isDark = true;
+var currentRole = 'Doctor';
+var isDark = true;
+var _loginAttempts = 0;
+var _retryTimer = null;
 
 function selectRole(btn, role) {
-  document.querySelectorAll('.role-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.role-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   currentRole = role;
 }
 
-async function doLogin() {
-  var errEl0 = document.getElementById('loginError');
-  if (errEl0) { errEl0.style.display='none'; errEl0.textContent=''; }
-  var btn0 = document.getElementById('loginBtn');
-  if (btn0) { btn0.textContent = 'Signing in...'; btn0.disabled = true; }
-  var email = document.getElementById('loginEmail').value;
-  var password = document.getElementById('loginPassword').value;
-  if (!email || !password) { alert('Please enter email and password'); return; }
-  try {
-    var res = await fetch('https://smartgumastha-backend-production.up.railway.app/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    var data = await res.json();
-    if (data.success && data.data.token) {
-      // Block super admin from hospital app
+function _showLoginError(msg) {
+  var el = document.getElementById('loginError');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+
+function _resetLoginBtn() {
+  var btn = document.getElementById('loginBtn');
+  if (btn) { btn.textContent = 'Sign in to MediWhats'; btn.disabled = false; }
+}
+
+function _startRetryBar(seconds, onDone) {
+  var bar = document.getElementById('loginRetryBar');
+  var fill = document.getElementById('retryFill');
+  var cd = document.getElementById('retryCountdown');
+  if (!bar) return;
+  bar.classList.add('show');
+  if (fill) fill.style.width = '0%';
+  var elapsed = 0;
+  clearInterval(_retryTimer);
+  _retryTimer = setInterval(function() {
+    elapsed++;
+    if (fill) fill.style.width = Math.min(100, (elapsed / seconds) * 100) + '%';
+    if (cd) cd.textContent = Math.max(0, seconds - elapsed) + 's';
+    if (elapsed >= seconds) {
+      clearInterval(_retryTimer);
+      bar.classList.remove('show');
+      if (onDone) onDone();
+    }
+  }, 1000);
+}
+
+function doLogin() {
+  var errEl = document.getElementById('loginError');
+  if (errEl) { errEl.style.display = 'none'; errEl.textContent = ''; }
+  var bar = document.getElementById('loginRetryBar');
+  if (bar) bar.classList.remove('show');
+  var email = (document.getElementById('loginEmail') || {}).value || '';
+  var password = (document.getElementById('loginPassword') || {}).value || '';
+  if (!email || !password) { _showLoginError('Please enter your email and password'); return; }
+  _loginAttempts = 0;
+  _attemptLogin(email, password);
+}
+
+function _attemptLogin(email, password) {
+  var btn = document.getElementById('loginBtn');
+  if (btn) { btn.textContent = 'Signing in...'; btn.disabled = true; }
+
+  var controller = new AbortController();
+  var timeout = setTimeout(function(){ controller.abort(); }, 35000);
+
+  fetch('https://smartgumastha-backend-production.up.railway.app/api/auth/login', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email, password: password }),
+    signal: controller.signal
+  })
+  .then(function(r){ clearTimeout(timeout); return r.json().then(function(d){ return {status:r.status,data:d}; }); })
+  .then(function(res) {
+    _resetLoginBtn();
+    var data = res.data;
+    if (data.success && data.data && data.data.token) {
       if (data.data.role === 'SUPER_ADMIN') {
-        alert('Please use the Super Admin panel at mediwhats_superadmin.html');
+        _showLoginError('Please use the Super Admin panel.');
         return;
       }
       localStorage.setItem('mw_token', data.data.token);
@@ -2028,34 +2013,34 @@ async function doLogin() {
       currentRole = role;
       document.getElementById('loginWrap').style.display = 'none';
       document.getElementById('app').classList.add('visible');
-      // Ensure ALL nav items are visible
       document.querySelectorAll('.nav-item').forEach(function(el){ el.style.display=''; el.style.visibility='visible'; el.style.opacity='1'; });
       document.querySelectorAll('.nav-section').forEach(function(el){ el.style.display=''; el.style.visibility='visible'; });
-      var btn4 = document.getElementById('loginBtn');
-      if (btn4) { btn4.textContent = 'Sign in to MediWhats'; btn4.disabled = false; }
-      var b3=document.getElementById('loginBtn'); if(b3){b3.textContent='Sign in to MediWhats';b3.disabled=false;}
       document.getElementById('sidebarUserName').textContent = data.data.first_name + ' ' + (data.data.last_name || '');
       document.getElementById('sidebarUserRole').textContent = role;
-      // Light theme for non-clinical roles
       if (role === 'RECEPTIONIST' || role === 'BILLING' || role === 'LAB' || role === 'PHARMACY') {
         document.body.classList.add('light');
         isDark = false;
-        document.getElementById('themeBtn').textContent = '🌙 Dark mode';
+        var tb = document.getElementById('themeBtn');
+        if (tb) tb.textContent = '🌙 Dark mode';
       }
-      // Hide nav items based on role
       applyRoleAccess(role);
     } else {
-      var errEl = document.getElementById('loginError');
-    if (errEl) { errEl.textContent = data.message || 'Invalid email or password. Please try again.'; errEl.style.display='block'; }
-    var btn2 = document.getElementById('loginBtn');
-    if (btn2) { btn2.textContent = 'Sign in to MediWhats'; btn2.disabled = false; }
+      _showLoginError(data.message || 'Invalid email or password. Please try again.');
     }
-  } catch(e) {
-    var errEl2 = document.getElementById('loginError');
-    if (errEl2) { errEl2.textContent = 'Connection error. Check your internet and try again.'; errEl2.style.display='block'; }
-    var btn3 = document.getElementById('loginBtn');
-    if (btn3) { btn3.textContent = 'Sign in to MediWhats'; btn3.disabled = false; }
-  }
+  })
+  .catch(function() {
+    clearTimeout(timeout);
+    _loginAttempts++;
+    if (_loginAttempts < 2) {
+      // Railway cold start — auto retry after 30s
+      var btn2 = document.getElementById('loginBtn');
+      if (btn2) { btn2.textContent = 'Waiting for server...'; btn2.disabled = true; }
+      _startRetryBar(30, function(){ _attemptLogin(email, password); });
+    } else {
+      _resetLoginBtn();
+      _showLoginError('Cannot reach server. Please check your internet or try again in a minute.');
+    }
+  });
 }
 
 function applyRoleAccess(role) {
@@ -6032,11 +6017,4 @@ function getLinkLabReports(patientId) {
       <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">HSN Code</label><input id="med_hsn" class="form-input" style="width:100%" value="3004"></div>
       <div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Generic Name</label><input id="med_generic" class="form-input" style="width:100%" placeholder="Optional"></div>
     </div>
-    <div style="padding:14px 20px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end">
-      <button onclick="document.getElementById('addMedModal').style.display='none'" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Cancel</button>
-      <button onclick="saveMedicine()" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer">Save Item</button>
-    </div>
-  </div>
-</div>
-</body>
-</html>
+    <div style="padding:14px 20px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap
