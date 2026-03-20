@@ -1,4 +1,4 @@
-<!-- MediWhats v39 BUILD:1774046674 -->
+<!-- MediWhats v40 BUILD:1774047921 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -249,6 +249,21 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 .emr-tab-btn { transition: all 0.2s; }
 .emr-tab-btn.active { background: var(--teal) !important; color: #000 !important; }
 .emr-tab-btn:not(.active):hover { background: rgba(0,196,154,0.1) !important; }
+
+.ptab-btn{padding:8px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px;font-family:inherit;transition:all .15s}
+.ptab-on{background:var(--teal)!important;color:#000!important;border-color:var(--teal)!important;font-weight:700!important}
+.ph-stat-card{background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px}
+.ph-stat-label{font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
+.ph-stat-val{font-size:24px;font-weight:800;color:var(--white)}
+.ph-lbl{display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px}
+.ph-inp{width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:9px 12px;font-size:14px;color:var(--white);font-family:inherit;outline:none}
+.ph-inp:focus{border-color:var(--teal)}
+.pos-pay-btn{flex:1;padding:8px 4px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.25);background:transparent;color:rgba(240,250,247,0.6);cursor:pointer;font-size:12px;font-weight:600;font-family:inherit;transition:all .15s}
+.pos-pay-on{background:rgba(0,196,154,0.15)!important;border-color:var(--teal)!important;color:var(--teal)!important}
+.low-stock-badge{background:rgba(230,57,70,0.15);color:#e63946;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.near-expiry-badge{background:rgba(239,159,39,0.15);color:#EF9F27;font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+.ok-badge{background:rgba(0,196,154,0.12);color:var(--teal);font-size:10px;font-weight:700;padding:2px 7px;border-radius:10px}
+
 </style>
 </head>
 <body>
@@ -1550,223 +1565,141 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <!-- PHARMACY SCREEN -->
 
 <div id="screen-pharmacy" class="screen">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px">
     <div>
       <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Pharmacy</div>
-      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Prescription orders from doctors</div>
+      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Inventory &middot; POS Billing &middot; Prescriptions &middot; Audit Log</div>
     </div>
-    <div style="display:flex;gap:10px">
-      <button onclick="showPharmaTab('pending')" id="pharma-tab-pending" style="padding:8px 18px;border-radius:8px;border:0.5px solid var(--teal);background:var(--teal);color:#000;font-weight:700;cursor:pointer;font-size:13px">Pending</button>
-      <button onclick="showPharmaTab('dispensed')" id="pharma-tab-dispensed" style="padding:8px 18px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Dispensed</button>
-    </div>
-  </div>
-  <div id="pharma-pending-content">
-    <div id="pharma-orders-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
-      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading prescription orders...</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button onclick="pharmTab('rx')" id="ptab-rx" class="ptab-btn ptab-on">Prescriptions</button>
+      <button onclick="pharmTab('inventory')" id="ptab-inventory" class="ptab-btn">Inventory</button>
+      <button onclick="pharmTab('billing')" id="ptab-billing" class="ptab-btn">POS Billing</button>
+      <button onclick="pharmTab('audit')" id="ptab-audit" class="ptab-btn">Audit Log</button>
     </div>
   </div>
-  <div id="pharma-dispensed-content" style="display:none">
-    <div id="pharma-dispensed-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
-      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading dispensed orders...</div>
+
+  <div id="ph-rx" class="ph-tab">
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <button onclick="pharmRxFilter('pending')" id="prxf-pending" class="ptab-btn ptab-on" style="font-size:12px;padding:6px 14px">Pending</button>
+      <button onclick="pharmRxFilter('dispensed')" id="prxf-dispensed" class="ptab-btn" style="font-size:12px;padding:6px 14px">Dispensed</button>
+      <button onclick="pharmRxFilter('all')" id="prxf-all" class="ptab-btn" style="font-size:12px;padding:6px 14px">All</button>
+      <input id="pharma-rx-search" type="text" placeholder="Search patient or drug..." oninput="pharmRxSearch(this.value)"
+        style="margin-left:auto;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none;min-width:180px">
+    </div>
+    <div id="pharma-orders-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:120px">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading prescriptions...</div>
     </div>
   </div>
-</div>
-<div id="prPanel" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:3000;flex-direction:column;overflow:hidden">
-  <!-- Header -->
-  <div style="background:#0D1412;border-bottom:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-    <div style="display:flex;align-items:center;gap:16px">
-      <button onclick="closePatientRecord()" style="background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.3);color:var(--teal);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">&#8592; Back</button>
+
+  <div id="ph-inventory" class="ph-tab" style="display:none">
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+      <div class="ph-stat-card"><div class="ph-stat-label">Total Items</div><div class="ph-stat-val" id="inv-total">0</div></div>
+      <div class="ph-stat-card" style="border-color:rgba(230,57,70,0.3)"><div class="ph-stat-label">Low Stock</div><div class="ph-stat-val" id="inv-low" style="color:#e63946">0</div></div>
+      <div class="ph-stat-card" style="border-color:rgba(239,159,39,0.3)"><div class="ph-stat-label">Near Expiry</div><div class="ph-stat-val" id="inv-expiry" style="color:#EF9F27">0</div></div>
+      <div class="ph-stat-card" style="border-color:rgba(0,196,154,0.3)"><div class="ph-stat-label">Stock Value</div><div class="ph-stat-val" id="inv-value" style="color:var(--teal)">&#8377;0</div></div>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;align-items:center">
+      <input id="inv-search" type="text" placeholder="Search drug, batch, category..." oninput="pharmInvSearch(this.value)"
+        style="background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none;flex:1;min-width:180px">
+      <select id="inv-filter" onchange="pharmInvFilter()" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none">
+        <option value="all">All Items</option><option value="low">Low Stock</option><option value="expiry">Near Expiry</option><option value="expired">Expired</option>
+      </select>
+      <button onclick="openAddStockModal()" style="background:var(--teal);border:none;border-radius:8px;padding:8px 16px;color:#000;font-weight:700;cursor:pointer;font-size:13px">+ Add Stock</button>
+      <button onclick="pharmGeneratePO()" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);border-radius:8px;padding:8px 14px;color:var(--teal);font-weight:600;cursor:pointer;font-size:13px">Generate PO</button>
+    </div>
+    <div id="pharma-inv-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:120px">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading inventory...</div>
+    </div>
+  </div>
+
+  <div id="ph-billing" class="ph-tab" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 340px;gap:16px">
       <div>
-        <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:18px;font-weight:700" id="prPatientName">Patient</div>
-        <div style="font-size:12px;color:rgba(240,250,247,0.5)">Patient Records</div>
+        <div style="margin-bottom:10px">
+          <input id="pos-search" type="text" placeholder="Search medicine..." oninput="posSearch(this.value)"
+            style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 14px;color:var(--white);font-size:14px;outline:none">
+          <div id="pos-suggestions" style="display:none;background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;margin-top:4px;max-height:200px;overflow-y:auto;position:relative;z-index:10"></div>
+        </div>
+        <div id="pos-cart" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;min-height:180px;overflow:hidden">
+          <div id="pos-cart-list" style="padding:16px">
+            <div style="text-align:center;color:rgba(240,250,247,0.3);padding:32px;font-size:13px">Search and add medicines</div>
+          </div>
+        </div>
+      </div>
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+        <div style="font-weight:700;font-size:14px">Bill Summary</div>
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(240,250,247,0.55)">Subtotal</span><span id="pos-subtotal">&#8377;0.00</span></div>
+        <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
+          <span style="color:rgba(240,250,247,0.55)">Discount</span>
+          <div style="display:flex;gap:5px">
+            <input id="pos-disc" type="number" value="0" min="0" oninput="posRecalc()" style="width:50px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px 6px;color:var(--white);font-size:12px;text-align:center;outline:none">
+            <select id="pos-disc-type" onchange="posRecalc()" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:6px;padding:4px;color:var(--white);font-size:12px;outline:none"><option value="pct">%</option><option value="flat">&#8377;</option></select>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(240,250,247,0.55)">GST</span><span id="pos-gst">&#8377;0.00</span></div>
+        <div style="display:flex;justify-content:space-between;font-size:17px;font-weight:800;padding-top:8px;border-top:0.5px solid rgba(0,196,154,0.2)"><span>Total</span><span id="pos-total" style="color:var(--teal)">&#8377;0.00</span></div>
+        <div>
+          <div style="font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Payment</div>
+          <div style="display:flex;gap:5px">
+            <button class="pos-pay-btn pos-pay-on" id="pp-cash" onclick="posSetPay('cash',this)">Cash</button>
+            <button class="pos-pay-btn" id="pp-upi" onclick="posSetPay('upi',this)">UPI</button>
+            <button class="pos-pay-btn" id="pp-card" onclick="posSetPay('card',this)">Card</button>
+          </div>
+        </div>
+        <button onclick="posBillSave()" style="width:100%;padding:12px;background:var(--teal);border:none;border-radius:10px;color:#000;font-size:14px;font-weight:800;cursor:pointer">Generate Bill</button>
+        <button onclick="posWAReceipt()" style="width:100%;padding:9px;background:rgba(37,211,102,0.1);border:0.5px solid rgba(37,211,102,0.35);border-radius:10px;color:#25d366;font-size:13px;font-weight:600;cursor:pointer">WhatsApp Receipt</button>
+        <button onclick="posClear()" style="width:100%;padding:7px;background:transparent;border:0.5px solid rgba(240,250,247,0.1);border-radius:8px;color:rgba(240,250,247,0.4);font-size:12px;cursor:pointer">Clear</button>
       </div>
     </div>
-    <button onclick="newVisit()" style="background:var(--teal);color:#000;border:none;padding:10px 20px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px;font-family:'Cabinet Grotesk',sans-serif">+ New Visit</button>
+    <div style="margin-top:14px">
+      <div style="font-size:11px;font-weight:700;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Recent Bills</div>
+      <div id="pos-recent-bills" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">Bills appear here after saving</div>
+    </div>
   </div>
 
-  <!-- Body: History left + Form right -->
-  <div style="display:grid;grid-template-columns:280px 1fr;flex:1;overflow:hidden">
-
-    <!-- Visit History Sidebar -->
-    <div style="background:#080C0B;border-right:0.5px solid rgba(0,196,154,0.15);overflow-y:auto;padding:16px">
-      <div style="font-size:11px;font-weight:700;color:rgba(240,250,247,0.4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">Visit History</div>
-      <div id="prHistory"><div style="color:rgba(240,250,247,0.4);font-size:13px;text-align:center;padding:20px">Loading...</div></div>
+  <div id="ph-audit" class="ph-tab" style="display:none">
+    <div style="display:flex;gap:8px;margin-bottom:14px;align-items:center;flex-wrap:wrap">
+      <select id="audit-type" onchange="pharmLoadAudit()" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:7px 12px;color:var(--white);font-size:13px;outline:none">
+        <option value="all">All Events</option><option value="dispensed">Dispensed</option><option value="stock_in">Stock In</option><option value="stock_adj">Adjustment</option><option value="return">Returns</option>
+      </select>
+      <button onclick="pharmExportAudit()" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);border-radius:8px;padding:7px 14px;color:var(--teal);font-size:13px;font-weight:600;cursor:pointer;margin-left:auto">Export CSV</button>
     </div>
-
-    <!-- EMR Form -->
-    <div style="overflow-y:auto;padding:24px" id="prForm">
-      <!-- Tab navigation -->
-      <div style="display:flex;gap:4px;margin-bottom:20px;flex-wrap:wrap">
-        <button id="prtab-subjective"  class="pr-tab active" onclick="switchPrTab('subjective')">Subjective</button>
-        <button id="prtab-vitals"      class="pr-tab" onclick="switchPrTab('vitals')">Vitals</button>
-        <button id="prtab-examination" class="pr-tab" onclick="switchPrTab('examination')">Examination</button>
-        <button id="prtab-diagnosis"   class="pr-tab" onclick="switchPrTab('diagnosis')">Diagnosis</button>
-        <button id="prtab-prescription" class="pr-tab" onclick="switchPrTab('prescription')">Prescription</button>
-        <button id="prtab-lab"         class="pr-tab" onclick="switchPrTab('lab')">Lab / Radiology</button>
-        <button id="prtab-followup"    class="pr-tab" onclick="switchPrTab('followup')">Follow-up</button>
-        <button id="prtab-dept"        class="pr-tab" onclick="switchPrTab('dept');loadDeptSection(document.getElementById('vr_dept').value,{})">Dept-Specific</button>
-      </div>
-
-      <!-- Visit meta row -->
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:20px;padding:14px;background:#0D1412;border-radius:12px;border:0.5px solid rgba(0,196,154,0.15)">
-        <div>
-          <label class="vr-label">Department</label>
-          <select id="vr_dept" class="form-select" onchange="loadDeptSection(this.value,{})"><option>General Medicine</option><option>Ophthalmology</option><option>Dental</option><option>Gynaecology</option><option>Paediatrics</option><option>ENT</option><option>Orthopaedics</option><option>Dermatology</option></select>
-        </div>
-        <div><label class="vr-label">Date</label><input id="vr_date" type="date" class="form-input" style="width:100%"></div>
-        <div>
-          <label class="vr-label">Visit Type</label>
-          <select id="vr_type" class="form-select"><option>OPD</option><option>IPD</option><option>Teleconsult</option><option>Follow-up</option></select>
-        </div>
-        <div style="display:flex;align-items:flex-end">
-          <div style="font-size:11px;color:var(--teal);font-weight:600" id="visit-status-badge">New Visit</div>
-        </div>
-      </div>
-
-      <!-- SECTION: SUBJECTIVE -->
-      <div class="pr-section" id="prsec-subjective">
-        <div class="vr-section-title">Subjective — What the patient tells you</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-          <div><label class="vr-label">Chief Complaint *</label><input id="vr_complaint" class="form-input" style="width:100%" placeholder="Fever, cough, headache..."></div>
-          <div><label class="vr-label">Duration</label><input id="vr_duration" class="form-input" style="width:100%" placeholder="3 days, 1 week..."></div>
-          <div style="grid-column:1/-1"><label class="vr-label">History of Present Illness</label><textarea id="vr_history" class="form-input" rows="3" style="width:100%;resize:vertical" placeholder="Onset, character, progression, associated symptoms..."></textarea></div>
-          <div><label class="vr-label">Known Allergies</label><input id="vr_allergies" class="form-input" style="width:100%" placeholder="Penicillin, Sulfa..."></div>
-          <div><label class="vr-label">Past Surgical History</label><input id="vr_surgical" class="form-input" style="width:100%" placeholder="Appendectomy 2018..."></div>
-        </div>
-      </div>
-
-      <!-- SECTION: VITALS -->
-      <div class="pr-section" id="prsec-vitals" style="display:none">
-        <div class="vr-section-title">Objective — Vitals</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
-          <div>
-            <label class="vr-label">Blood Pressure</label>
-            <div style="display:flex;align-items:center;gap:6px">
-              <input id="vr_bp_s" type="number" class="form-input" style="width:70px;text-align:center" placeholder="120">
-              <span style="color:rgba(240,250,247,0.4)">/</span>
-              <input id="vr_bp_d" type="number" class="form-input" style="width:70px;text-align:center" placeholder="80">
-              <span style="font-size:11px;color:rgba(240,250,247,0.4)">mmHg</span>
-            </div>
-          </div>
-          <div><label class="vr-label">Temperature (&#8451;)</label><input id="vr_temp" type="number" step="0.1" class="form-input" style="width:100%" placeholder="98.6"></div>
-          <div><label class="vr-label">Pulse (bpm)</label><input id="vr_pulse" type="number" class="form-input" style="width:100%" placeholder="72"></div>
-          <div><label class="vr-label">SpO2 (%)</label><input id="vr_spo2" type="number" class="form-input" style="width:100%" placeholder="98"></div>
-          <div><label class="vr-label">Weight (kg)</label><input id="vr_weight" type="number" step="0.1" class="form-input" style="width:100%" placeholder="70" oninput="calcBMI()"></div>
-          <div><label class="vr-label">Height (cm)</label><input id="vr_height" type="number" class="form-input" style="width:100%" placeholder="170" oninput="calcBMI()"></div>
-          <div style="display:flex;align-items:flex-end"><div style="font-size:18px;font-weight:700;color:var(--teal);font-family:'Cabinet Grotesk',sans-serif" id="vr_bmi_display">BMI: —</div><input type="hidden" id="vr_bmi_val"></div>
-        </div>
-      </div>
-
-      <!-- SECTION: EXAMINATION -->
-      <div class="pr-section" id="prsec-examination" style="display:none">
-        <div class="vr-section-title">Objective — Physical Examination</div>
-        <textarea id="vr_exam" class="form-input" rows="8" style="width:100%;resize:vertical;font-family:monospace;font-size:13px" placeholder="General: Conscious, oriented, afebrile&#10;CVS: S1 S2 heard, no murmur&#10;RS: Clear, no wheeze&#10;Abdomen: Soft, non-tender&#10;CNS: No focal deficit"></textarea>
-      </div>
-
-      <!-- SECTION: DIAGNOSIS -->
-      <div class="pr-section" id="prsec-diagnosis" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div class="vr-section-title" style="margin:0">Assessment — Diagnosis</div>
-          <button onclick="aiSuggestDiagnosis()" style="padding:7px 16px;background:rgba(127,119,221,0.15);border:0.5px solid #7F77DD;color:#AFA9EC;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px">
-            <span style="font-size:14px">✨</span> AI Suggest Diagnosis
-          </button>
-        </div>
-        <div id="ai-diagnosis-suggestions" style="display:none;margin-bottom:14px"></div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-          <div style="grid-column:1/-1"><label class="vr-label">Primary Diagnosis *</label><input id="vr_dx" class="form-input" style="width:100%" placeholder="Acute viral fever"></div>
-          <div><label class="vr-label">Secondary Diagnosis</label><input id="vr_dx2" class="form-input" style="width:100%" placeholder="Upper respiratory tract infection"></div>
-          <div><label class="vr-label">ICD-10 Code</label><input id="vr_icd" class="form-input" style="width:100%" placeholder="J06.9"></div>
-        </div>
-      </div>
-
-      <!-- SECTION: PRESCRIPTION -->
-      <div class="pr-section" id="prsec-prescription" style="display:none">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div class="vr-section-title" style="margin:0">Plan — Prescription</div>
-          <button onclick="aiDraftPrescription()" style="padding:7px 16px;background:rgba(127,119,221,0.15);border:0.5px solid #7F77DD;color:#AFA9EC;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px">
-            <span style="font-size:14px">✨</span> AI Draft Rx
-          </button>
-        </div>
-        <div id="ai-rx-review-panel" style="display:none;margin-bottom:14px"></div>
-        <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-          <select id="rx-drug-select" class="form-select" style="width:220px">
-            <option value="">Select drug...</option><option>Paracetamol</option><option>Dolo 650</option><option>Ibuprofen</option><option>Aspirin</option><option>Diclofenac</option><option>Amoxicillin</option><option>Azithromycin</option><option>Ciprofloxacin</option><option>Metronidazole</option><option>Doxycycline</option><option>Pantoprazole</option><option>Omeprazole</option><option>Domperidone</option><option>Ondansetron</option><option>Metformin</option><option>Glimepiride</option><option>Amlodipine</option><option>Atenolol</option><option>Telmisartan</option><option>Atorvastatin</option><option>Cetirizine</option><option>Levocetrizine</option><option>Montelukast</option><option>Salbutamol</option><option>Multivitamin</option><option>Vitamin D3</option><option>Calcium</option><option>Iron</option><option>Folic Acid</option><option>Augmentin</option><option>Cefixime</option><option>Levofloxacin</option></select>
-          <button onclick="addRxRow(document.getElementById('rx-drug-select').value)" style="background:var(--teal);color:#000;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">+ Add</button>
-          <button onclick="addRxRow('')" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px">+ Custom drug</button>
-        </div>
-        <table style="width:100%;border-collapse:collapse">
-          <thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">
-            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Drug</th>
-            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Strength</th>
-            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Dose</th>
-            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Frequency</th>
-            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Duration</th>
-            <th></th>
-          </tr></thead>
-          <tbody id="rx-table-body"></tbody>
-        </table>
-        <div style="margin-top:16px"><label class="vr-label">General Advice</label><textarea id="vr_advice" class="form-input" rows="2" style="width:100%;resize:vertical" placeholder="Drink plenty of fluids, rest, avoid spicy food..."></textarea></div>
-      </div>
-
-      <!-- SECTION: LAB -->
-      <div class="pr-section" id="prsec-lab" style="display:none">
-        <div class="vr-section-title">Plan — Lab & Radiology Requests</div>
-        <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Laboratory Tests</div>
-        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-          <select id="lab-select" class="form-select" style="width:260px">
-            <option value="">Select test...</option><option>CBC (Complete Blood Count)</option><option>ESR</option><option>Blood Sugar Fasting</option><option>Blood Sugar PP</option><option>Blood Sugar Random</option><option>HbA1c</option><option>LFT</option><option>KFT</option><option>Lipid Profile</option><option>Thyroid Profile (T3/T4/TSH)</option><option>Urine Routine & Microscopy</option><option>Dengue NS1 Antigen</option><option>Malaria Antigen</option><option>Widal Test</option><option>CRP</option><option>Serum Electrolytes</option><option>Vitamin D</option><option>Vitamin B12</option><option>HIV (ELISA)</option><option>HBsAg</option><option>Pregnancy Test (Urine)</option><option>Pap Smear</option></select>
-          <button onclick="addLabRow(document.getElementById('lab-select').value)" style="background:var(--teal);color:#000;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">+ Add</button>
-        </div>
-        <table style="width:100%;border-collapse:collapse;margin-bottom:20px">
-          <thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">
-            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Test</th>
-            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Urgency</th>
-            <th></th>
-          </tr></thead>
-          <tbody id="lab-table-body"></tbody>
-        </table>
-        <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Radiology</div>
-        <div style="display:flex;gap:10px;margin-bottom:12px;flex-wrap:wrap">
-          <select id="rad-select" class="form-select" style="width:260px">
-            <option value="">Select...</option><option>X-Ray Chest (PA view)</option><option>X-Ray KUB</option><option>X-Ray Spine</option><option>X-Ray Hand/Wrist</option><option>USG Abdomen</option><option>USG Pelvis</option><option>USG Thyroid</option><option>2D Echocardiogram</option><option>ECG</option><option>MRI Brain</option><option>CT Scan Head</option><option>DEXA Scan</option></select>
-          <button onclick="addRadRow(document.getElementById('rad-select').value)" style="background:var(--teal);color:#000;border:none;padding:9px 16px;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px">+ Add</button>
-        </div>
-        <table style="width:100%;border-collapse:collapse">
-          <thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">
-            <th style="text-align:left;padding:8px;font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase">Investigation</th>
-            <th></th>
-          </tr></thead>
-          <tbody id="rad-table-body"></tbody>
-        </table>
-      </div>
-
-      <!-- SECTION: FOLLOW-UP -->
-      <div class="pr-section" id="prsec-followup" style="display:none">
-        <div class="vr-section-title">Plan — Follow-up & Instructions</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
-          <div><label class="vr-label">Follow-up Date</label><input id="vr_followup" type="date" class="form-input" style="width:100%"></div>
-          <div><label class="vr-label">Referral To</label><input id="vr_referral" class="form-input" style="width:100%" placeholder="Dr. Sharma / Apollo Hospital"></div>
-          <div style="grid-column:1/-1"><label class="vr-label">Follow-up Instructions</label><textarea id="vr_followup_notes" class="form-input" rows="3" style="width:100%;resize:vertical" placeholder="Return if fever persists beyond 3 days, or if any new symptoms develop..."></textarea></div>
-        </div>
-      </div>
-
-      <!-- SECTION: DEPT SPECIFIC -->
-      <div class="pr-section" id="prsec-dept" style="display:none">
-        <div class="vr-section-title">Department-Specific Findings</div>
-        <div id="dept-section"><div style="color:rgba(240,250,247,0.4);font-size:13px;padding:16px;text-align:center">Select department from the top to see specific fields</div></div>
-      </div>
-
-      <!-- Save buttons -->
-      <div style="display:flex;gap:10px;margin-top:24px;padding-top:20px;border-top:0.5px solid rgba(0,196,154,0.15);flex-wrap:wrap">
-        <button onclick="saveVisitRecord(false)" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);padding:12px 20px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px">Save Draft</button>
-        <button onclick="confirmSend()" style="background:var(--teal);color:#000;border:none;padding:12px 24px;border-radius:10px;font-weight:700;cursor:pointer;font-size:13px">&#10003; Save &amp; Send WhatsApp</button>
-        <button onclick="printVisitRecord()" style="background:rgba(255,255,255,0.06);border:0.5px solid rgba(240,250,247,0.2);color:rgba(240,250,247,0.8);padding:12px 20px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px">&#128438; Print / PDF</button>
-        <button onclick="sendVisitWhatsApp()" style="background:rgba(37,211,102,0.12);border:0.5px solid rgba(37,211,102,0.4);color:#25d366;padding:12px 20px;border-radius:10px;font-weight:600;cursor:pointer;font-size:13px">&#128241; Send via WhatsApp</button>
-        <button onclick="closeEMR()" style="background:none;border:0.5px solid rgba(240,250,247,0.15);color:rgba(240,250,247,0.4);padding:12px 16px;border-radius:10px;cursor:pointer;font-size:13px;margin-left:auto">&#215; Close</button>
-      </div>
+    <div id="pharma-audit-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:120px">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Dispensing and stock events will appear here.</div>
     </div>
   </div>
 </div>
+
+<!-- ADD STOCK MODAL -->
+<div id="addStockModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:6000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:16px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto">
+    <div style="padding:16px 20px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0D1412;z-index:1">
+      <div style="font-weight:700;font-size:16px">Add / Receive Stock</div>
+      <button onclick="closeAddStockModal()" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:22px;cursor:pointer">&#215;</button>
+    </div>
+    <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:12px">
+      <div style="grid-column:1/-1"><label class="ph-lbl">Drug Name *</label><input id="stk_name" class="ph-inp" placeholder="e.g. Paracetamol 500mg Tab"></div>
+      <div><label class="ph-lbl">Category</label><select id="stk_cat" class="ph-inp"><option>Tablet</option><option>Capsule</option><option>Syrup</option><option>Injection</option><option>Cream/Ointment</option><option>Surgical</option><option>Other</option></select></div>
+      <div><label class="ph-lbl">Manufacturer</label><input id="stk_mfr" class="ph-inp" placeholder="e.g. Cipla"></div>
+      <div><label class="ph-lbl">Batch Number *</label><input id="stk_batch" class="ph-inp" placeholder="e.g. B2024001"></div>
+      <div><label class="ph-lbl">Expiry Date *</label><input id="stk_expiry" type="date" class="ph-inp"></div>
+      <div><label class="ph-lbl">Quantity *</label><input id="stk_qty" type="number" class="ph-inp" placeholder="0" min="1"></div>
+      <div><label class="ph-lbl">Reorder Level</label><input id="stk_reorder" type="number" class="ph-inp" placeholder="10" min="0"></div>
+      <div><label class="ph-lbl">Purchase Price (&#8377;)</label><input id="stk_cost" type="number" class="ph-inp" placeholder="0.00" step="0.01"></div>
+      <div><label class="ph-lbl">MRP (&#8377;) *</label><input id="stk_mrp" type="number" class="ph-inp" placeholder="0.00" step="0.01"></div>
+      <div><label class="ph-lbl">GST %</label><select id="stk_gst" class="ph-inp"><option value="0">0%</option><option value="5">5%</option><option value="12">12%</option><option value="18">18%</option></select></div>
+      <div><label class="ph-lbl">HSN Code</label><input id="stk_hsn" class="ph-inp" value="3004" placeholder="3004"></div>
+      <div><label class="ph-lbl">Schedule</label><select id="stk_schedule" class="ph-inp"><option value="">OTC</option><option value="H">Schedule H</option><option value="H1">Schedule H1</option><option value="X">Schedule X</option></select></div>
+      <div style="grid-column:1/-1"><label class="ph-lbl">Supplier</label><input id="stk_supplier" class="ph-inp" placeholder="Supplier name"></div>
+    </div>
+    <div style="padding:14px 20px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end">
+      <button onclick="closeAddStockModal()" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Cancel</button>
+      <button onclick="pharmSaveStock()" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer">Save Stock</button>
+    </div>
+  </div>
+</div>
+
+
 
 <!-- EMR MODAL - Full Screen Visit Record -->
 <div id="emrModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:3000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px">
@@ -2898,6 +2831,346 @@ function tdConnectDoctor() {
 function esc(t) {
   return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
+
+
+// ═══════════════════════════════════════════════════════════════
+//  PHARMACY MODULE v2 — Full Inventory, POS, Prescriptions, Audit
+// ═══════════════════════════════════════════════════════════════
+var _pharmRxData=[], _pharmInvData=[], _posCart=[], _posPayMode='cash', _pharmRxFilter='pending', _pharmAuditLog=[];
+
+function pharmTab(tab) {
+  ['rx','inventory','billing','audit'].forEach(function(t){
+    var el=document.getElementById('ph-'+t); if(el) el.style.display=t===tab?'':'none';
+    var btn=document.getElementById('ptab-'+t); if(btn) btn.classList.toggle('ptab-on',t===tab);
+  });
+  if(tab==='rx'){_pharmRxFilter='pending';pharmRxFilter('pending');loadPharmacy();}
+  if(tab==='inventory') pharmLoadInventory();
+  if(tab==='billing'){posLoadRecent();pharmLoadInventory();}
+  if(tab==='audit') pharmLoadAudit();
+}
+
+function pharmRxFilter(f) {
+  _pharmRxFilter=f;
+  ['pending','dispensed','all'].forEach(function(x){var b=document.getElementById('prxf-'+x);if(b)b.classList.toggle('ptab-on',x===f);});
+  pharmRxRender();
+}
+
+function pharmRxSearch(val) {
+  var q=val.toLowerCase();
+  pharmRxRenderList(_pharmRxData.filter(function(v){
+    var n=((v.first_name||'')+(v.last_name?' '+v.last_name:'')).toLowerCase();
+    return !q||n.includes(q)||(v.diagnosis_primary||'').toLowerCase().includes(q);
+  }));
+}
+
+async function loadPharmacy() {
+  var el=document.getElementById('pharma-orders-list'); if(!el)return;
+  el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div>';
+  try {
+    var data=await apiCall('/hospitals/'+mwHospitalId+'/visits?has_prescription=true&limit=50');
+    _pharmRxData=(data.data||data.visits||[]);
+    pharmRxRender();
+  } catch(e) { el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">No prescription orders yet.</div>'; }
+}
+
+function pharmRxRender() {
+  var filtered=_pharmRxData.filter(function(v){
+    if(_pharmRxFilter==='pending') return !v.dispensed;
+    if(_pharmRxFilter==='dispensed') return !!v.dispensed;
+    return true;
+  });
+  pharmRxRenderList(filtered);
+}
+
+function pharmRxRenderList(list) {
+  var el=document.getElementById('pharma-orders-list'); if(!el)return;
+  if(!list.length){el.innerHTML='<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No prescriptions found.</div>';return;}
+  var rows=list.map(function(v){
+    var name=((v.first_name||'')+(v.last_name?' '+v.last_name:'')).trim()||'Patient';
+    var drugs=Array.isArray(v.prescription_json)?v.prescription_json.map(function(r){return r.drug;}).join(', '):(v.diagnosis_primary||'—');
+    var dt=v.visit_date?new Date(v.visit_date).toLocaleDateString('en-IN'):'—';
+    var badge=v.dispensed?'<span class="ok-badge">Dispensed</span>':'<span class="low-stock-badge">Pending</span>';
+    return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+      +'<td style="padding:10px 14px"><div style="font-weight:600">'+esc(name)+'</div><div style="font-size:11px;color:rgba(240,250,247,0.4)">'+esc(v.mrn||'')+'</div></td>'
+      +'<td style="padding:10px 14px;font-size:12.5px;color:rgba(240,250,247,0.6);max-width:200px">'+esc(drugs.substring(0,55))+'</td>'
+      +'<td style="padding:10px 14px;font-size:12px;color:rgba(240,250,247,0.5)">'+dt+'</td>'
+      +'<td style="padding:10px 14px">'+badge+'</td>'
+      +'<td style="padding:10px 14px"><div style="display:flex;gap:5px">'
+      +'<button class="action-btn pharma-view-btn" data-vid="'+v.id+'" style="font-size:11px;padding:5px 10px">View Rx</button>'
+      +'<button class="action-btn pharma-dispense-btn" data-vid="'+v.id+'" style="font-size:11px;padding:5px 10px;background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">Dispense</button>'
+      +'<button class="action-btn pharma-wa-btn" data-phone="'+(v.phone||'')+'" style="font-size:11px;padding:5px 10px;background:rgba(37,211,102,0.08);border-color:rgba(37,211,102,0.3);color:#25d366">WA</button>'
+      +'</div></td></tr>';
+  }).join('');
+  el.innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2);background:rgba(0,196,154,0.03)">'
+    +'<th style="padding:10px 14px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Patient</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Medicines</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Date</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Status</th>'
+    +'<th style="padding:10px 14px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Actions</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+  el.querySelectorAll('.pharma-dispense-btn').forEach(function(btn){btn.addEventListener('click',function(){pharmDispenseRx(this.dataset.vid);});});
+  el.querySelectorAll('.pharma-view-btn').forEach(function(btn){btn.addEventListener('click',function(){openVisitViewer(this.dataset.vid);});});
+  el.querySelectorAll('.pharma-wa-btn').forEach(function(btn){btn.addEventListener('click',function(){pharmWASendRx(this.dataset.phone);});});
+}
+
+async function pharmDispenseRx(visitId) {
+  try { await apiCall('/hospitals/'+mwHospitalId+'/visits/'+visitId+'/dispense','POST',{}); showToast('Marked as dispensed \u2713','success'); loadPharmacy(); }
+  catch(e) { showToast('Error dispensing','error'); }
+}
+
+function pharmWASendRx(phone) {
+  var ph=(phone||'').replace(/\D/g,'').replace(/^91/,'');
+  if(!ph){ph=prompt('Patient WhatsApp number (10 digits):');if(!ph)return;}
+  var msg='Your prescription from '+((hospitalSettings||{}).name||'MediWhats Clinic')+' is ready. _MediWhats_';
+  window.open('https://wa.me/91'+ph+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+async function pharmLoadInventory() {
+  var el=document.getElementById('pharma-inv-list'); if(el) el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div>';
+  try { var data=await apiCall('/hospitals/'+mwHospitalId+'/pharmacy/inventory'); _pharmInvData=data.data||[]; }
+  catch(e) { _pharmInvData=pharmDemoInventory(); }
+  pharmInvRender(_pharmInvData); pharmInvStats();
+}
+
+function pharmDemoInventory() {
+  var t=new Date(), s=new Date(t); s.setDate(s.getDate()+45); var x=new Date(t); x.setDate(x.getDate()-10);
+  return [
+    {id:1,name:'Paracetamol 500mg Tab',category:'Tablet',manufacturer:'Cipla',batch:'B2024001',expiry:s.toISOString().split('T')[0],qty:240,reorder:50,mrp:2.50,cost:1.20,gst:5,hsn:'3004',schedule:''},
+    {id:2,name:'Amoxicillin 500mg Cap',category:'Capsule',manufacturer:'Sun Pharma',batch:'A2024002',expiry:new Date(t.getFullYear()+1,t.getMonth(),1).toISOString().split('T')[0],qty:8,reorder:20,mrp:12.00,cost:6.00,gst:12,hsn:'3004',schedule:'H'},
+    {id:3,name:'Metformin 500mg Tab',category:'Tablet',manufacturer:'USV',batch:'M2024003',expiry:x.toISOString().split('T')[0],qty:120,reorder:30,mrp:3.50,cost:1.80,gst:5,hsn:'3004',schedule:'H'},
+    {id:4,name:'ORS Sachet',category:'Other',manufacturer:'WHO',batch:'O2024004',expiry:new Date(t.getFullYear()+2,0,1).toISOString().split('T')[0],qty:500,reorder:100,mrp:8.00,cost:4.00,gst:0,hsn:'3005',schedule:''},
+    {id:5,name:'Azithromycin 250mg Tab',category:'Tablet',manufacturer:'Cipla',batch:'AZ2024005',expiry:new Date(t.getFullYear()+1,5,1).toISOString().split('T')[0],qty:60,reorder:20,mrp:18.00,cost:9.00,gst:12,hsn:'3004',schedule:'H'},
+  ];
+}
+
+function pharmInvStats() {
+  var t=new Date(), d90=new Date(t); d90.setDate(d90.getDate()+90);
+  var lo=_pharmInvData.filter(function(i){return i.qty<=i.reorder;}).length;
+  var ex=_pharmInvData.filter(function(i){var e=new Date(i.expiry);return e<=d90&&e>=t;}).length;
+  var val=_pharmInvData.reduce(function(s,i){return s+(i.qty*(i.cost||0));},0);
+  var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+  set('inv-total',_pharmInvData.length); set('inv-low',lo); set('inv-expiry',ex);
+  set('inv-value','\u20b9'+val.toLocaleString('en-IN',{maximumFractionDigits:0}));
+}
+
+function pharmInvSearch(val) {
+  var q=val.toLowerCase();
+  pharmInvRender(_pharmInvData.filter(function(i){return !q||(i.name||'').toLowerCase().includes(q)||(i.batch||'').toLowerCase().includes(q);}));
+}
+
+function pharmInvFilter() {
+  var f=document.getElementById('inv-filter').value, t=new Date(), d90=new Date(t); d90.setDate(d90.getDate()+90);
+  pharmInvRender(_pharmInvData.filter(function(i){
+    if(f==='low') return i.qty<=i.reorder;
+    if(f==='expiry') return new Date(i.expiry)<=d90&&new Date(i.expiry)>=t;
+    if(f==='expired') return new Date(i.expiry)<t;
+    return true;
+  }));
+}
+
+function pharmInvRender(items) {
+  var el=document.getElementById('pharma-inv-list'); if(!el)return;
+  if(!items.length){el.innerHTML='<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No items.</div>';return;}
+  var t=new Date(), d90=new Date(t); d90.setDate(d90.getDate()+90);
+  var rows=items.map(function(i){
+    var exp=new Date(i.expiry), isExp=exp<t, isNear=!isExp&&exp<=d90, isLow=i.qty<=(i.reorder||0);
+    var badge=isExp?'<span class="low-stock-badge">EXPIRED</span>':isNear?'<span class="near-expiry-badge">Near Expiry</span>':isLow?'<span class="low-stock-badge">Low Stock</span>':'<span class="ok-badge">OK</span>';
+    return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+      +'<td style="padding:10px 12px"><div style="font-weight:600;font-size:13px">'+esc(i.name||'')+'</div>'
+      +'<div style="font-size:11px;color:rgba(240,250,247,0.4)">'+esc(i.category||'')+' \xb7 '+esc(i.manufacturer||'')+(i.schedule?' [Sch '+i.schedule+']':'')+'</div></td>'
+      +'<td style="padding:10px 12px;font-size:12px;font-family:monospace;color:rgba(240,250,247,0.55)">'+esc(i.batch||'')+'</td>'
+      +'<td style="padding:10px 12px;font-size:12px;color:'+(isExp?'#e63946':isNear?'#EF9F27':'rgba(240,250,247,0.55)')+'">'+exp.toLocaleDateString('en-IN')+'</td>'
+      +'<td style="padding:10px 12px;font-size:13px;font-weight:700;color:'+(isLow?'#e63946':'var(--white)')+'">'+i.qty+'</td>'
+      +'<td style="padding:10px 12px;font-size:12px">\u20b9'+parseFloat(i.mrp||0).toFixed(2)+'</td>'
+      +'<td style="padding:10px 12px">'+badge+'</td>'
+      +'<td style="padding:10px 12px"><div style="display:flex;gap:5px">'
+      +'<button class="action-btn inv-adj-btn" data-id="'+i.id+'" style="font-size:11px;padding:4px 10px;background:rgba(239,159,39,0.1);border-color:rgba(239,159,39,0.4);color:#EF9F27">Adjust</button>'
+      +'<button class="action-btn" onclick="posAddItemById('+i.id+')" style="font-size:11px;padding:4px 10px;background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">+Bill</button>'
+      +'</div></td></tr>';
+  }).join('');
+  el.innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2);background:rgba(0,196,154,0.03)">'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Drug</th>'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Batch</th>'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Expiry</th>'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Qty</th>'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">MRP</th>'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Status</th>'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Actions</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+  el.querySelectorAll('.inv-adj-btn').forEach(function(btn){btn.addEventListener('click',function(){pharmAdjustStock(this.dataset.id);});});
+}
+
+function pharmAdjustStock(id) {
+  var item=_pharmInvData.find(function(i){return String(i.id)===String(id);});
+  if(!item)return;
+  var qty=prompt('Adjust quantity for '+item.name+'\nCurrent: '+item.qty+'\nNew quantity:');
+  if(qty===null||qty==='')return;
+  var n=parseInt(qty); if(isNaN(n)||n<0){showToast('Invalid quantity','error');return;}
+  item.qty=n; pharmInvRender(_pharmInvData); pharmInvStats();
+  pharmLogAudit('stock_adj',item.name+' adjusted to '+n,item.batch);
+  showToast('Stock adjusted \u2713','success');
+}
+
+function pharmGeneratePO() {
+  var low=_pharmInvData.filter(function(i){return i.qty<=(i.reorder||0);});
+  if(!low.length){showToast('No items below reorder level','success');return;}
+  var lines=low.map(function(i){var need=Math.max((i.reorder||0)*3-i.qty,10);return i.name+' \u2014 Order: '+need+' units @ \u20b9'+i.cost;});
+  if(navigator.clipboard) navigator.clipboard.writeText(lines.join('\n'));
+  alert('Purchase Order ('+low.length+' items):\n\n'+lines.join('\n')+'\n\nCopied to clipboard!');
+}
+
+function posSearch(val) {
+  var sug=document.getElementById('pos-suggestions'); if(!sug)return;
+  if(!val||val.length<2){sug.style.display='none';return;}
+  var q=val.toLowerCase();
+  var m=_pharmInvData.filter(function(i){return (i.name||'').toLowerCase().includes(q)&&i.qty>0;}).slice(0,8);
+  if(!m.length){sug.style.display='none';return;}
+  sug.innerHTML=m.map(function(i){return '<div class="pos-sug-item" data-id="'+i.id+'" style="padding:10px 14px;cursor:pointer;border-bottom:0.5px solid rgba(0,196,154,0.08);font-size:13px;display:flex;justify-content:space-between"><span style="font-weight:600">'+esc(i.name)+'</span><span style="color:rgba(240,250,247,0.45);font-size:11px">Qty:'+i.qty+' MRP:\u20b9'+i.mrp+'</span></div>';}).join('');
+  sug.style.display='block';
+  sug.querySelectorAll('.pos-sug-item').forEach(function(el){
+    el.addEventListener('click',function(){posAddItemById(this.dataset.id);document.getElementById('pos-search').value='';sug.style.display='none';});
+    el.addEventListener('mouseover',function(){this.style.background='rgba(0,196,154,0.08)';});
+    el.addEventListener('mouseout',function(){this.style.background='';});
+  });
+}
+
+function posAddItemById(id) {
+  var item=_pharmInvData.find(function(i){return String(i.id)===String(id);});
+  if(!item)return;
+  var ex=_posCart.find(function(c){return c.id===item.id;});
+  if(ex){if(ex.qty>=item.qty){showToast('Insufficient stock','error');return;}ex.qty++;}
+  else _posCart.push({id:item.id,name:item.name,qty:1,mrp:item.mrp,gst:item.gst||0,batch:item.batch,max:item.qty});
+  posRenderCart();
+}
+
+function posRenderCart() {
+  var el=document.getElementById('pos-cart-list'); if(!el)return;
+  if(!_posCart.length){el.innerHTML='<div style="text-align:center;color:rgba(240,250,247,0.3);padding:32px;font-size:13px">Search and add medicines</div>';posRecalc();return;}
+  el.innerHTML=_posCart.map(function(item,idx){
+    return '<div style="display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+      +'<div style="flex:1"><div style="font-weight:600;font-size:13px">'+esc(item.name)+'</div><div style="font-size:11px;color:rgba(240,250,247,0.4)">MRP:\u20b9'+item.mrp+' GST:'+item.gst+'%</div></div>'
+      +'<div style="display:flex;align-items:center;gap:5px">'
+      +'<button onclick="posQtyChange('+idx+',-1)" style="width:24px;height:24px;border-radius:5px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:var(--white);cursor:pointer">\u2212</button>'
+      +'<span style="width:28px;text-align:center;font-weight:700;font-size:13px">'+item.qty+'</span>'
+      +'<button onclick="posQtyChange('+idx+',1)" style="width:24px;height:24px;border-radius:5px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:var(--white);cursor:pointer">+</button>'
+      +'</div>'
+      +'<div style="width:65px;text-align:right;font-weight:700;font-size:13px">\u20b9'+(item.qty*item.mrp).toFixed(2)+'</div>'
+      +'<button onclick="posRemove('+idx+')" style="background:rgba(230,57,70,0.1);border:none;color:#e63946;padding:3px 7px;border-radius:5px;cursor:pointer">\u00d7</button>'
+      +'</div>';
+  }).join('');
+  posRecalc();
+}
+
+function posQtyChange(idx,d){if(!_posCart[idx])return;var n=_posCart[idx].qty+d;if(n<1){posRemove(idx);return;}if(n>_posCart[idx].max){showToast('Insufficient stock','error');return;}_posCart[idx].qty=n;posRenderCart();}
+function posRemove(idx){_posCart.splice(idx,1);posRenderCart();}
+
+function posRecalc() {
+  var sub=_posCart.reduce(function(s,i){return s+i.qty*i.mrp;},0);
+  var gst=_posCart.reduce(function(s,i){return s+i.qty*i.mrp*(i.gst/100);},0);
+  var discRaw=parseFloat((document.getElementById('pos-disc')||{}).value||0)||0;
+  var discType=(document.getElementById('pos-disc-type')||{}).value||'pct';
+  var disc=discType==='pct'?sub*(discRaw/100):Math.min(discRaw,sub);
+  var total=Math.max(0,sub-disc+gst);
+  var set=function(id,v){var e=document.getElementById(id);if(e)e.textContent=v;};
+  set('pos-subtotal','\u20b9'+sub.toFixed(2)); set('pos-gst','\u20b9'+gst.toFixed(2)); set('pos-total','\u20b9'+total.toFixed(2));
+}
+
+function posSetPay(mode,btn){_posPayMode=mode;document.querySelectorAll('.pos-pay-btn').forEach(function(b){b.classList.remove('pos-pay-on');});if(btn)btn.classList.add('pos-pay-on');}
+
+function posBillSave() {
+  if(!_posCart.length){showToast('Add medicines first','error');return;}
+  var sub=_posCart.reduce(function(s,i){return s+i.qty*i.mrp;},0);
+  var gst=_posCart.reduce(function(s,i){return s+i.qty*i.mrp*(i.gst/100);},0);
+  var discRaw=parseFloat((document.getElementById('pos-disc')||{}).value||0)||0;
+  var discType=(document.getElementById('pos-disc-type')||{}).value||'pct';
+  var disc=discType==='pct'?sub*(discRaw/100):Math.min(discRaw,sub);
+  var total=Math.max(0,sub-disc+gst);
+  _posCart.forEach(function(item){var inv=_pharmInvData.find(function(i){return i.id===item.id;});if(inv)inv.qty=Math.max(0,inv.qty-item.qty);});
+  pharmLogAudit('dispensed',_posCart.map(function(i){return i.qty+'x '+i.name;}).join(', '),'');
+  pharmInvStats();
+  showToast('Bill saved \u2014 \u20b9'+total.toFixed(2)+' ('+_posPayMode.toUpperCase()+') \u2713','success');
+  posClear();
+}
+
+function posWAReceipt() {
+  if(!_posCart.length){showToast('Add items first','error');return;}
+  var lines=_posCart.map(function(i){return i.qty+'x '+i.name+' \u2014 \u20b9'+(i.qty*i.mrp).toFixed(2);});
+  var total=(document.getElementById('pos-total')||{}).textContent||'—';
+  var msg='*'+((hospitalSettings||{}).name||'MediWhats Clinic')+' \u2014 Receipt*\nDate: '+new Date().toLocaleDateString('en-IN')+'\n\n'+lines.join('\n')+'\n\n*Total: '+total+'* ('+_posPayMode.toUpperCase()+')\n_MediWhats_';
+  var ph=prompt('Patient WhatsApp number (10 digits):');
+  if(!ph)return;
+  window.open('https://wa.me/91'+ph.replace(/\D/g,'')+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+function posClear() {
+  _posCart=[]; _posPayMode='cash';
+  document.querySelectorAll('.pos-pay-btn').forEach(function(b){b.classList.remove('pos-pay-on');});
+  var e=document.getElementById('pp-cash');if(e)e.classList.add('pos-pay-on');
+  var d=document.getElementById('pos-disc');if(d)d.value=0;
+  posRenderCart();
+}
+
+function posLoadRecent(){var el=document.getElementById('pos-recent-bills');if(el)el.innerHTML='<div style="padding:14px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">Bills generated this session appear here.</div>';}
+
+function pharmLogAudit(type,desc,batch){_pharmAuditLog.unshift({type:type,desc:desc,batch:batch,ts:Date.now(),user:((mwUser||{}).first_name||'Doctor')});}
+
+function pharmLoadAudit() {
+  var el=document.getElementById('pharma-audit-list');if(!el)return;
+  var type=(document.getElementById('audit-type')||{}).value||'all';
+  var filtered=type==='all'?_pharmAuditLog:_pharmAuditLog.filter(function(e){return e.type===type;});
+  if(!filtered.length){el.innerHTML='<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No audit entries yet.</div>';return;}
+  var clrs={dispensed:'var(--teal)',stock_in:'#68D391',stock_adj:'#EF9F27',return:'#9F7AEA',expired:'#e63946'};
+  var rows=filtered.map(function(e){
+    return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+      +'<td style="padding:10px 12px;font-size:12px;color:rgba(240,250,247,0.5)">'+new Date(e.ts).toLocaleString('en-IN')+'</td>'
+      +'<td style="padding:10px 12px"><span style="font-size:11px;font-weight:700;color:'+(clrs[e.type]||'rgba(240,250,247,0.5)')+'">'+e.type.toUpperCase().replace('_',' ')+'</span></td>'
+      +'<td style="padding:10px 12px;font-size:13px">'+esc(e.desc||'')+'</td>'
+      +'<td style="padding:10px 12px;font-size:12px;font-family:monospace;color:rgba(240,250,247,0.4)">'+esc(e.batch||'—')+'</td>'
+      +'<td style="padding:10px 12px;font-size:12px;color:rgba(240,250,247,0.4)">'+esc(e.user||'')+'</td>'
+      +'</tr>';
+  }).join('');
+  el.innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2);background:rgba(0,196,154,0.03)">'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Time</th>'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Event</th>'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Description</th>'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">Batch</th>'
+    +'<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase">User</th>'
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function pharmExportAudit() {
+  if(!_pharmAuditLog.length){showToast('No audit data to export','error');return;}
+  var csv='Time,Event,Description,Batch,User\n'+_pharmAuditLog.map(function(e){return[new Date(e.ts).toLocaleString('en-IN'),e.type,'"'+e.desc+'"',e.batch||'',e.user||''].join(',');}).join('\n');
+  var a=document.createElement('a');a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);a.download='pharmacy-audit-'+new Date().toISOString().split('T')[0]+'.csv';a.click();
+  showToast('Exported \u2713','success');
+}
+
+function openAddStockModal(){var m=document.getElementById('addStockModal');if(m)m.style.display='flex';var exp=document.getElementById('stk_expiry');if(exp&&!exp.value){var d=new Date();d.setFullYear(d.getFullYear()+1);exp.value=d.toISOString().split('T')[0];}}
+function closeAddStockModal(){var m=document.getElementById('addStockModal');if(m)m.style.display='none';}
+
+function pharmSaveStock() {
+  var name=(document.getElementById('stk_name')||{}).value||'';
+  var batch=(document.getElementById('stk_batch')||{}).value||'';
+  var qty=parseInt((document.getElementById('stk_qty')||{}).value||0);
+  var mrp=parseFloat((document.getElementById('stk_mrp')||{}).value||0);
+  var expiry=(document.getElementById('stk_expiry')||{}).value||'';
+  if(!name.trim()){showToast('Drug name required','error');return;}
+  if(!batch.trim()){showToast('Batch number required','error');return;}
+  if(!qty||qty<1){showToast('Quantity must be at least 1','error');return;}
+  if(!mrp||mrp<=0){showToast('MRP required','error');return;}
+  if(!expiry){showToast('Expiry date required','error');return;}
+  var item={id:Date.now(),name:name.trim(),category:(document.getElementById('stk_cat')||{}).value||'',manufacturer:(document.getElementById('stk_mfr')||{}).value||'',batch:batch.trim(),expiry:expiry,qty:qty,reorder:parseInt((document.getElementById('stk_reorder')||{}).value||10),cost:parseFloat((document.getElementById('stk_cost')||{}).value||0),mrp:mrp,gst:parseInt((document.getElementById('stk_gst')||{}).value||0),hsn:(document.getElementById('stk_hsn')||{}).value||'3004',schedule:(document.getElementById('stk_schedule')||{}).value||'',supplier:(document.getElementById('stk_supplier')||{}).value||''};
+  _pharmInvData.unshift(item);
+  pharmInvRender(_pharmInvData); pharmInvStats();
+  pharmLogAudit('stock_in',qty+'x '+name+' (Batch: '+batch+')',batch);
+  apiCall('/hospitals/'+mwHospitalId+'/pharmacy/inventory','POST',item).catch(function(){});
+  closeAddStockModal();
+  showToast('Stock added: '+name+' \u2713','success');
+  ['stk_name','stk_batch','stk_qty','stk_mrp','stk_cost','stk_mfr','stk_reorder','stk_supplier'].forEach(function(id){var e=document.getElementById(id);if(e)e.value='';});
+}
+
+function showPharmaTab(tab){pharmTab(tab==='pending'||tab==='dispensed'?'rx':tab);}
+
 
 function applyRoleAccess(role) {
   document.querySelectorAll('.nav-item').forEach(function(item) {
