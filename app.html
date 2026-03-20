@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773977621 -->
+<!-- MediWhats v23 BUILD:1773982355 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -199,33 +199,97 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <body>
 
 <!-- LOGIN -->
-<div class="login-wrap" id="loginWrap">
+<div class="login-w<div id="loginWrap">
   <div class="login-glow"></div>
-  <div class="login-card">
-    <div class="login-logo">
-      <div class="login-logo-icon">MW</div>
-      <div class="login-logo-name">Medi<span>Whats</span></div>
-    </div>
+
+  <!-- LOGIN PANEL -->
+  <div class="login-card" id="authLogin">
+    <div class="login-logo"><div class="login-logo-icon">MW</div><div class="login-logo-name">Medi<span>Whats</span></div></div>
     <div class="login-title">Welcome back</div>
     <div class="login-sub">Sign in to your hospital dashboard</div>
     <div style="margin-bottom:20px">
       <div style="font-size:12px;font-weight:700;color:var(--gray);letter-spacing:0.5px;text-transform:uppercase;margin-bottom:8px">Login as</div>
       <div class="role-select">
-        <button class="role-btn active" onclick="selectRole(this,'Doctor')">👨‍⚕️ Doctor</button>
-        <button class="role-btn" onclick="selectRole(this,'Receptionist')">🖥️ Receptionist</button>
-        <button class="role-btn" onclick="selectRole(this,'Billing')">🧾 Billing</button>
-        <button class="role-btn" onclick="selectRole(this,'Admin')">⚙️ Admin</button>
+        <button class="role-btn active" onclick="selectRole(this,'Doctor')">&#128104;&#8205;&#9877;&#65039; Doctor</button>
+        <button class="role-btn" onclick="selectRole(this,'Receptionist')">&#128421;&#65039; Reception</button>
+        <button class="role-btn" onclick="selectRole(this,'Billing')">&#129534; Billing</button>
+        <button class="role-btn" onclick="selectRole(this,'Admin')">&#9881;&#65039; Admin</button>
       </div>
     </div>
     <div class="form-group">
       <label class="form-label">Email</label>
-      <input class="form-input" type="email" placeholder="sai@mediwhats.in" id="loginEmail" value="sai@smartgumastha.com">
+      <input class="form-input" type="email" id="loginEmail" placeholder="you@mediwhats.in" autocomplete="email">
     </div>
     <div class="form-group">
-      <label class="form-label">Password</label>
-      <input class="form-input" type="password" placeholder="••••••••" id="loginPassword" value="Admin@1234">
+      <label class="form-label" style="display:flex;justify-content:space-between">
+        Password
+        <span onclick="showAuth('forgot')" style="color:var(--teal);cursor:pointer;font-weight:600;font-size:11px">Forgot password?</span>
+      </label>
+      <input class="form-input" type="password" id="loginPassword" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
-    <button class="login-btn" onclick="doLogin()">Sign in to MediWhats</button>
+    <div id="loginError" style="display:none;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);border-radius:8px;padding:10px 12px;font-size:13px;color:#fca5a5;margin-bottom:14px"></div>
+    <button class="login-btn" id="loginBtn" onclick="doLogin()">Sign in to MediWhats</button>
+    <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--gray)">
+      New to MediWhats?
+      <span onclick="showAuth('signup')" style="color:var(--teal);cursor:pointer;font-weight:700;margin-left:4px">Start free trial &#8594;</span>
+    </div>
+    <div style="text-align:center;margin-top:10px;font-size:11px;color:rgba(240,250,247,0.3)">
+      Questions? <a href="https://wa.me/917993135689?text=Hi, I want to know about MediWhats" target="_blank" style="color:var(--teal);text-decoration:none">WhatsApp us</a> &#183; <a href="mailto:info@mediwhats.in" style="color:var(--teal);text-decoration:none">info@mediwhats.in</a>
+    </div>
+  </div>
+
+  <!-- SIGNUP PANEL -->
+  <div class="login-card" id="authSignup" style="display:none">
+    <div class="login-logo"><div class="login-logo-icon">MW</div><div class="login-logo-name">Medi<span>Whats</span></div></div>
+    <div class="login-title">Start free trial</div>
+    <div class="login-sub">30 days free &#183; No credit card &#183; Live in 5 minutes</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
+      <div class="form-group" style="margin:0"><label class="form-label">First name</label><input class="form-input" type="text" id="signupFirst" placeholder="Dr. Sai"></div>
+      <div class="form-group" style="margin:0"><label class="form-label">Last name</label><input class="form-input" type="text" id="signupLast" placeholder="Charan"></div>
+    </div>
+    <div class="form-group"><label class="form-label">Clinic / Hospital name</label><input class="form-input" type="text" id="signupClinic" placeholder="City Clinic, Hyderabad"></div>
+    <div class="form-group"><label class="form-label">Work email</label><input class="form-input" type="email" id="signupEmail" placeholder="you@clinic.in"></div>
+    <div class="form-group"><label class="form-label">WhatsApp number</label><input class="form-input" type="tel" id="signupPhone" placeholder="+91 99999 99999"></div>
+    <div class="form-group">
+      <label class="form-label">Plan</label>
+      <select id="signupPlan" class="form-select" style="width:100%">
+        <option value="clinic">MediWhats Clinic &#8212; &#8377;999/month</option>
+        <option value="hospital">MediWhats Hospital &#8212; &#8377;2,499/month</option>
+        <option value="lis">MediWhats LIS &#8212; &#8377;1,499/month</option>
+      </select>
+    </div>
+    <div class="form-group"><label class="form-label">Password (min 8 chars)</label><input class="form-input" type="password" id="signupPassword" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"></div>
+    <div id="signupError" style="display:none;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);border-radius:8px;padding:10px 12px;font-size:13px;color:#fca5a5;margin-bottom:14px"></div>
+    <div id="signupSuccess" style="display:none;background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.4);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--teal);margin-bottom:14px;line-height:1.6"></div>
+    <button class="login-btn" id="signupBtn" onclick="doSignup()">Create free account &#8594;</button>
+    <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--gray)">Already have an account? <span onclick="showAuth('login')" style="color:var(--teal);cursor:pointer;font-weight:700;margin-left:4px">Sign in</span></div>
+    <div style="text-align:center;margin-top:8px;font-size:11px;color:rgba(240,250,247,0.3)"><a href="mailto:info@mediwhats.in" style="color:var(--teal);text-decoration:none">info@mediwhats.in</a> &#183; +91-7993135689</div>
+  </div>
+
+  <!-- FORGOT PASSWORD PANEL -->
+  <div class="login-card" id="authForgot" style="display:none">
+    <div class="login-logo"><div class="login-logo-icon">MW</div><div class="login-logo-name">Medi<span>Whats</span></div></div>
+    <div class="login-title">Reset password</div>
+    <div class="login-sub">Enter your registered email and we'll send a reset link</div>
+    <div class="form-group"><label class="form-label">Registered email</label><input class="form-input" type="email" id="forgotEmail" placeholder="you@mediwhats.in" onkeydown="if(event.key==='Enter')doForgotPassword()"></div>
+    <div id="forgotError" style="display:none;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);border-radius:8px;padding:10px 12px;font-size:13px;color:#fca5a5;margin-bottom:14px"></div>
+    <div id="forgotSuccess" style="display:none;background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.4);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--teal);margin-bottom:14px;line-height:1.6"></div>
+    <button class="login-btn" id="forgotBtn" onclick="doForgotPassword()">Send reset link</button>
+    <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--gray)">Remembered it? <span onclick="showAuth('login')" style="color:var(--teal);cursor:pointer;font-weight:700;margin-left:4px">Back to login</span></div>
+    <div style="text-align:center;margin-top:10px;font-size:12px;color:rgba(240,250,247,0.3)">Need help? <a href="https://wa.me/917993135689?text=Hi, I need help resetting my MediWhats password" target="_blank" style="color:var(--teal);text-decoration:none">WhatsApp +91-7993135689</a></div>
+  </div>
+
+  <!-- RESET PASSWORD PANEL -->
+  <div class="login-card" id="authReset" style="display:none">
+    <div class="login-logo"><div class="login-logo-icon">MW</div><div class="login-logo-name">Medi<span>Whats</span></div></div>
+    <div class="login-title">Set new password</div>
+    <div class="login-sub">Enter your new password below</div>
+    <div class="form-group"><label class="form-label">New password</label><input class="form-input" type="password" id="resetPassword" placeholder="Min 8 characters"></div>
+    <div class="form-group"><label class="form-label">Confirm new password</label><input class="form-input" type="password" id="resetPasswordConfirm" placeholder="Repeat password"></div>
+    <div id="resetError" style="display:none;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);border-radius:8px;padding:10px 12px;font-size:13px;color:#fca5a5;margin-bottom:14px"></div>
+    <div id="resetSuccess" style="display:none;background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.4);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--teal);margin-bottom:14px"></div>
+    <button class="login-btn" id="resetBtn" onclick="doResetPassword()">Update password</button>
+    <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--gray)"><span onclick="showAuth('login')" style="color:var(--teal);cursor:pointer;font-weight:700">&#8592; Back to login</span></div>
   </div>
 </div>
 
@@ -1551,6 +1615,245 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 <div class="toast" id="toast"></div>
 
 <script>
+// ===== AUTH ROUTING & FUNCTIONS =====
+function initAuthRouting() {
+  var full = (window.location.pathname + window.location.hash + window.location.search).toLowerCase();
+  var params = new URLSearchParams(window.location.search);
+  var token = params.get('token') || params.get('reset_token');
+  if (token) { window.resetToken = token; showAuth('reset'); }
+  else if (full.includes('signup') || params.get('mode') === 'signup') showAuth('signup');
+  else if (full.includes('reset') || full.includes('reset-password')) showAuth('reset');
+  else if (full.includes('forgot')) showAuth('forgot');
+  else showAuth('login');
+}
+
+function showAuth(panel) {
+  ['Login','Signup','Forgot','Reset'].forEach(function(p){
+    var el=document.getElementById('auth'+p); if(el) el.style.display='none';
+  });
+  var target=document.getElementById('auth'+panel.charAt(0).toUpperCase()+panel.slice(1));
+  if(target) target.style.display='block';
+  var paths={login:'/app',signup:'/app',forgot:'/app',reset:'/app'};
+  try{ history.pushState(null,'',paths[panel]||'/login'); }catch(e){}
+}
+
+
+
+
+
+
+
+
+// ===== AUTH SYSTEM =====
+
+// URL-based routing for /login /signup /reset-password
+function initAuthRouting() {
+  var path = window.location.pathname.toLowerCase();
+  var hash = window.location.hash.toLowerCase();
+  var search = window.location.search.toLowerCase();
+
+  if (path.includes('/signup') || hash.includes('signup')) {
+    showAuth('signup');
+  } else if (path.includes('/reset') || hash.includes('reset') || search.includes('reset_token')) {
+    showAuth('reset');
+  } else if (path.includes('/forgot') || hash.includes('forgot')) {
+    showAuth('forgot');
+  } else {
+    showAuth('login');
+  }
+
+  // Check for reset token in URL
+  var params = new URLSearchParams(window.location.search);
+  var token = params.get('reset_token') || params.get('token');
+  if (token) {
+    window.resetToken = token;
+    showAuth('reset');
+  }
+}
+
+function showAuth(panel) {
+  ['authLogin','authSignup','authForgot','authReset'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  var target = document.getElementById('auth' + panel.charAt(0).toUpperCase() + panel.slice(1));
+  if (target) target.style.display = 'block';
+
+  // Update URL without reload
+  var paths = { login:'/login', signup:'/signup', forgot:'/forgot-password', reset:'/reset-password' };
+  if (history.pushState) {
+    try { history.pushState(null, '', paths[panel] || '/login'); } catch(e){}
+  }
+}
+
+function togglePwd(inputId, btn) {
+  var input = document.getElementById(inputId);
+  if (!input) return;
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+  }
+}
+
+// ── SIGNUP ────────────────────────────────────────────────────────
+async function doSignup() {
+  var first   = document.getElementById('signupFirst')?.value?.trim();
+  var last    = document.getElementById('signupLast')?.value?.trim();
+  var clinic  = document.getElementById('signupClinic')?.value?.trim();
+  var email   = document.getElementById('signupEmail')?.value?.trim();
+  var phone   = document.getElementById('signupPhone')?.value?.trim();
+  var plan    = document.getElementById('signupPlan')?.value;
+  var pwd     = document.getElementById('signupPassword')?.value;
+  var errEl   = document.getElementById('signupError');
+  var sucEl   = document.getElementById('signupSuccess');
+  var btn     = document.getElementById('signupBtn');
+
+  if (errEl) { errEl.style.display='none'; errEl.textContent=''; }
+  if (sucEl) { sucEl.style.display='none'; }
+
+  // Validation
+  if (!first) { showSignupError('Please enter your first name'); return; }
+  if (!clinic) { showSignupError('Please enter your clinic/hospital name'); return; }
+  if (!email || !email.includes('@')) { showSignupError('Please enter a valid email address'); return; }
+  if (!phone) { showSignupError('Please enter your WhatsApp number'); return; }
+  if (!pwd || pwd.length < 8) { showSignupError('Password must be at least 8 characters'); return; }
+
+  if (btn) { btn.textContent = 'Creating account...'; btn.disabled = true; }
+
+  try {
+    var res = await fetch('https://smartgumastha-backend-production.up.railway.app/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        first_name:    first,
+        last_name:     last || '',
+        hospital_name: clinic,
+        email:         email,
+        phone:         phone,
+        plan:          plan,
+        password:      pwd,
+        role:          'HOSPITAL_ADMIN'
+      })
+    });
+    var data = await res.json();
+    if (data.success) {
+      if (sucEl) {
+        sucEl.style.display = 'block';
+        sucEl.textContent = 'Account created! Check email ' + email + ' for login details.';
+      }
+      if (btn) { btn.textContent = '✓ Account created'; btn.style.background='rgba(0,196,154,0.3)'; }
+
+      // Auto-fill login and switch after 3 sec
+      setTimeout(function(){
+        var le = document.getElementById('loginEmail'); if(le) le.value = email;
+        showAuth('login');
+        if(btn){ btn.textContent='Create free account →'; btn.disabled=false; btn.style.background=''; }
+      }, 4000);
+    } else {
+      showSignupError(data.message || 'Signup failed. Please try again or WhatsApp us at +91-7993135689');
+      if (btn) { btn.textContent = 'Create free account →'; btn.disabled = false; }
+    }
+  } catch(e) {
+    // If API doesn't have signup endpoint yet, show contact message
+    if (sucEl) {
+      sucEl.style.display = 'block';
+        sucEl.textContent = 'Request received! We will contact you on ' + phone + ' within 2 hours. WhatsApp +91-7993135689 now.';
+    }
+    if (btn) { btn.textContent = 'Create free account →'; btn.disabled = false; }
+  }
+}
+
+function showSignupError(msg) {
+  var el = document.getElementById('signupError');
+  if (el) { el.textContent = msg; el.style.display = 'block'; }
+}
+
+// ── FORGOT PASSWORD ───────────────────────────────────────────────
+async function doForgotPassword() {
+  var email = document.getElementById('forgotEmail')?.value?.trim();
+  var errEl = document.getElementById('forgotError');
+  var sucEl = document.getElementById('forgotSuccess');
+  var btn   = document.getElementById('forgotBtn');
+
+  if (errEl) { errEl.style.display='none'; }
+  if (sucEl) { sucEl.style.display='none'; }
+
+  if (!email || !email.includes('@')) {
+    if (errEl) { errEl.textContent = 'Please enter your registered email address'; errEl.style.display='block'; }
+    return;
+  }
+
+  if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
+
+  try {
+    var res = await fetch('https://smartgumastha-backend-production.up.railway.app/api/auth/forgot-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: email })
+    });
+    var data = await res.json();
+    if (sucEl) {
+      sucEl.style.display = 'block';
+        sucEl.textContent = 'Reset link sent to ' + email + '. Check inbox and spam. Help: WhatsApp +91-7993135689.';
+    }
+    if (btn) { btn.textContent = 'Send reset link'; btn.disabled = false; }
+  } catch(e) {
+    // Show WhatsApp fallback
+    if (sucEl) {
+      sucEl.style.display = 'block';
+        sucEl.textContent = 'Please WhatsApp +91-7993135689 for help.';
+    }
+    if (btn) { btn.textContent = 'Send reset link'; btn.disabled = false; }
+  }
+}
+
+// ── RESET PASSWORD ────────────────────────────────────────────────
+async function doResetPassword() {
+  var pwd     = document.getElementById('resetPassword')?.value;
+  var confirm = document.getElementById('resetPasswordConfirm')?.value;
+  var errEl   = document.getElementById('resetError');
+  var sucEl   = document.getElementById('resetSuccess');
+  var btn     = document.getElementById('resetBtn');
+  var token   = window.resetToken || new URLSearchParams(window.location.search).get('token');
+
+  if (errEl) { errEl.style.display='none'; }
+  if (sucEl) { sucEl.style.display='none'; }
+
+  if (!pwd || pwd.length < 8) {
+    if (errEl) { errEl.textContent='Password must be at least 8 characters'; errEl.style.display='block'; }
+    return;
+  }
+  if (pwd !== confirm) {
+    if (errEl) { errEl.textContent='Passwords do not match'; errEl.style.display='block'; }
+    return;
+  }
+
+  if (btn) { btn.textContent = 'Updating...'; btn.disabled = true; }
+
+  try {
+    var res = await fetch('https://smartgumastha-backend-production.up.railway.app/api/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: token, password: pwd })
+    });
+    var data = await res.json();
+    if (data.success) {
+      if (sucEl) { sucEl.textContent = '✓ Password updated! Redirecting to login...'; sucEl.style.display='block'; }
+      setTimeout(function(){ showAuth('login'); }, 2000);
+    } else {
+      if (errEl) { errEl.textContent = data.message || 'Reset failed. Please request a new link.'; errEl.style.display='block'; }
+    }
+  } catch(e) {
+    if (errEl) { errEl.textContent = 'Error. Please WhatsApp +91-7993135689 for help.'; errEl.style.display='block'; }
+  }
+  if (btn) { btn.textContent = 'Update password'; btn.disabled = false; }
+}
+
+// ── UPDATED doLogin — proper error display ────────────────────────
+
 let currentRole = 'Doctor';
 let isDark = true;
 
@@ -1561,8 +1864,12 @@ function selectRole(btn, role) {
 }
 
 async function doLogin() {
-  var email = document.querySelector('#loginWrap input[type="email"]').value;
-  var password = document.querySelector('#loginWrap input[type="password"]').value;
+  var errEl0 = document.getElementById('loginError');
+  if (errEl0) { errEl0.style.display='none'; errEl0.textContent=''; }
+  var btn0 = document.getElementById('loginBtn');
+  if (btn0) { btn0.textContent = 'Signing in...'; btn0.disabled = true; }
+  var email = document.getElementById('loginEmail').value;
+  var password = document.getElementById('loginPassword').value;
   if (!email || !password) { alert('Please enter email and password'); return; }
   try {
     var res = await fetch('https://smartgumastha-backend-production.up.railway.app/api/auth/login', {
@@ -1589,6 +1896,9 @@ async function doLogin() {
       // Ensure ALL nav items are visible
       document.querySelectorAll('.nav-item').forEach(function(el){ el.style.display=''; el.style.visibility='visible'; el.style.opacity='1'; });
       document.querySelectorAll('.nav-section').forEach(function(el){ el.style.display=''; el.style.visibility='visible'; });
+      var btn4 = document.getElementById('loginBtn');
+      if (btn4) { btn4.textContent = 'Sign in to MediWhats'; btn4.disabled = false; }
+      var b3=document.getElementById('loginBtn'); if(b3){b3.textContent='Sign in to MediWhats';b3.disabled=false;}
       document.getElementById('sidebarUserName').textContent = data.data.first_name + ' ' + (data.data.last_name || '');
       document.getElementById('sidebarUserRole').textContent = role;
       // Light theme for non-clinical roles
@@ -1600,10 +1910,16 @@ async function doLogin() {
       // Hide nav items based on role
       applyRoleAccess(role);
     } else {
-      alert(data.message || 'Invalid credentials');
+      var errEl = document.getElementById('loginError');
+    if (errEl) { errEl.textContent = data.message || 'Invalid email or password. Please try again.'; errEl.style.display='block'; }
+    var btn2 = document.getElementById('loginBtn');
+    if (btn2) { btn2.textContent = 'Sign in to MediWhats'; btn2.disabled = false; }
     }
   } catch(e) {
-    alert('Connection error. Check internet.');
+    var errEl2 = document.getElementById('loginError');
+    if (errEl2) { errEl2.textContent = 'Connection error. Check your internet and try again.'; errEl2.style.display='block'; }
+    var btn3 = document.getElementById('loginBtn');
+    if (btn3) { btn3.textContent = 'Sign in to MediWhats'; btn3.disabled = false; }
   }
 }
 
@@ -1678,7 +1994,11 @@ if (mwUser && mwUser.role) {
     document.querySelectorAll('.nav-item').forEach(function(el){ el.style.display=''; });
     document.querySelectorAll('.nav-section').forEach(function(el){ el.style.display=''; });
     startQueueAutoRefresh();
+  initAuthRouting();
   });
+
+  // Init auth routing on page load
+  initAuthRouting();
 }
 
 async function apiCall(path, method='GET', body=null) {
