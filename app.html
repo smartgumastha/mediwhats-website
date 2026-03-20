@@ -227,14 +227,14 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     </div>
     <div class="form-group">
       <label class="form-label">Email</label>
-      <input class="form-input" type="email" id="loginEmail" placeholder="you@mediwhats.in" autocomplete="email">
+      <input class="form-input" type="email" id="loginEmail" placeholder="you@mediwhats.in" autocomplete="off">
     </div>
     <div class="form-group">
       <label class="form-label" style="display:flex;justify-content:space-between">
         Password
         <span onclick="showAuth('forgot')" style="color:var(--teal);cursor:pointer;font-weight:600;font-size:11px">Forgot password?</span>
       </label>
-      <input class="form-input" type="password" id="loginPassword" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;" autocomplete="current-password" onkeydown="if(event.key==='Enter')doLogin()">
+      <input class="form-input" type="password" id="loginPassword" placeholder="••••••••" autocomplete="new-password" onkeydown="if(event.key==='Enter')doLogin()">
     </div>
     <div id="loginError" style="display:none;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);border-radius:8px;padding:10px 12px;font-size:13px;color:#fca5a5;margin-bottom:14px"></div>
     <div id="loginRetryBar">
