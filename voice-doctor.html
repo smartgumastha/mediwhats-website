@@ -279,6 +279,10 @@ html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var
     <div class="s-card"><div class="s-card-title">📋 Consultation summary</div><div id="sum-content"><div class="loading-box"><div class="spin">⏳</div><div style="margin-top:8px;font-size:13px">Generating summary...</div></div></div></div>
     <div style="background:rgba(251,211,141,0.07);border:1px solid rgba(251,211,141,0.18);border-radius:11px;padding:11px 13px;margin-bottom:14px;font-size:12.5px;color:#FBD38D;line-height:1.6">⚠️ AI-generated guidance. A licensed MediWhats doctor reviews before prescription is issued.</div>
     <button class="btn-wa" onclick="sendToWA()"><span style="font-size:19px">💬</span> Get prescription on WhatsApp</button>
+    <button class="btn-wa" onclick="sendToWA()" style="background:linear-gradient(135deg,#25D366,#128C7E)"><span style="font-size:19px">💬</span> Get prescription on WhatsApp</button>
+    <button onclick="connectRealDoctor()" style="width:100%;padding:14px;background:rgba(99,179,237,0.1);border:1px solid rgba(99,179,237,0.3);border-radius:var(--radius,16px);color:#63B3ED;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:9px">
+      <span style="font-size:18px">👨‍⚕️</span> Speak to a Real Doctor
+    </button>
     <button class="btn-new" onclick="newConsult()">🔄 New Consultation</button>
     <div style="text-align:center;font-size:11px;color:rgba(247,250,252,0.2);margin-top:14px">MediWhats · mediwhats.in · +91-7993135689</div>
   </div>
@@ -418,6 +422,16 @@ async function endCall(){
 function sendToWA(){var msg='Hi MediWhats! I completed a voice consultation with Dr. Aiden.\n\nPatient: '+pat.name+', Age: '+pat.age+'\n\nSummary:\n'+curSummary.substring(0,400)+'\n\nPlease send my prescription. Thank you!';window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(msg),'_blank');}
 function newConsult(){pat={name:'',age:'',gender:'Male',phone:'',language:'English'};msgs=[];curSummary='';lastReply='';document.querySelectorAll('#s-intake input').forEach(function(e){e.value='';});setGender('Male','M');goScreen('intro');}
 function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+
+
+function connectRealDoctor() {
+  var msg = 'Hi MediWhats! I completed a voice consultation with Dr. Aiden and would like to speak with a real doctor.\n\n'
+    + 'Patient: ' + pat.name + ', Age: ' + pat.age + '\n'
+    + 'Symptoms: ' + pat.symptoms_desc + '\n\n'
+    + 'Summary:\n' + curSummary.substring(0, 300) + '\n\n'
+    + 'Please connect me with a doctor for a call or video consultation. Thank you!';
+  window.open('https://wa.me/917993135689?text=' + encodeURIComponent(msg), '_blank');
+}
 
 if(synth){synth.getVoices();synth.addEventListener('voiceschanged',function(){synth.getVoices();});}
 </script>
