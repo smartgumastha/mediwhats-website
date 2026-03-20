@@ -1,4 +1,4 @@
-<!-- MediWhats v39 BUILD:1774045510 -->
+<!-- MediWhats v39 BUILD:1774046674 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -400,7 +400,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     </div>
 
     <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--gray)">Already have an account? <span onclick="showAuth('login')" style="color:var(--teal);cursor:pointer;font-weight:700;margin-left:4px">Sign in</span></div>
-    <div style="text-align:center;margin-top:8px;font-size:11px;color:rgba(240,250,247,0.3)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="234a4d454c634e46474a544b4257500d4a4d">[email&#160;protected]</a> &nbsp;·&nbsp; +91-7993135689</div>
+    <div style="text-align:center;margin-top:8px;font-size:11px;color:rgba(240,250,247,0.3)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="0e676068614e636b6a6779666f7a7d206760">[email&#160;protected]</a> &nbsp;·&nbsp; +91-7993135689</div>
   </div>
 
 
@@ -1254,7 +1254,121 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 </div>
 
 <!-- TELECONSULT -->
-<div class="screen" <div id="screen-teleconsult" class="screen">
+<div class="screen" 
+
+<div id="screen-teledoc" class="screen">
+  <!-- Header row -->
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
+    <div>
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">AI TeleDoc Queue</div>
+      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Review AI consultations · Approve prescriptions · Connect patients to real doctors</div>
+    </div>
+    <button onclick="loadTeleDoc()" style="padding:8px 18px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:var(--teal);font-weight:600;cursor:pointer;font-size:13px">↻ Refresh</button>
+  </div>
+
+  <!-- Stats row -->
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Pending Review</div>
+      <div style="font-size:24px;font-weight:800;color:var(--white)" id="td-stat-pending">—</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Reviewed Today</div>
+      <div style="font-size:24px;font-weight:800;color:var(--teal)" id="td-stat-done">—</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Total Consults</div>
+      <div style="font-size:24px;font-weight:800;color:var(--white)" id="td-stat-total">—</div>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Avg Response</div>
+      <div style="font-size:24px;font-weight:800;color:var(--white)">~5 min</div>
+    </div>
+  </div>
+
+  <!-- Tab filters -->
+  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <button onclick="tdFilter('all')" id="tdf-all" style="padding:7px 16px;border-radius:8px;border:0.5px solid var(--teal);background:var(--teal);color:#000;font-weight:700;cursor:pointer;font-size:13px">All</button>
+    <button onclick="tdFilter('pending')" id="tdf-pending" style="padding:7px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Pending Review</button>
+    <button onclick="tdFilter('reviewed')" id="tdf-reviewed" style="padding:7px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Reviewed</button>
+  </div>
+
+  <!-- Queue list -->
+  <div id="td-queue-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:200px">
+    <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading TeleDoc queue...</div>
+  </div>
+</div>
+
+<!-- ── TELEDOC REVIEW MODAL ─────────────────────────────────── -->
+<div id="td-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:5000;flex-direction:column;overflow:hidden">
+  <div style="background:#0D1412;border-bottom:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="display:flex;align-items:center;gap:16px">
+      <button onclick="closeTdModal()" style="background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.3);color:var(--teal);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">← Back</button>
+      <div>
+        <div style="font-size:18px;font-weight:700" id="td-modal-name">Patient</div>
+        <div style="font-size:12px;color:rgba(240,250,247,0.5)" id="td-modal-meta">AI TeleDoc Consultation</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="tdCallPatient()" style="background:rgba(37,211,102,0.1);border:0.5px solid rgba(37,211,102,0.4);color:#25d366;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">📞 Call Patient</button>
+      <button onclick="tdApprove()" id="td-approve-btn" style="background:var(--teal);border:none;color:#000;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700">✓ Approve & Send Rx</button>
+    </div>
+  </div>
+
+  <div style="flex:1;overflow-y:auto;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px" id="td-modal-body">
+
+    <!-- LEFT: AI Summary -->
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">AI Consultation Summary</div>
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Patient Details</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px" id="td-patient-info"></div>
+      </div>
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:16px">
+        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">AI Assessment</div>
+        <div style="font-size:13px;color:rgba(240,250,247,0.85);line-height:1.8;white-space:pre-wrap" id="td-ai-summary">Loading...</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Doctor prescription editor -->
+    <div>
+      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Your Prescription</div>
+
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:14px">
+        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Diagnosis</div>
+        <input id="td-diagnosis" type="text" placeholder="e.g. Viral fever, Acute gastritis..." style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--white);outline:none;font-family:'Cabinet Grotesk',sans-serif">
+      </div>
+
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:14px">
+        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Medicines & Advice</div>
+        <textarea id="td-prescription" rows="7" placeholder="1. Paracetamol 500mg — 1 tab TDS x 3 days&#10;2. ORS sachet — 1 BD x 3 days&#10;&#10;Advice: Rest, drink fluids&#10;Follow-up: After 3 days if no improvement" style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--white);outline:none;font-family:'Cabinet Grotesk',sans-serif;resize:vertical;line-height:1.6"></textarea>
+      </div>
+
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:14px">
+        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Doctor Notes (internal)</div>
+        <textarea id="td-notes" rows="3" placeholder="Any additional notes for records..." style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--white);outline:none;font-family:'Cabinet Grotesk',sans-serif;resize:vertical"></textarea>
+      </div>
+
+      <!-- Connect to real doctor option -->
+      <div style="background:rgba(37,211,102,0.06);border:0.5px solid rgba(37,211,102,0.2);border-radius:12px;padding:14px">
+        <div style="font-size:12px;font-weight:700;color:#25d366;margin-bottom:8px">Connect Patient to Real Doctor</div>
+        <div style="font-size:12px;color:rgba(240,250,247,0.55);margin-bottom:10px;line-height:1.5">Patient needs a direct consultation? Send them a WhatsApp message to schedule a video/phone call.</div>
+        <button onclick="tdConnectDoctor()" style="width:100%;background:rgba(37,211,102,0.12);border:0.5px solid rgba(37,211,102,0.35);color:#25d366;padding:9px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Cabinet Grotesk',sans-serif">📱 Send "Call Back" WhatsApp to Patient</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom action bar -->
+  <div style="background:#0D1412;border-top:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
+    <div style="font-size:12px;color:rgba(240,250,247,0.4)" id="td-modal-status">Pending doctor review</div>
+    <div style="display:flex;gap:10px">
+      <button onclick="closeTdModal()" style="padding:10px 20px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);color:rgba(240,250,247,0.6);border-radius:8px;cursor:pointer;font-size:13px;font-family:'Cabinet Grotesk',sans-serif">Cancel</button>
+      <button onclick="tdApprove()" style="padding:10px 28px;background:var(--teal);border:none;color:#000;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;font-family:'Cabinet Grotesk',sans-serif">✓ Approve & Send Prescription on WhatsApp</button>
+    </div>
+  </div>
+</div>
+
+<div id="screen-teleconsult" class="screen">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
     <div>
       <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Teleconsultation</div>
@@ -1434,118 +1548,6 @@ tr:hover td{background:rgba(255,255,255,0.02)}
 
 
 <!-- PHARMACY SCREEN -->
-
-<div id="screen-teledoc" class="screen">
-  <!-- Header row -->
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px">
-    <div>
-      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">AI TeleDoc Queue</div>
-      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Review AI consultations · Approve prescriptions · Connect patients to real doctors</div>
-    </div>
-    <button onclick="loadTeleDoc()" style="padding:8px 18px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:var(--teal);font-weight:600;cursor:pointer;font-size:13px">↻ Refresh</button>
-  </div>
-
-  <!-- Stats row -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px">
-    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
-      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Pending Review</div>
-      <div style="font-size:24px;font-weight:800;color:var(--white)" id="td-stat-pending">—</div>
-    </div>
-    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
-      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Reviewed Today</div>
-      <div style="font-size:24px;font-weight:800;color:var(--teal)" id="td-stat-done">—</div>
-    </div>
-    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
-      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Total Consults</div>
-      <div style="font-size:24px;font-weight:800;color:var(--white)" id="td-stat-total">—</div>
-    </div>
-    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
-      <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Avg Response</div>
-      <div style="font-size:24px;font-weight:800;color:var(--white)">~5 min</div>
-    </div>
-  </div>
-
-  <!-- Tab filters -->
-  <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
-    <button onclick="tdFilter('all')" id="tdf-all" style="padding:7px 16px;border-radius:8px;border:0.5px solid var(--teal);background:var(--teal);color:#000;font-weight:700;cursor:pointer;font-size:13px">All</button>
-    <button onclick="tdFilter('pending')" id="tdf-pending" style="padding:7px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Pending Review</button>
-    <button onclick="tdFilter('reviewed')" id="tdf-reviewed" style="padding:7px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Reviewed</button>
-  </div>
-
-  <!-- Queue list -->
-  <div id="td-queue-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:200px">
-    <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading TeleDoc queue...</div>
-  </div>
-</div>
-
-<!-- ── TELEDOC REVIEW MODAL ─────────────────────────────────── -->
-<div id="td-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.92);z-index:5000;flex-direction:column;overflow:hidden">
-  <div style="background:#0D1412;border-bottom:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-    <div style="display:flex;align-items:center;gap:16px">
-      <button onclick="closeTdModal()" style="background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.3);color:var(--teal);padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px">← Back</button>
-      <div>
-        <div style="font-size:18px;font-weight:700" id="td-modal-name">Patient</div>
-        <div style="font-size:12px;color:rgba(240,250,247,0.5)" id="td-modal-meta">AI TeleDoc Consultation</div>
-      </div>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button onclick="tdCallPatient()" style="background:rgba(37,211,102,0.1);border:0.5px solid rgba(37,211,102,0.4);color:#25d366;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600">📞 Call Patient</button>
-      <button onclick="tdApprove()" id="td-approve-btn" style="background:var(--teal);border:none;color:#000;padding:8px 20px;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700">✓ Approve & Send Rx</button>
-    </div>
-  </div>
-
-  <div style="flex:1;overflow-y:auto;padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:20px" id="td-modal-body">
-
-    <!-- LEFT: AI Summary -->
-    <div>
-      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">AI Consultation Summary</div>
-      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:16px">
-        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Patient Details</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px" id="td-patient-info"></div>
-      </div>
-      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:16px">
-        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px">AI Assessment</div>
-        <div style="font-size:13px;color:rgba(240,250,247,0.85);line-height:1.8;white-space:pre-wrap" id="td-ai-summary">Loading...</div>
-      </div>
-    </div>
-
-    <!-- RIGHT: Doctor prescription editor -->
-    <div>
-      <div style="font-size:13px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px">Your Prescription</div>
-
-      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:14px">
-        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Diagnosis</div>
-        <input id="td-diagnosis" type="text" placeholder="e.g. Viral fever, Acute gastritis..." style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 12px;font-size:14px;color:var(--white);outline:none;font-family:'Cabinet Grotesk',sans-serif">
-      </div>
-
-      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:14px">
-        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Medicines & Advice</div>
-        <textarea id="td-prescription" rows="7" placeholder="1. Paracetamol 500mg — 1 tab TDS x 3 days&#10;2. ORS sachet — 1 BD x 3 days&#10;&#10;Advice: Rest, drink fluids&#10;Follow-up: After 3 days if no improvement" style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--white);outline:none;font-family:'Cabinet Grotesk',sans-serif;resize:vertical;line-height:1.6"></textarea>
-      </div>
-
-      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;margin-bottom:14px">
-        <div style="font-size:11px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px">Doctor Notes (internal)</div>
-        <textarea id="td-notes" rows="3" placeholder="Any additional notes for records..." style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:10px 12px;font-size:13px;color:var(--white);outline:none;font-family:'Cabinet Grotesk',sans-serif;resize:vertical"></textarea>
-      </div>
-
-      <!-- Connect to real doctor option -->
-      <div style="background:rgba(37,211,102,0.06);border:0.5px solid rgba(37,211,102,0.2);border-radius:12px;padding:14px">
-        <div style="font-size:12px;font-weight:700;color:#25d366;margin-bottom:8px">Connect Patient to Real Doctor</div>
-        <div style="font-size:12px;color:rgba(240,250,247,0.55);margin-bottom:10px;line-height:1.5">Patient needs a direct consultation? Send them a WhatsApp message to schedule a video/phone call.</div>
-        <button onclick="tdConnectDoctor()" style="width:100%;background:rgba(37,211,102,0.12);border:0.5px solid rgba(37,211,102,0.35);color:#25d366;padding:9px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600;font-family:'Cabinet Grotesk',sans-serif">📱 Send "Call Back" WhatsApp to Patient</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Bottom action bar -->
-  <div style="background:#0D1412;border-top:0.5px solid rgba(0,196,154,0.2);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0">
-    <div style="font-size:12px;color:rgba(240,250,247,0.4)" id="td-modal-status">Pending doctor review</div>
-    <div style="display:flex;gap:10px">
-      <button onclick="closeTdModal()" style="padding:10px 20px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(255,255,255,0.15);color:rgba(240,250,247,0.6);border-radius:8px;cursor:pointer;font-size:13px;font-family:'Cabinet Grotesk',sans-serif">Cancel</button>
-      <button onclick="tdApprove()" style="padding:10px 28px;background:var(--teal);border:none;color:#000;border-radius:8px;cursor:pointer;font-size:14px;font-weight:700;font-family:'Cabinet Grotesk',sans-serif">✓ Approve & Send Prescription on WhatsApp</button>
-    </div>
-  </div>
-</div>
 
 <div id="screen-pharmacy" class="screen">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
@@ -2858,7 +2860,7 @@ async function tdApprove() {
   var notes = (document.getElementById('td-notes')        ||{}).value||'';
   var btn = document.getElementById('td-approve-btn');
   if (!diag.trim())  { showToast('Please enter a diagnosis','error'); return; }
-  if (!presc.trim()) { showToast('Please enter prescription/advice','error'); return; }
+  if (!presc.trim()) { showToast('Please enter prescription','error'); return; }
   if (btn) { btn.textContent = 'Sending...'; btn.disabled = true; }
   var user = mwUser || {};
   var hData = hospitalSettings || {};
@@ -2871,27 +2873,25 @@ async function tdApprove() {
     var ph = (c.patient_phone||'').replace(/\D/g,'').replace(/^91/,'');
     window.open('https://wa.me/91' + ph + '?text=' + encodeURIComponent(waMsg), '_blank');
   }
-  showToast('Prescription sent on WhatsApp ✓', 'success');
+  showToast('Prescription sent ✓', 'success');
   if (btn) { btn.textContent = '✓ Approve & Send Rx'; btn.disabled = false; }
   closeTdModal(); loadTeleDoc();
 }
 
 function tdCallPatient() {
-  if (!_tdActive || !_tdActive.patient_phone) { showToast('No phone number for this patient','error'); return; }
-  var phone = _tdActive.patient_phone.replace(/\D/g,'').replace(/^91/,'');
-  window.open('tel:+91' + phone);
+  if (!_tdActive || !_tdActive.patient_phone) { showToast('No phone number','error'); return; }
+  window.open('tel:+91' + _tdActive.patient_phone.replace(/\D/g,'').replace(/^91/,''));
 }
 
 function tdConnectDoctor() {
   if (!_tdActive) return;
   var c = _tdActive;
-  var user = mwUser || {};
-  var docName = 'Dr. ' + (user.first_name||'') + ' ' + (user.last_name||'');
-  var msg = 'Hello ' + (c.patient_name||'') + '! This is ' + docName + ' from MediWhats TeleDoc. I have reviewed your AI consultation and would like to speak with you directly. Please call me back. Thank you. _MediWhats TeleDoc_';
+  var docName = 'Dr. ' + ((mwUser||{}).first_name||'') + ' ' + ((mwUser||{}).last_name||'');
+  var msg = 'Hello ' + (c.patient_name||'') + '! This is ' + docName + ' from MediWhats TeleDoc. I have reviewed your consultation and would like to speak with you directly. Please call back. _MediWhats TeleDoc_';
   var phone = (c.patient_phone||'').replace(/\D/g,'').replace(/^91/,'');
-  if (!phone) { showToast('No phone number available','error'); return; }
+  if (!phone) { showToast('No phone number','error'); return; }
   window.open('https://wa.me/91' + phone + '?text=' + encodeURIComponent(msg), '_blank');
-  showToast('WhatsApp opened – send message to patient','success');
+  showToast('WhatsApp opened','success');
 }
 
 
@@ -2926,7 +2926,7 @@ function showScreen(name, navEl) {
   if (name === 'teledoc') loadTeleDoc();
   if (navEl) navEl.classList.add('active');
   var titles = {dashboard:'Dashboard',patients:'Patients',appointments:'Appointments',ipd:'IPD & Bed Management',billing:'Billing',staff:'Staff Management',teledoc:'AI TeleDoc Queue',teleconsult:'Teleconsult',investigations:'Investigations',pharmacy:'Pharmacy',settings:'Settings'};
-  var actions = {dashboard:'New appointment',patients:'Register patient',teledoc:'Refresh',teleconsult:'New consult',investigations:'New order',pharmacy:'Dispense',settings:'Save',appointments:'Book appointment',ipd:'Admit patient',billing:'New bill',staff:'Add staff'};
+  var actions = {dashboard:'New appointment',patients:'Register patient',appointments:'Book appointment',ipd:'Admit patient',billing:'New bill',staff:'Add staff'};
   if (name === 'staff') loadStaff();
   document.getElementById('topbarTitle').textContent = titles[name] || name;
   document.getElementById('topbarActionBtn').innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ${actions[name] || 'New'}`;
