@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773967620 -->
+<!-- MediWhats v23 BUILD:1773968284 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2558,10 +2558,48 @@ async function saveVisitRecord(sendNow) {
     if (data.success) {
       showToast(sendNow ? 'Visit saved & WhatsApp sent ✓' : 'Visit saved as draft ✓', 'success');
       loadVisitHistory(activeVisitPatient.id);
+
+      // ── Auto-create investigation orders for all lab/radiology tests ──
+      var visitId = editingVisitId || (data.data && data.data.id);
+      var allTests = [];
+      (visitLabRows || []).forEach(function(l) {
+        allTests.push({
+          test_name: l.test || l.name || l.test_name || '',
+          test_code: l.code || '',
+          dept_type: 'LAB',
+          sample_type: l.sample || '',
+          fasting_required: false,
+          priority: 'routine',
+          clinical_indication: document.getElementById('vr_dx')?.value || '',
+          source: 'in-house'
+        });
+      });
+      (visitRadRows || []).forEach(function(r) {
+        allTests.push({
+          test_name: r.test || r.name || r.test_name || '',
+          test_code: r.code || '',
+          dept_type: 'RADIOLOGY',
+          priority: 'routine',
+          clinical_indication: document.getElementById('vr_dx')?.value || '',
+          source: 'in-house'
+        });
+      });
+      if (allTests.length > 0 && visitId) {
+        apiCall('/hospitals/' + mwHospitalId + '/investigations/orders', 'POST', {
+          patient_id: activeVisitPatient.id,
+          visit_id:   visitId,
+          orders:     allTests,
+          notify_staff: false
+        }).then(function(inv) {
+          if (inv.success) {
+            showToast(allTests.length + ' investigation order(s) created ✓', 'success');
+          }
+        }).catch(function() {});
+      }
     } else {
       showToast('Error: ' + data.message, 'error');
     }
-  } catch(e) { showToast('Network error', 'error'); }
+  } catch(e) { showToast('Network error: ' + e.message, 'error'); }
 }
 
 function confirmSend() {
