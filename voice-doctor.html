@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Dr. Aiden — Voice AI Doctor | MediWhats TeleDoc</title>
+<style>
+:root{--bg:#0a0e1a;--card:#111827;--border:rgba(99,179,237,0.15);--teal:#00C49A;--blue:#63B3ED;--purple:#9F7AEA;--white:#F7FAFC;--muted:rgba(247,250,252,0.55);--red:#FC8181;--red-bg:#1a0505;--green:#68D391;--radius:16px}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--white);overflow:hidden}
+.screen{position:absolute;inset:0;display:none;flex-direction:column;align-items:center}
+.screen.active{display:flex}
+
+/* INTRO */
+#s-intro{background:var(--bg);justify-content:flex-start;padding:32px 24px 40px;overflow-y:auto}
+.logo-row{display:flex;align-items:center;gap:10px;margin-bottom:28px}
+.logo-mark{width:40px;height:40px;background:var(--teal);border-radius:11px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;color:#000}
+.logo-name{font-size:19px;font-weight:700}
+.hero{text-align:center;margin-bottom:28px}
+.hero-av-wrap{position:relative;width:120px;height:120px;margin:0 auto 16px}
+.av-ring{position:absolute;inset:-6px;border-radius:50%;border:2px solid var(--teal);opacity:.35;animation:rp 2.2s ease-in-out infinite}
+.av-ring2{position:absolute;inset:-16px;border-radius:50%;border:2px solid var(--teal);opacity:.15;animation:rp 2.2s ease-in-out infinite .6s}
+@keyframes rp{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.av-face{width:120px;height:120px;border-radius:50%;background:linear-gradient(145deg,#1a2744,#0f172a);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:58px;position:relative;z-index:1}
+.hero-title{font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--teal),var(--blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px}
+.hero-sub{font-size:14px;color:var(--muted);line-height:1.6}
+.feat-list{display:flex;flex-direction:column;gap:10px;margin-bottom:28px;width:100%}
+.feat{display:flex;align-items:center;gap:12px;background:var(--card);border:0.5px solid var(--border);border-radius:14px;padding:13px 16px}
+.feat-icon{font-size:22px;flex-shrink:0}
+.feat-main{font-size:13.5px;color:var(--white)}
+.feat-sub{font-size:12px;color:var(--muted);margin-top:2px}
+.btn-start{width:100%;padding:17px;background:linear-gradient(135deg,var(--teal),var(--blue));border:none;border-radius:var(--radius);color:#000;font-size:17px;font-weight:800;cursor:pointer;font-family:inherit;margin-bottom:12px}
+.fine{font-size:11.5px;color:var(--muted);text-align:center;line-height:1.7}
+
+/* INTAKE */
+#s-intake{background:var(--bg);justify-content:flex-start;overflow-y:auto}
+.intake-hdr{width:100%;background:linear-gradient(135deg,#1a2744,#0f1729);padding:18px 24px 26px;border-radius:0 0 22px 22px;border-bottom:1px solid var(--border);flex-shrink:0}
+.back-btn{background:rgba(255,255,255,0.07);border:none;border-radius:8px;color:var(--white);padding:6px 12px;cursor:pointer;font-size:13px;margin-bottom:10px;font-family:inherit}
+.intake-hdr h2{font-size:20px;font-weight:700;margin-bottom:3px}
+.intake-hdr p{font-size:13px;color:var(--muted)}
+.intake-body{padding:20px 24px 36px;width:100%}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:11.5px;font-weight:600;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px}
+.field input,.field select,.field textarea{width:100%;background:var(--card);border:1px solid var(--border);border-radius:11px;padding:12px 14px;font-size:15px;color:var(--white);font-family:inherit;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.field input:focus,.field select:focus{border-color:var(--teal)}
+.field input::placeholder{color:rgba(247,250,252,0.28)}
+.field select option{background:#111827;color:var(--white)}
+.r2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g-row{display:flex;gap:8px}
+.g-btn{flex:1;padding:11px;border-radius:10px;border:1px solid var(--border);background:transparent;color:var(--muted);font-weight:600;cursor:pointer;font-size:13px;transition:all .15s;font-family:inherit}
+.g-btn.on{border-color:var(--teal);background:rgba(0,196,154,0.1);color:var(--teal)}
+.warn{background:rgba(252,211,77,0.07);border:1px solid rgba(252,211,77,0.2);border-radius:11px;padding:11px 14px;font-size:12.5px;color:#FBD38D;line-height:1.6;margin-bottom:16px}
+.btn-go{width:100%;padding:16px;background:linear-gradient(135deg,var(--teal),var(--blue));border:none;border-radius:var(--radius);color:#000;font-size:16px;font-weight:800;cursor:pointer;font-family:inherit;margin-top:4px}
+.btn-go:disabled{background:rgba(255,255,255,0.09);color:var(--muted);cursor:not-allowed}
+
+/* CALL */
+#s-call{background:var(--bg);justify-content:space-between;padding:0}
+.topbar{width:100%;display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:rgba(0,0,0,0.35);flex-shrink:0}
+.ti{display:flex;align-items:center;gap:8px}
+.dot-live{width:8px;height:8px;border-radius:50%;background:var(--green);animation:db 1.5s infinite}
+@keyframes db{0%,100%{opacity:1}50%{opacity:.25}}
+.tname{font-size:14px;font-weight:600}
+.ttimer{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+.end-btn{background:rgba(252,129,129,0.13);border:1px solid rgba(252,129,129,0.28);border-radius:9px;color:var(--red);padding:7px 13px;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit}
+
+.doc-area{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 16px;min-height:0}
+
+/* Avatar */
+.av-wrap{position:relative;width:150px;height:150px;margin-bottom:16px;flex-shrink:0}
+.av-r1,.av-r2,.av-r3{position:absolute;border-radius:50%;border:2px solid var(--teal);transition:all .3s}
+.av-r1{inset:-7px;opacity:.25}
+.av-r2{inset:-16px;opacity:.12}
+.av-r3{inset:-27px;opacity:.05}
+.av-wrap.speaking .av-r1{inset:-10px;opacity:.55;animation:sp1 .55s ease-in-out infinite}
+.av-wrap.speaking .av-r2{inset:-20px;opacity:.3;animation:sp1 .55s ease-in-out infinite .15s}
+.av-wrap.speaking .av-r3{inset:-32px;opacity:.12;animation:sp1 .55s ease-in-out infinite .3s}
+.av-wrap.listening .av-r1{border-color:var(--purple);inset:-10px;opacity:.45;animation:ls1 .9s ease-in-out infinite}
+.av-wrap.listening .av-r2{border-color:var(--purple);inset:-20px;opacity:.22;animation:ls1 .9s ease-in-out infinite .2s}
+.av-wrap.listening .av-r3{border-color:var(--purple);inset:-32px;opacity:.08;animation:ls1 .9s ease-in-out infinite .4s}
+@keyframes sp1{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+@keyframes ls1{0%,100%{transform:scale(1)}50%{transform:scale(1.1)}}
+
+.av-inner{width:150px;height:150px;border-radius:50%;background:linear-gradient(145deg,#1e3a5f,#0f1e3a);border:2px solid rgba(99,179,237,0.25);display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;z-index:1}
+.av-emoji{font-size:62px;transition:transform .3s}
+.av-wrap.speaking .av-emoji{animation:sb .42s ease-in-out infinite}
+@keyframes sb{0%,100%{transform:scale(1)}50%{transform:scale(1.04) translateY(-2px)}}
+
+.bars{display:flex;gap:3px;align-items:flex-end;height:24px;margin-top:5px}
+.b{width:4px;border-radius:3px;background:var(--teal);opacity:.25;transition:opacity .2s}
+.av-wrap.speaking .b{opacity:1;animation:bd .42s ease-in-out infinite}
+.av-wrap.listening .b{background:var(--purple);opacity:1;animation:bd .32s ease-in-out infinite}
+.b:nth-child(1){height:7px;--h:1.5}.b:nth-child(2){height:13px;--h:2.1}.b:nth-child(3){height:19px;--h:1.7}.b:nth-child(4){height:24px;--h:1.3}.b:nth-child(5){height:19px;--h:1.9}.b:nth-child(6){height:13px;--h:2.3}.b:nth-child(7){height:7px;--h:1.6}
+@keyframes bd{0%,100%{transform:scaleY(1)}50%{transform:scaleY(var(--h,1.8))}}
+.b:nth-child(1){animation-delay:0s}.b:nth-child(2){animation-delay:.07s}.b:nth-child(3){animation-delay:.14s}.b:nth-child(4){animation-delay:.21s}.b:nth-child(5){animation-delay:.28s}.b:nth-child(6){animation-delay:.35s}.b:nth-child(7){animation-delay:.42s}
+
+.doc-name{font-size:17px;font-weight:700;margin-bottom:4px}
+.doc-status{font-size:13px;color:var(--muted);min-height:19px;transition:color .25s;text-align:center}
+.doc-status.speaking{color:var(--teal)}.doc-status.listening{color:var(--purple)}.doc-status.thinking{color:var(--blue)}
+
+.doc-bubble{background:var(--card);border:0.5px solid var(--border);border-radius:16px 16px 16px 4px;padding:12px 15px;width:100%;max-width:340px;min-height:58px;font-size:13.5px;line-height:1.7;transition:opacity .3s;margin-top:12px}
+.doc-bubble.empty{opacity:.35}
+.bubble-lbl{font-size:10px;font-weight:600;color:var(--teal);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
+
+.pat-area{width:100%;padding:8px 18px 0;flex-shrink:0}
+.pat-bubble{background:rgba(159,122,234,0.08);border:0.5px solid rgba(159,122,234,0.2);border-radius:16px 16px 4px 16px;padding:11px 15px;font-size:13.5px;color:rgba(247,250,252,0.75);line-height:1.6;min-height:46px;transition:all .25s}
+.pat-bubble.listening{border-color:rgba(159,122,234,0.5);background:rgba(159,122,234,0.14)}
+.pat-bubble.empty{opacity:.3}
+.pat-lbl{font-size:10px;font-weight:600;color:var(--purple);letter-spacing:.5px;text-transform:uppercase;margin-bottom:5px}
+
+.controls{width:100%;padding:12px 20px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;flex-shrink:0;background:rgba(0,0,0,0.22)}
+.mic-btn{width:68px;height:68px;border-radius:50%;border:none;cursor:pointer;font-size:26px;background:linear-gradient(135deg,var(--teal),var(--blue));box-shadow:0 5px 22px rgba(0,196,154,0.38);transition:all .2s;display:flex;align-items:center;justify-content:center}
+.mic-btn.listening{background:linear-gradient(135deg,var(--purple),#6B46C1);box-shadow:0 5px 22px rgba(159,122,234,0.45);animation:mp .8s ease-in-out infinite}
+.mic-btn.disabled{background:rgba(255,255,255,0.07);box-shadow:none;cursor:not-allowed}
+@keyframes mp{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}
+.mic-lbl{font-size:12px;color:var(--muted)}
+.ctrls{display:flex;gap:12px}
+.c-btn{display:flex;flex-direction:column;align-items:center;gap:4px;background:var(--card);border:0.5px solid var(--border);border-radius:12px;padding:9px 16px;cursor:pointer;font-size:11px;color:var(--muted);font-family:inherit}
+.c-btn:hover{border-color:var(--blue);color:var(--white)}
+.c-btn span{font-size:18px}
+
+/* EMERGENCY */
+#s-emergency{background:var(--red-bg);justify-content:center;padding:32px 24px;text-align:center}
+.e-icon{font-size:76px;animation:ep 1s infinite;margin-bottom:14px}
+@keyframes ep{0%,100%{transform:scale(1)}50%{transform:scale(1.13)}}
+.e-title{font-size:27px;font-weight:800;color:var(--red);margin-bottom:10px}
+.e-desc{font-size:15px;color:rgba(247,250,252,0.72);line-height:1.7;margin-bottom:28px;max-width:300px}
+.e-call{display:flex;align-items:center;justify-content:center;gap:10px;background:var(--red);color:#fff;border:none;border-radius:16px;padding:17px;font-size:20px;font-weight:800;cursor:pointer;font-family:inherit;width:100%;text-decoration:none;margin-bottom:10px;box-shadow:0 7px 22px rgba(252,129,129,0.32)}
+.e-back{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:11px;padding:12px;color:var(--muted);font-size:14px;cursor:pointer;font-family:inherit;width:100%;margin-top:6px}
+
+/* SUMMARY */
+#s-summary{background:var(--bg);justify-content:flex-start;overflow-y:auto;padding:0}
+.sum-hdr{width:100%;background:linear-gradient(135deg,#0d2818,#0a1f12);padding:22px 24px 34px;text-align:center;border-radius:0 0 26px 26px;border-bottom:1px solid rgba(104,211,145,0.18);flex-shrink:0}
+.sum-hdr h2{font-size:21px;font-weight:800;color:var(--green);margin-top:6px}
+.sum-hdr p{font-size:13px;color:var(--muted);margin-top:3px}
+.sum-body{padding:18px 22px 40px;width:100%}
+.s-card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px}
+.s-card-title{font-size:10.5px;font-weight:600;color:var(--teal);letter-spacing:.5px;text-transform:uppercase;margin-bottom:9px}
+.s-text{font-size:13.5px;color:rgba(247,250,252,0.83);line-height:1.8;white-space:pre-wrap}
+.sv-row{display:flex;justify-content:space-between}
+.sv-val{font-size:21px;font-weight:800;color:var(--green)}
+.sv-lbl{font-size:12px;color:var(--muted);margin-top:2px}
+.btn-wa{width:100%;padding:15px;background:linear-gradient(135deg,#25D366,#128C7E);border:none;border-radius:var(--radius);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:9px}
+.btn-new{width:100%;padding:13px;background:transparent;border:1px solid var(--border);border-radius:var(--radius);color:var(--muted);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit}
+.spin{display:inline-block;animation:spin 1s linear infinite;font-size:20px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-box{text-align:center;padding:28px;color:var(--muted)}
+
+/* Think dots */
+.td{display:inline-flex;gap:4px;align-items:center}
+.td span{width:6px;height:6px;border-radius:50%;background:var(--blue);animation:tda .8s infinite}
+.td span:nth-child(2){animation-delay:.15s}
+.td span:nth-child(3){animation-delay:.3s}
+@keyframes tda{0%,80%,100%{transform:scale(1);opacity:.45}40%{transform:scale(1.45);opacity:1}}
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="s-intro" class="screen active">
+  <div class="logo-row">
+    <div class="logo-mark">MW</div>
+    <span class="logo-name">MediWhats TeleDoc</span>
+  </div>
+  <div class="hero">
+    <div class="hero-av-wrap">
+      <div class="av-ring"></div><div class="av-ring2"></div>
+      <div class="av-face">👨‍⚕️</div>
+    </div>
+    <div class="hero-title">Meet Dr. Aiden</div>
+    <div class="hero-sub">India's first voice AI doctor<br>Speaks Telugu · Hindi · English</div>
+  </div>
+  <div class="feat-list">
+    <div class="feat"><div class="feat-icon">🎙️</div><div><div class="feat-main">Just speak — no typing</div><div class="feat-sub">Tell symptoms in your own language</div></div></div>
+    <div class="feat"><div class="feat-icon">🤖</div><div><div class="feat-main">AI listens, understands, responds</div><div class="feat-sub">Like a real video call with a doctor</div></div></div>
+    <div class="feat"><div class="feat-icon">📱</div><div><div class="feat-main">Prescription on WhatsApp</div><div class="feat-sub">Reviewed by a licensed doctor</div></div></div>
+    <div class="feat"><div class="feat-icon">💰</div><div><div class="feat-main">Save ₹500–₹2,000</div><div class="feat-sub">No travel, no waiting room</div></div></div>
+  </div>
+  <button class="btn-start" onclick="goScreen('intake')">Start Voice Consultation 🎙️</button>
+  <div class="fine">🔒 Private & secure · AI triages, real doctor prescribes<br>Not for emergencies — call 108 for urgent care</div>
+</div>
+
+<!-- INTAKE -->
+<div id="s-intake" class="screen">
+  <div class="intake-hdr">
+    <button class="back-btn" onclick="goScreen('intro')">← Back</button>
+    <h2>Quick details 👋</h2>
+    <p>Dr. Aiden will ask the rest by voice</p>
+  </div>
+  <div class="intake-body">
+    <div class="warn">⚠️ <strong>Emergency?</strong> Chest pain, difficulty breathing, unconscious — call <strong>108 immediately.</strong></div>
+    <div class="field"><label>Your name *</label><input id="p_name" type="text" placeholder="e.g. Priya Sharma" autocomplete="off"></div>
+    <div class="r2">
+      <div class="field"><label>Age *</label><input id="p_age" type="number" placeholder="28" min="1" max="120"></div>
+      <div class="field"><label>WhatsApp</label><input id="p_phone" type="tel" placeholder="+91 98765..."></div>
+    </div>
+    <div class="field"><label>Gender</label>
+      <div class="g-row">
+        <button class="g-btn on" id="gb_M" onclick="setGender('Male','M')">Male</button>
+        <button class="g-btn" id="gb_F" onclick="setGender('Female','F')">Female</button>
+        <button class="g-btn" id="gb_O" onclick="setGender('Other','O')">Other</button>
+      </div>
+    </div>
+    <div class="field"><label>Language</label>
+      <select id="p_lang">
+        <option value="English">English</option>
+        <option value="Hindi">Hindi — हिंदी</option>
+        <option value="Telugu">Telugu — తెలుగు</option>
+      </select>
+    </div>
+    <button class="btn-go" id="startBtn" onclick="startCall()">Start Voice Call with Dr. Aiden 🎙️</button>
+    <div style="text-align:center;font-size:12px;color:var(--muted);margin-top:10px;line-height:1.6">Allow microphone when browser asks<br>Works best on Chrome / Android</div>
+  </div>
+</div>
+
+<!-- CALL -->
+<div id="s-call" class="screen">
+  <div class="topbar">
+    <div class="ti"><div class="dot-live"></div><span class="tname">Dr. Aiden · MediWhats</span></div>
+    <div id="call-timer" class="ttimer">00:00</div>
+    <button class="end-btn" onclick="endCall()">End</button>
+  </div>
+  <div class="doc-area">
+    <div class="av-wrap" id="avatar">
+      <div class="av-r1"></div><div class="av-r2"></div><div class="av-r3"></div>
+      <div class="av-inner">
+        <div class="av-emoji">👨‍⚕️</div>
+        <div class="bars"><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div><div class="b"></div></div>
+      </div>
+    </div>
+    <div class="doc-name">Dr. Aiden</div>
+    <div class="doc-status" id="doc-status">Ready to listen</div>
+    <div class="doc-bubble empty" id="doc-bubble">
+      <div class="bubble-lbl">Dr. Aiden says</div>
+      <span id="doc-text">Tap the mic and speak your symptoms...</span>
+    </div>
+  </div>
+  <div class="pat-area">
+    <div class="pat-bubble empty" id="pat-bubble">
+      <div class="pat-lbl">You said</div>
+      <span id="pat-text">Your words will appear here...</span>
+    </div>
+  </div>
+  <div class="controls">
+    <button class="mic-btn" id="mic-btn" onclick="toggleMic()">🎙️</button>
+    <div class="mic-lbl" id="mic-lbl">Tap to speak</div>
+    <div class="ctrls">
+      <button class="c-btn" onclick="replayLast()"><span>🔊</span>Replay</button>
+      <button class="c-btn" onclick="endCall()"><span>📋</span>Summary</button>
+      <button class="c-btn" onclick="toggleMute()" id="mute-btn"><span id="mute-ico">🔈</span>Sound</button>
+    </div>
+  </div>
+</div>
+
+<!-- EMERGENCY -->
+<div id="s-emergency" class="screen">
+  <div class="e-icon">🚨</div>
+  <div class="e-title">Emergency Detected</div>
+  <div class="e-desc">Your symptoms sound serious. Please call emergency services right now. Do not wait for an online consultation.</div>
+  <a href="tel:108" class="e-call">📞 Call 108 — Emergency</a>
+  <a href="tel:102" class="e-call" style="background:#c53030;font-size:17px">🚑 Call 102 — Ambulance</a>
+  <button class="e-back" onclick="goScreen('intro')">← Back to home</button>
+</div>
+
+<!-- SUMMARY -->
+<div id="s-summary" class="screen">
+  <div class="sum-hdr">
+    <div style="font-size:46px">✅</div>
+    <h2>Consultation Complete</h2>
+    <p id="sum-name">Generating your summary...</p>
+  </div>
+  <div class="sum-body">
+    <div class="s-card"><div class="s-card-title">💰 Savings today</div>
+      <div class="sv-row">
+        <div><div class="sv-val">₹800–₹1,500</div><div class="sv-lbl">vs in-person visit</div></div>
+        <div style="text-align:right"><div class="sv-val">~3 hrs</div><div class="sv-lbl">travel + wait saved</div></div>
+      </div>
+    </div>
+    <div class="s-card"><div class="s-card-title">📋 Consultation summary</div><div id="sum-content"><div class="loading-box"><div class="spin">⏳</div><div style="margin-top:8px;font-size:13px">Generating summary...</div></div></div></div>
+    <div style="background:rgba(251,211,141,0.07);border:1px solid rgba(251,211,141,0.18);border-radius:11px;padding:11px 13px;margin-bottom:14px;font-size:12.5px;color:#FBD38D;line-height:1.6">⚠️ AI-generated guidance. A licensed MediWhats doctor reviews before prescription is issued.</div>
+    <button class="btn-wa" onclick="sendToWA()"><span style="font-size:19px">💬</span> Get prescription on WhatsApp</button>
+    <button class="btn-new" onclick="newConsult()">🔄 New Consultation</button>
+    <div style="text-align:center;font-size:11px;color:rgba(247,250,252,0.2);margin-top:14px">MediWhats · mediwhats.in · +91-7993135689</div>
+  </div>
+</div>
+
+<script>
+var API='https://smartgumastha-backend-production.up.railway.app/api';
+var WA='917993135689';
+var pat={name:'',age:'',gender:'Male',phone:'',language:'English'};
+var msgs=[];
+var isListen=false,isSpeak=false,isThink=false,isMuted=false;
+var callSecs=0,callTmr=null,recog=null;
+var synth=window.speechSynthesis;
+var lastReply='',curSummary='';
+
+var EMERG=[/chest\s*pain/i,/heart\s*attack/i,/can.t\s*breath/i,/cannot\s*breath/i,/difficulty\s*breath/i,/shortness\s*of\s*breath/i,/saans\s*nahi/i,/unconscious/i,/behosh/i,/not\s*waking/i,/seizure/i,/fits/i,/convuls/i,/heavy\s*bleed/i,/bahut\s*khoon/i,/blood\s*vomit/i,/stroke/i,/paralys/i,/face\s*drooping/i,/poisoning/i,/zeher/i,/overdose/i];
+function isEmg(t){return EMERG.some(function(p){return p.test(t);});}
+
+function goScreen(id){document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('active');});var el=document.getElementById('s-'+id);if(el)el.classList.add('active');window.scrollTo(0,0);}
+
+function setGender(g,k){pat.gender=g;['M','F','O'].forEach(function(x){var b=document.getElementById('gb_'+x);if(b)b.classList.toggle('on',x===k);});}
+
+function startCall(){
+  var n=(document.getElementById('p_name')||{}).value||'';
+  var a=(document.getElementById('p_age')||{}).value||'';
+  if(!n.trim()){alert('Please enter your name');return;}
+  if(!a){alert('Please enter your age');return;}
+  pat.name=n.trim();pat.age=a;
+  pat.phone=(document.getElementById('p_phone')||{}).value||'';
+  pat.language=(document.getElementById('p_lang')||{}).value||'English';
+  msgs=[];
+  goScreen('call');
+  startTimer();
+  var g=buildGreet();
+  setDocTxt(g);
+  speak(g,function(){setTimeout(startListen,600);});
+}
+
+function buildGreet(){
+  var n=pat.name.split(' ')[0];
+  if(pat.language==='Hindi')return 'Namaste '+n+'! Main Dr. Aiden hoon, MediWhats TeleDoc se. Aap bataiye, aaj aapko kya takleef ho rahi hai?';
+  if(pat.language==='Telugu')return 'Namaskaram '+n+'! Nenu Dr. Aiden ni, MediWhats TeleDoc nunchi. Meeru cheppandi, ee roju meeru em anubhavisthunnaru?';
+  return 'Hello '+n+'! I am Dr. Aiden from MediWhats TeleDoc. I am here to help you today. Please tell me — what symptoms are you experiencing?';
+}
+
+function startListen(){
+  if(isListen||isSpeak||isThink)return;
+  var SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){setDocTxt('Voice recognition not supported. Please use Chrome on Android.');return;}
+  recog=new SR();
+  recog.continuous=false;recog.interimResults=true;recog.maxAlternatives=1;
+  var lm={'English':'en-IN','Hindi':'hi-IN','Telugu':'te-IN'};
+  recog.lang=lm[pat.language]||'en-IN';
+  recog.onstart=function(){isListen=true;setAv('listening');setSt('Listening... speak now','listening');setMic('listening');setPatTxt('');pb().classList.remove('empty');pb().classList.add('listening');};
+  recog.onresult=function(e){var interim='',final='';for(var i=e.resultIndex;i<e.results.length;i++){if(e.results[i].isFinal)final+=e.results[i][0].transcript;else interim+=e.results[i][0].transcript;}setPatTxt(interim||final);if(final)handleSpeech(final.trim());};
+  recog.onerror=function(e){isListen=false;setAv('idle');setMic('idle');pb().classList.remove('listening');if(e.error==='not-allowed'){setDocTxt('Microphone blocked. Please allow mic in browser settings.');speak('Please allow microphone access.');}else{setSt('Tap mic to speak','');}};
+  recog.onend=function(){isListen=false;setMic('idle');pb().classList.remove('listening');if(!isThink&&!isSpeak){setAv('idle');setSt('Tap mic to continue','');}};
+  try{recog.start();}catch(e){}
+}
+
+function stopListen(){if(recog)try{recog.stop();}catch(e){}isListen=false;setAv('idle');setMic('idle');}
+
+function toggleMic(){
+  if(isSpeak){stopSpeak();return;}
+  if(isListen){stopListen();return;}
+  if(isThink)return;
+  startListen();
+}
+
+async function handleSpeech(text){
+  if(!text||text.length<2)return;
+  stopListen();
+  setPatTxt(text);
+  if(isEmg(text)){stopSpeak();speak('This sounds like an emergency. Please call 108 immediately.',function(){goScreen('emergency');});return;}
+  if(/\b(summary|done|finish|end|bye|thank|khatam|shukriya)\b/i.test(text)){msgs.push({role:'user',content:text});endCall();return;}
+  msgs.push({role:'user',content:text});
+  isThink=true;setAv('thinking');setSt('Thinking...','thinking');showThink();
+  try{
+    var r=await fetch(API+'/teledoc/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient:pat,messages:msgs})});
+    var d=await r.json();
+    if(d.emergency){isThink=false;speak('Emergency detected. Please call 108.',function(){goScreen('emergency');});return;}
+    var rep=d.reply||'Could you please repeat that?';
+    msgs.push({role:'assistant',content:rep});
+    isThink=false;setDocTxt(rep);speak(rep,function(){setTimeout(startListen,700);});
+  }catch(e){
+    isThink=false;var em='Connection issue. Tap mic to try again.';setDocTxt(em);speak(em);setAv('idle');setSt('Tap mic to continue','');
+  }
+}
+
+function speak(text,onDone){
+  if(!synth){if(onDone)onDone();return;}
+  if(isMuted){setDocTxt(text);setAv('speaking');setTimeout(function(){setAv('idle');if(onDone)onDone();},Math.min(text.length*38,4500));return;}
+  stopSpeak();
+  var clean=text.replace(/\*\*/g,'').replace(/\*/g,'').replace(/<[^>]*>/g,'');
+  var u=new SpeechSynthesisUtterance(clean);
+  var vs=synth.getVoices(),pv=null;
+  if(pat.language==='Hindi')pv=vs.find(function(v){return v.lang==='hi-IN';})||vs.find(function(v){return v.lang.startsWith('hi');});
+  if(pat.language==='Telugu')pv=pv||vs.find(function(v){return v.lang==='te-IN';})||vs.find(function(v){return v.lang.startsWith('te');});
+  pv=pv||vs.find(function(v){return v.lang==='en-IN'&&v.name.includes('Female');})||vs.find(function(v){return v.lang==='en-IN';})||vs.find(function(v){return v.lang.startsWith('en');});
+  if(pv)u.voice=pv;
+  u.rate=0.88;u.pitch=1.05;u.volume=1;
+  u.onstart=function(){isSpeak=true;setAv('speaking');setSt('Dr. Aiden is speaking...','speaking');lastReply=text;};
+  u.onend=function(){isSpeak=false;setAv('idle');setSt('Tap mic to respond','');setMic('idle');if(onDone)onDone();};
+  u.onerror=function(){isSpeak=false;setAv('idle');if(onDone)onDone();};
+  synth.speak(u);
+}
+
+function stopSpeak(){synth.cancel();isSpeak=false;}
+function replayLast(){if(lastReply)speak(lastReply);}
+function toggleMute(){isMuted=!isMuted;var i=document.getElementById('mute-ico');var b=document.getElementById('mute-btn');if(i)i.textContent=isMuted?'🔇':'🔈';if(b)b.style.opacity=isMuted?'0.45':'1';if(isMuted)stopSpeak();}
+
+function setAv(s){var a=document.getElementById('avatar');if(!a)return;a.classList.remove('speaking','listening');if(s==='speaking'||s==='thinking')a.classList.add('speaking');else if(s==='listening')a.classList.add('listening');}
+function setSt(t,c){var e=document.getElementById('doc-status');if(!e)return;e.textContent=t;e.className='doc-status'+(c?' '+c:'');}
+function setDocTxt(t){var e=document.getElementById('doc-text');var b=document.getElementById('doc-bubble');if(e)e.innerHTML=t.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');if(b)b.classList.remove('empty');}
+function showThink(){var e=document.getElementById('doc-text');if(e)e.innerHTML='<span class="td"><span></span><span></span><span></span></span>';var b=document.getElementById('doc-bubble');if(b)b.classList.remove('empty');}
+function setPatTxt(t){var e=document.getElementById('pat-text');var b=pb();if(e)e.textContent=t||'Your words will appear here...';if(b){b.classList.toggle('empty',!t);b.classList.toggle('listening',!!t&&isListen);}}
+function pb(){return document.getElementById('pat-bubble');}
+function setMic(s){var b=document.getElementById('mic-btn');var l=document.getElementById('mic-lbl');if(!b)return;b.classList.remove('listening','disabled');if(s==='listening'){b.classList.add('listening');b.textContent='⏹️';if(l)l.textContent='Tap to stop';}else if(s==='thinking'){b.classList.add('disabled');b.textContent='🤔';if(l)l.textContent='Thinking...';}else{b.textContent='🎙️';if(l)l.textContent='Tap to speak';}}
+
+function startTimer(){callSecs=0;clearInterval(callTmr);callTmr=setInterval(function(){callSecs++;var m=String(Math.floor(callSecs/60)).padStart(2,'0');var s=String(callSecs%60).padStart(2,'0');var e=document.getElementById('call-timer');if(e)e.textContent=m+':'+s;},1000);}
+function stopTimer(){clearInterval(callTmr);}
+
+async function endCall(){
+  stopListen();stopSpeak();stopTimer();
+  if(msgs.length<2){speak('It was nice speaking with you '+pat.name.split(' ')[0]+'. Take care and stay healthy!',function(){goScreen('intro');});return;}
+  goScreen('summary');
+  document.getElementById('sum-name').textContent='Here\'s your summary, '+pat.name;
+  try{
+    var r=await fetch(API+'/teledoc/summary',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient:pat,messages:msgs})});
+    var d=await r.json();
+    curSummary=d.summary||'Summary could not be generated.';
+    document.getElementById('sum-content').innerHTML='<div class="s-text">'+esc(curSummary)+'</div>';
+    fetch(API+'/teledoc/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({patient:pat,messages:msgs,summary:curSummary,hospitalId:'1'})}).catch(function(){});
+  }catch(e){document.getElementById('sum-content').innerHTML='<div style="font-size:13px;color:var(--muted)">Could not load summary. Please WhatsApp us for your prescription.</div>';}
+}
+
+function sendToWA(){var msg='Hi MediWhats! I completed a voice consultation with Dr. Aiden.\n\nPatient: '+pat.name+', Age: '+pat.age+'\n\nSummary:\n'+curSummary.substring(0,400)+'\n\nPlease send my prescription. Thank you!';window.open('https://wa.me/'+WA+'?text='+encodeURIComponent(msg),'_blank');}
+function newConsult(){pat={name:'',age:'',gender:'Male',phone:'',language:'English'};msgs=[];curSummary='';lastReply='';document.querySelectorAll('#s-intake input').forEach(function(e){e.value='';});setGender('Male','M');goScreen('intro');}
+function esc(t){return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/\n/g,'<br>');}
+
+if(synth){synth.getVoices();synth.addEventListener('voiceschanged',function(){synth.getVoices();});}
+</script>
+</body>
+</html>
