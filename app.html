@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773968284 -->
+<!-- MediWhats v23 BUILD:1773970491 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -79,6 +79,8 @@ body.light{
 /* SCREENS */
 .screen{display:none}
 .screen.active{display:block}
+.lab-tab{padding:8px 16px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:12px;transition:all .15s}
+.lab-tab.active-tab,.lab-tab:focus{background:var(--teal);color:#000;border-color:var(--teal)}
 
 /* DASHBOARD */
 .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px}
@@ -576,23 +578,152 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         </div>
       </div>
     
-<!-- INVESTIGATIONS SCREEN -->
+<!-- INVESTIGATIONS SCREEN — FULL LIS -->
 <div id="screen-investigations" class="screen">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-    <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Investigations</div>
-    <div style="display:flex;gap:10px">
-      <button onclick="showInvTab('orders')" id="inv-tab-orders" style="padding:8px 18px;border-radius:8px;border:0.5px solid var(--teal);background:var(--teal);color:#000;font-weight:700;cursor:pointer;font-size:13px">Orders</button>
-      <button onclick="showInvTab('results')" id="inv-tab-results" style="padding:8px 18px;border-radius:8px;border:0.5px solid rgba(0,196,154,0.3);background:transparent;color:rgba(240,250,247,0.7);font-weight:600;cursor:pointer;font-size:13px">Results</button>
+    <div>
+      <div style="font-family:'Cabinet Grotesk',sans-serif;font-size:22px;font-weight:700">Laboratory</div>
+      <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px">Sample collection · Processing · Reports</div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="showLabTab('worklist')" id="lab-tab-worklist" class="lab-tab active-tab">Worklist</button>
+      <button onclick="showLabTab('collection')" id="lab-tab-collection" class="lab-tab">Collection</button>
+      <button onclick="showLabTab('results')" id="lab-tab-results" class="lab-tab">Enter Results</button>
+      <button onclick="showLabTab('approve')" id="lab-tab-approve" class="lab-tab">Approve</button>
     </div>
   </div>
-  <div id="inv-tab-content-orders">
-    <div id="inv-orders-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
-      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading orders...</div>
+
+  <!-- WORKLIST TAB -->
+  <div id="lab-content-worklist">
+    <!-- Stats -->
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px">
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Ordered</div>
+        <div style="font-size:20px;font-weight:700;color:rgba(240,250,247,0.8);margin-top:4px" id="lab-stat-ordered">0</div>
+      </div>
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Collected</div>
+        <div style="font-size:20px;font-weight:700;color:#378ADD;margin-top:4px" id="lab-stat-collected">0</div>
+      </div>
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Processing</div>
+        <div style="font-size:20px;font-weight:700;color:#8b5cf6;margin-top:4px" id="lab-stat-processing">0</div>
+      </div>
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Pending Approval</div>
+        <div style="font-size:20px;font-weight:700;color:#EF9F27;margin-top:4px" id="lab-stat-approve">0</div>
+      </div>
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:14px">
+        <div style="font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em">Completed</div>
+        <div style="font-size:20px;font-weight:700;color:#00C49A;margin-top:4px" id="lab-stat-done">0</div>
+      </div>
+    </div>
+    <!-- Filters -->
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <input type="date" id="lab-filter-date" onchange="loadLabWorklist()" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.3);border-radius:8px;padding:8px 12px;color:#F0FAF7;font-size:13px">
+      <input type="text" id="lab-filter-search" placeholder="Search patient / accession..." oninput="filterLabWorklist(this.value)" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.3);border-radius:8px;padding:8px 12px;color:#F0FAF7;font-size:13px;width:220px">
+      <select id="lab-filter-status" onchange="loadLabWorklist()" class="form-select" style="width:150px">
+        <option value="">All statuses</option>
+        <option value="ordered">Ordered</option>
+        <option value="sample_collected">Collected</option>
+        <option value="processing">Processing</option>
+        <option value="completed">Completed</option>
+      </select>
+      <button onclick="loadLabWorklist()" style="padding:8px 16px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:8px;cursor:pointer;font-size:13px">Refresh</button>
+    </div>
+    <div id="lab-worklist-table" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading worklist...</div>
     </div>
   </div>
-  <div id="inv-tab-content-results" style="display:none">
-    <div id="inv-results-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
-      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading results...</div>
+
+  <!-- COLLECTION TAB -->
+  <div id="lab-content-collection" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+      <!-- Patient search -->
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;padding:20px">
+        <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px">Find Patient Orders</div>
+        <div style="position:relative;margin-bottom:12px">
+          <input id="lab-patient-search" type="text" class="form-input" style="width:100%" placeholder="Search by name, UHID, accession no..." oninput="searchLabPatient(this.value)">
+          <div id="lab-patient-suggestions" style="display:none;position:absolute;top:100%;left:0;right:0;background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:10px;z-index:100;max-height:160px;overflow-y:auto;margin-top:4px;box-shadow:0 8px 24px rgba(0,0,0,0.6)"></div>
+        </div>
+        <div id="lab-patient-orders" style="display:none">
+          <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Pending orders</div>
+          <div id="lab-patient-orders-list"></div>
+        </div>
+      </div>
+      <!-- Vacutainer guide -->
+      <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;padding:20px">
+        <div style="font-size:12px;font-weight:700;color:var(--teal);text-transform:uppercase;letter-spacing:.05em;margin-bottom:14px">Vacutainer Collection Guide</div>
+        <div id="vacu-guide">
+          <div style="font-size:13px;color:rgba(240,250,247,0.4);text-align:center;padding:20px">Select a patient to see required tubes</div>
+        </div>
+        <div id="barcode-panel" style="display:none;margin-top:14px;padding-top:14px;border-top:0.5px solid rgba(0,196,154,0.15)">
+          <div style="font-size:11px;color:rgba(240,250,247,0.5);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">Barcode Labels</div>
+          <div id="barcode-labels-list"></div>
+          <button onclick="printBarcodeLabels()" style="margin-top:10px;padding:8px 18px;background:var(--teal);color:#000;border:none;border-radius:8px;font-weight:700;cursor:pointer;font-size:13px;width:100%">Print Barcode Labels</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS ENTRY TAB -->
+  <div id="lab-content-results" style="display:none">
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:0.5px solid rgba(0,196,154,0.15);display:flex;justify-content:space-between;align-items:center">
+        <div style="font-size:14px;font-weight:600">Pending result entry</div>
+        <input type="text" id="results-search" placeholder="Search..." oninput="filterResultsEntry(this.value)" style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:8px;padding:6px 12px;color:#F0FAF7;font-size:12px;width:200px">
+      </div>
+      <div id="results-entry-list"><div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div></div>
+    </div>
+  </div>
+
+  <!-- APPROVE TAB -->
+  <div id="lab-content-approve" style="display:none">
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden">
+      <div style="padding:14px 18px;border-bottom:0.5px solid rgba(0,196,154,0.15)">
+        <div style="font-size:14px;font-weight:600">Awaiting biochemist/pathologist approval</div>
+      </div>
+      <div id="approve-list"><div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT ENTRY MODAL -->
+<div id="resultEntryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:6000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:20px;width:100%;max-width:700px;max-height:90vh;overflow-y:auto">
+    <div style="padding:16px 22px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0D1412;z-index:10">
+      <div>
+        <div style="font-size:16px;font-weight:700" id="rem-test-name">Enter Results</div>
+        <div style="font-size:12px;color:rgba(240,250,247,0.5);margin-top:2px" id="rem-patient-name"></div>
+      </div>
+      <button id="closeResultEntry" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:22px;cursor:pointer">&#215;</button>
+    </div>
+    <div style="padding:20px">
+      <div id="rem-params-list"></div>
+      <div style="margin-top:14px">
+        <label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Tech Comment</label>
+        <textarea id="rem-tech-comment" rows="2" class="form-input" style="width:100%;resize:none" placeholder="Optional notes about sample quality, dilution, repeat run..."></textarea>
+      </div>
+    </div>
+    <div style="padding:14px 22px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:#0D1412">
+      <button id="cancelResultEntry" style="padding:10px 20px;border:0.5px solid rgba(240,250,247,0.2);border-radius:10px;background:none;color:rgba(240,250,247,0.6);cursor:pointer">Cancel</button>
+      <button id="saveResultEntry" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer">Save Results &amp; Generate AI Report</button>
+    </div>
+  </div>
+</div>
+
+<!-- APPROVE RESULT MODAL -->
+<div id="approveModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:6000;align-items:center;justify-content:center;padding:20px">
+  <div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:20px;width:100%;max-width:600px;max-height:90vh;overflow-y:auto">
+    <div style="padding:16px 22px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#0D1412;z-index:10">
+      <div style="font-size:16px;font-weight:700">Review &amp; Approve Report</div>
+      <button id="closeApproveModal" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:22px;cursor:pointer">&#215;</button>
+    </div>
+    <div id="approve-modal-body" style="padding:20px"></div>
+    <div style="padding:14px 22px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;flex-wrap:wrap;position:sticky;bottom:0;background:#0D1412">
+      <button id="printLabReport" style="padding:10px 18px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(240,250,247,0.2);color:#F0FAF7;border-radius:8px;cursor:pointer;font-size:13px">Print Report</button>
+      <button id="sendPatientWA" style="padding:10px 18px;background:rgba(37,211,102,0.1);border:0.5px solid rgba(37,211,102,0.4);color:#25d366;border-radius:8px;cursor:pointer;font-size:13px">Send to Patient</button>
+      <button id="approveResultBtn" style="padding:10px 24px;background:var(--teal);color:#000;border:none;border-radius:10px;font-weight:700;cursor:pointer;margin-left:auto">Approve &amp; Release</button>
     </div>
   </div>
 </div>
@@ -3182,74 +3313,17 @@ async function deleteMedicine(id) {
 // Investigations
 var invOrdersData=[], invResultsData=[];
 
-async function loadInvestigations() {
-  showInvTab('orders');
-  var today=new Date().toISOString().split('T')[0];
-  try {
-    var data=await apiCall('/hospitals/'+mwHospitalId+'/investigations/orders?date='+today);
-    if (data.success) { invOrdersData=data.data; renderInvOrders(invOrdersData); }
-  } catch(e) {}
-}
 
-function showInvTab(tab) {
-  var oc=document.getElementById('inv-tab-content-orders'); if(oc) oc.style.display=tab==='orders'?'block':'none';
-  var rc=document.getElementById('inv-tab-content-results'); if(rc) rc.style.display=tab==='results'?'block':'none';
-  var ob=document.getElementById('inv-tab-orders'); if(ob){ ob.style.background=tab==='orders'?'var(--teal)':'transparent'; ob.style.color=tab==='orders'?'#000':'rgba(240,250,247,0.7)'; }
-  var rb=document.getElementById('inv-tab-results'); if(rb){ rb.style.background=tab==='results'?'var(--teal)':'transparent'; rb.style.color=tab==='results'?'#000':'rgba(240,250,247,0.7)'; }
-  if (tab==='results') loadInvResults();
-}
 
-function renderInvOrders(orders) {
-  var el=document.getElementById('inv-orders-list'); if(!el) return;
-  if (!orders.length) { el.innerHTML='<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No investigation orders today.</div>'; return; }
-  var sc={ordered:'#ef9f27',sample_collected:'#378add',processing:'#8b5cf6',completed:'#00C49A',cancelled:'#ef4444'};
-  el.innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">'+['MRN','Patient','Test','Dept','Status','Action'].map(function(h){ return '<th style="padding:10px 14px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">'+h+'</th>'; }).join('')+'</tr></thead><tbody>'
-    +orders.map(function(o){
-      var name=((o.first_name||'')+(o.last_name?' '+o.last_name:'')).trim();
-      return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
-        +'<td style="padding:10px 14px;font-weight:600;color:var(--teal)">'+(o.mrn||'\u2014')+'</td>'
-        +'<td style="padding:10px 14px">'+name+'</td>'
-        +'<td style="padding:10px 14px">'+o.test_name+'</td>'
-        +'<td style="padding:10px 14px"><span style="background:rgba(0,196,154,0.1);color:var(--teal);padding:2px 8px;border-radius:4px;font-size:11px">'+(o.dept_type||'LAB')+'</span></td>'
-        +'<td style="padding:10px 14px"><span style="color:'+(sc[o.status]||'#888')+';font-size:12px;font-weight:600;text-transform:uppercase">'+(o.status||'ordered')+'</span></td>'
-        +'<td style="padding:10px 14px">'+(o.status!=='completed'?'<button class="action-btn" style="font-size:11px;padding:5px 10px">Enter Result</button>':'<span style="color:var(--teal);font-size:12px">\u2713 Done</span>')+'</td></tr>';
-    }).join('')+'</tbody></table>';
-}
 
-async function loadInvResults() {
-  try {
-    var data=await apiCall('/hospitals/'+mwHospitalId+'/investigations/results?reviewed=false');
-    if (data.success) { invResultsData=data.data; renderInvResults(invResultsData); }
-  } catch(e) {}
-}
 
-function renderInvResults(results) {
-  var el=document.getElementById('inv-results-list'); if(!el) return;
-  if (!results.length) { el.innerHTML='<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No pending results.</div>'; return; }
-  var sc={normal:'#00C49A',borderline:'#ef9f27',abnormal:'#ef4444',pending:'#888'};
-  el.innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2)">'+['Patient','Test','Date','Status','AI Summary','Action'].map(function(h){ return '<th style="padding:10px 14px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">'+h+'</th>'; }).join('')+'</tr></thead><tbody>'
-    +results.map(function(r){
-      var name=((r.first_name||'')+(r.last_name?' '+r.last_name:'')).trim();
-      return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
-        +'<td style="padding:10px 14px">'+name+'</td>'
-        +'<td style="padding:10px 14px;font-weight:600">'+r.test_name+'</td>'
-        +'<td style="padding:10px 14px;font-size:12px;color:rgba(240,250,247,0.6)">'+(r.result_date||'\u2014')+'</td>'
-        +'<td style="padding:10px 14px"><span style="color:'+(sc[r.overall_status]||'#888')+';font-weight:600;font-size:11px;text-transform:uppercase">'+(r.overall_status||'pending')+'</span></td>'
-        +'<td style="padding:10px 14px;max-width:180px;font-size:11px;color:rgba(240,250,247,0.6)">'+(r.ai_summary||'').substring(0,80)+'</td>'
-        +'<td style="padding:10px 14px"><button class="action-btn" data-rid="'+r.id+'" data-phone="'+(r.p_phone||r.phone||'')+'" style="font-size:11px;padding:5px 10px">Send to Patient</button></td></tr>';
-    }).join('')+'</tbody></table>';
-  el.querySelectorAll('button[data-rid]').forEach(function(btn){
-    btn.addEventListener('click',function(){ dispatchInvResult(this.dataset.rid,this.dataset.phone); });
-  });
-}
 
-async function dispatchInvResult(resultId,patientPhone) {
-  var phone=patientPhone||prompt('Patient WhatsApp number:');
-  if (!phone) return;
-  var data=await apiCall('/hospitals/'+mwHospitalId+'/investigations/results/'+resultId+'/dispatch','POST',{patient_phone:phone});
-  if (data.success) { showToast('Results sent \u2713','success'); loadInvResults(); }
-  else showToast('Error: '+data.message,'error');
-}
+
+
+
+
+
+
 
 
 
@@ -4073,6 +4147,653 @@ async function openDispenseModal(visitId) {
 }
 
 
+
+
+
+// ===================================================================
+// FULL LIS FRONTEND — MediWhats Laboratory Information System
+// ===================================================================
+
+var labOrdersData = [];
+var labResultsData = [];
+var currentLabOrder = null;
+var currentLabResult = null;
+var selectedPatientOrders = [];
+
+// Vacutainer color map
+var VACU_MAP = {
+  purple:          { hex:'#9B59B6', label:'Purple (EDTA)',        additive:'K2EDTA 3 mL',              inv:'8 inversions',  note:'For CBC, ESR, HbA1c' },
+  yellow:          { hex:'#F1C40F', label:'Yellow (SST/Gold)',     additive:'Gel+Clot activator 5 mL',  inv:'5 inversions',  note:'For LFT, KFT, Lipid, Thyroid. Centrifuge after 30 min.' },
+  grey:            { hex:'#888',    label:'Grey (Fluoride)',        additive:'NaF+K Oxalate 3 mL',       inv:'8 inversions',  note:'For Blood Sugar. Keep on ice.' },
+  light_blue:      { hex:'#3498DB', label:'Light Blue (Citrate)',   additive:'3.2% Sodium citrate 2.7 mL', inv:'4 inversions', note:'For PT, APTT, INR. Must fill to mark.' },
+  green:           { hex:'#27AE60', label:'Green (Heparin)',        additive:'Li Heparin 4 mL',          inv:'8 inversions',  note:'For electrolytes, ABG' },
+  red:             { hex:'#E74C3C', label:'Red (Plain)',            additive:'No additive 5 mL',          inv:'None',          note:'For serology, Widal, Dengue' },
+  white_container: { hex:'#BDC3C7', label:'Urine Container',       additive:'Sterile container 10-30 mL', inv:'N/A',          note:'Midstream urine, clean catch' },
+  orange:          { hex:'#E67E22', label:'Orange (RST)',           additive:'Thrombin 3 mL',            inv:'6 inversions',  note:'Emergency biochemistry' }
+};
+
+// Status config
+var LAB_STATUS = {
+  ordered:          { color:'rgba(240,250,247,0.5)', bg:'rgba(240,250,247,0.08)', label:'Ordered',    icon:'○' },
+  sample_collected: { color:'#378ADD',               bg:'rgba(55,138,221,0.1)',   label:'Collected',  icon:'◑' },
+  processing:       { color:'#8b5cf6',               bg:'rgba(139,92,246,0.1)',   label:'Processing', icon:'⟳' },
+  outsourced:       { color:'#EF9F27',               bg:'rgba(239,159,39,0.1)',   label:'Outsourced', icon:'→' },
+  completed:        { color:'#00C49A',               bg:'rgba(0,196,154,0.1)',    label:'Done',       icon:'✓' },
+  rejected:         { color:'#E24B4A',               bg:'rgba(226,75,74,0.1)',    label:'Rejected',   icon:'✗' }
+};
+
+// ── MAIN LOAD FUNCTION ────────────────────────────────────────────────
+async function loadInvestigations() {
+  showLabTab('worklist');
+  var df = document.getElementById('lab-filter-date');
+  if (df && !df.value) df.value = new Date().toISOString().split('T')[0];
+  loadLabWorklist();
+}
+
+function showLabTab(tab) {
+  ['worklist','collection','results','approve'].forEach(function(t) {
+    var content = document.getElementById('lab-content-'+t);
+    var btn = document.getElementById('lab-tab-'+t);
+    if (content) content.style.display = t===tab ? 'block' : 'none';
+    if (btn) {
+      btn.classList.toggle('active-tab', t===tab);
+    }
+  });
+  if (tab === 'results')  loadResultsEntry();
+  if (tab === 'approve')  loadApproveList();
+  if (tab === 'collection') { /* patient search drives this */ }
+}
+
+// ── WORKLIST ──────────────────────────────────────────────────────────
+async function loadLabWorklist() {
+  var el = document.getElementById('lab-worklist-table');
+  if (el) el.innerHTML = '<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div>';
+  try {
+    var date   = document.getElementById('lab-filter-date')?.value || new Date().toISOString().split('T')[0];
+    var status = document.getElementById('lab-filter-status')?.value || '';
+    var url    = '/hospitals/'+mwHospitalId+'/investigations/orders?date='+date+(status?'&status='+status:'');
+    var data   = await apiCall(url);
+    if (!data.success) { if(el) el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">No orders found.</div>'; return; }
+    labOrdersData = data.data || [];
+    renderLabWorklist(labOrdersData);
+    updateLabStats(labOrdersData);
+  } catch(e) {
+    if(el) el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Error loading worklist.</div>';
+  }
+}
+
+function updateLabStats(orders) {
+  var counts = { ordered:0, sample_collected:0, processing:0, completed:0, approve:0 };
+  orders.forEach(function(o) { if(counts[o.status]!==undefined) counts[o.status]++; });
+  var e1=document.getElementById('lab-stat-ordered');    if(e1) e1.textContent=counts.ordered;
+  var e2=document.getElementById('lab-stat-collected');  if(e2) e2.textContent=counts.sample_collected;
+  var e3=document.getElementById('lab-stat-processing'); if(e3) e3.textContent=counts.processing;
+  var e5=document.getElementById('lab-stat-done');       if(e5) e5.textContent=counts.completed;
+}
+
+function filterLabWorklist(val) {
+  if (!val) { renderLabWorklist(labOrdersData); return; }
+  var q = val.toLowerCase();
+  renderLabWorklist(labOrdersData.filter(function(o) {
+    var name = ((o.first_name||'')+(o.last_name?' '+o.last_name:'')).toLowerCase();
+    return name.includes(q) || (o.accession_number||'').toLowerCase().includes(q) || (o.mrn||'').toLowerCase().includes(q) || (o.test_name||'').toLowerCase().includes(q);
+  }));
+}
+
+function renderLabWorklist(orders) {
+  var el = document.getElementById('lab-worklist-table'); if(!el) return;
+  if (!orders.length) { el.innerHTML='<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No orders for selected date/filter.</div>'; return; }
+
+  var rows = orders.map(function(o) {
+    var name = ((o.first_name||'')+(o.last_name?' '+o.last_name:'')).trim()||'Patient';
+    var sc = LAB_STATUS[o.status] || LAB_STATUS.ordered;
+    var vacu = o.vacutainer_color ? VACU_MAP[o.vacutainer_color] : null;
+    var vacuDot = vacu ? '<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:'+vacu.hex+';border:1px solid rgba(0,0,0,0.2);margin-right:5px;vertical-align:middle"></span>' : '';
+    var dept_badge = '<span style="font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(0,196,154,0.1);color:var(--teal)">'+(o.dept_type||'LAB')+'</span>';
+    
+    var actions = '';
+    if (o.status === 'ordered') {
+      actions = '<button class="action-btn wl-receive-btn" data-oid="'+o.id+'" style="font-size:11px;padding:4px 10px;background:rgba(55,138,221,0.15);border-color:#378ADD;color:#378ADD">Receive Sample</button>';
+    } else if (o.status === 'sample_collected') {
+      actions = '<button class="action-btn wl-enter-btn" data-oid="'+o.id+'" style="font-size:11px;padding:4px 10px;background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">Enter Results</button>';
+    } else if (o.status === 'processing') {
+      actions = '<button class="action-btn wl-enter-btn" data-oid="'+o.id+'" style="font-size:11px;padding:4px 10px;background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">Enter Results</button>';
+    } else if (o.status === 'completed') {
+      actions = '<span style="color:var(--teal);font-size:12px">\u2713 Done</span>';
+    }
+
+    return '<tr class="wl-row" style="border-bottom:0.5px solid rgba(0,196,154,0.06)" data-oid="'+o.id+'">'
+      +'<td style="padding:10px 12px"><div style="font-family:monospace;font-size:12px;color:var(--teal);font-weight:600">'+(o.accession_number||'\u2014')+'</div></td>'
+      +'<td style="padding:10px 12px"><div style="font-weight:600;font-size:13px">'+name+'</div><div style="font-size:11px;color:rgba(240,250,247,0.4)">'+(o.mrn||'')+(o.age?' \xb7 '+o.age+'y':'')+'</div></td>'
+      +'<td style="padding:10px 12px"><div style="font-size:13px">'+o.test_name+'</div><div style="font-size:11px;color:rgba(240,250,247,0.4);margin-top:2px">'+vacuDot+(vacu?vacu.label:'')+'</div></td>'
+      +'<td style="padding:10px 12px">'+dept_badge+'</td>'
+      +'<td style="padding:10px 12px"><span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:'+sc.color+';background:'+sc.bg+';padding:3px 10px;border-radius:12px">'+sc.icon+' '+sc.label+'</span></td>'
+      +'<td style="padding:10px 12px"><div style="display:flex;gap:6px">'+actions+'</div></td>'
+      +'</tr>';
+  }).join('');
+
+  el.innerHTML = '<table style="width:100%;border-collapse:collapse">'
+    +'<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2);background:rgba(0,196,154,0.03)">'
+    +['Accession','Patient','Test','Dept','Status','Action'].map(function(h){ return '<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">'+h+'</th>'; }).join('')
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+
+  // Wire action buttons
+  el.querySelectorAll('.wl-receive-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); receiveSample(this.dataset.oid); });
+  });
+  el.querySelectorAll('.wl-enter-btn').forEach(function(btn) {
+    btn.addEventListener('click', function(e) { e.stopPropagation(); openResultEntry(this.dataset.oid); });
+  });
+}
+
+// ── RECEIVE SAMPLE ────────────────────────────────────────────────────
+async function receiveSample(orderId) {
+  var order = labOrdersData.find(function(o){ return String(o.id)===String(orderId); });
+  if (!order) return;
+  var name = ((order.first_name||'')+(order.last_name?' '+order.last_name:'')).trim();
+  var vacu = order.vacutainer_color ? VACU_MAP[order.vacutainer_color] : null;
+  var vacuInfo = vacu ? ' (\u25CF '+vacu.label+')' : '';
+
+  if (!confirm('Confirm sample received for:\n'+name+'\nTest: '+order.test_name+vacuInfo+'\nAccession: '+(order.accession_number||''))) return;
+
+  var data = await apiCall('/hospitals/'+mwHospitalId+'/investigations/orders/'+orderId+'/receive', 'PUT', {
+    received_by: (mwUser&&(mwUser.name||mwUser.email))||'Lab Tech',
+    notes: ''
+  });
+  if (data.success) {
+    showToast('Sample received \u2713 Accession: '+(order.accession_number||''), 'success');
+    loadLabWorklist();
+  } else {
+    showToast('Error: '+data.message, 'error');
+  }
+}
+
+// ── COLLECTION TAB — Patient search ───────────────────────────────────
+async function searchLabPatient(val) {
+  var s = document.getElementById('lab-patient-suggestions'); if(!s) return;
+  if (!val||val.length<2) { s.style.display='none'; return; }
+  if (!window.patientsData||!window.patientsData.length) {
+    var d = await apiCall('/hospitals/'+mwHospitalId+'/patients');
+    if(d.success) window.patientsData=d.data;
+  }
+  var q=val.toLowerCase();
+  var matches = (window.patientsData||[]).filter(function(p){
+    return ((p.first_name||'')+(p.last_name?' '+p.last_name:'')).toLowerCase().includes(q)||(p.mrn||'').toLowerCase().includes(q)||(p.phone||'').includes(val);
+  }).slice(0,6);
+  if (!matches.length) { s.style.display='none'; return; }
+  s.innerHTML = matches.map(function(p){
+    var name=((p.first_name||'')+(p.last_name?' '+p.last_name:'')).trim();
+    return '<div class="lp-opt" data-pid="'+p.patient_id+'" data-name="'+name.replace(/"/g,'&quot;')+'" style="padding:10px 12px;cursor:pointer;border-bottom:0.5px solid rgba(0,196,154,0.1)">'
+      +'<div style="font-weight:600;font-size:13px">'+name+'</div>'
+      +'<div style="font-size:11px;color:rgba(240,250,247,0.5)">'+(p.mrn||'')+(p.phone?' \xb7 '+p.phone:'')+'</div></div>';
+  }).join('');
+  s.style.display='block';
+  s.querySelectorAll('.lp-opt').forEach(function(opt){
+    opt.onmouseenter=function(){ this.style.background='rgba(0,196,154,0.08)'; };
+    opt.onmouseleave=function(){ this.style.background=''; };
+    opt.onclick=function(){ loadPatientLabOrders(this.dataset.pid, this.dataset.name); s.style.display='none'; document.getElementById('lab-patient-search').value=this.dataset.name; };
+  });
+}
+
+async function loadPatientLabOrders(patientId, patientName) {
+  var el = document.getElementById('lab-patient-orders'); if(!el) return;
+  el.style.display='block';
+  var data = await apiCall('/hospitals/'+mwHospitalId+'/investigations/orders?patient_id='+patientId+'&status=ordered');
+  var orders = (data.data||[]).filter(function(o){ return o.status==='ordered'||o.status==='sample_collected'; });
+  var listEl = document.getElementById('lab-patient-orders-list');
+
+  if (!orders.length) {
+    listEl.innerHTML='<div style="color:rgba(240,250,247,0.4);font-size:13px;padding:8px 0">No pending orders</div>';
+    showVacuGuide([], patientName);
+    return;
+  }
+
+  selectedPatientOrders = orders;
+  listEl.innerHTML = orders.map(function(o) {
+    var vacu = o.vacutainer_color ? VACU_MAP[o.vacutainer_color] : null;
+    var sc = LAB_STATUS[o.status]||LAB_STATUS.ordered;
+    return '<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 10px;background:rgba(0,196,154,0.05);border-radius:8px;margin-bottom:6px">'
+      +'<div>'
+      +'<div style="font-size:13px;font-weight:600">'+o.test_name+'</div>'
+      +'<div style="font-size:11px;color:rgba(240,250,247,0.4);font-family:monospace">'+(o.accession_number||'')+'</div>'
+      +'</div>'
+      +'<span style="font-size:11px;font-weight:600;color:'+sc.color+'">'+sc.label+'</span>'
+      +'</div>';
+  }).join('');
+
+  showVacuGuide(orders, patientName);
+}
+
+function showVacuGuide(orders, patientName) {
+  var el = document.getElementById('vacu-guide'); if(!el) return;
+  if (!orders.length) { el.innerHTML='<div style="color:rgba(240,250,247,0.4);font-size:13px;text-align:center;padding:20px">No orders</div>'; return; }
+
+  // Group by vacutainer color
+  var byTube = {};
+  orders.forEach(function(o) {
+    var color = o.vacutainer_color || 'unknown';
+    if (!byTube[color]) byTube[color] = [];
+    byTube[color].push(o);
+  });
+
+  // Order of draw (CLSI standard)
+  var drawOrder = ['light_blue','red','yellow','green','purple','grey','white_container'];
+  var sortedColors = Object.keys(byTube).sort(function(a,b){
+    return (drawOrder.indexOf(a)+1||99)-(drawOrder.indexOf(b)+1||99);
+  });
+
+  el.innerHTML = '<div style="font-size:11px;color:rgba(240,250,247,0.5);margin-bottom:10px">Draw order (CLSI standard):</div>'
+    + sortedColors.map(function(color, idx) {
+        var vacu = VACU_MAP[color] || {hex:'#888',label:color,additive:'',inv:'',note:''};
+        var tests = byTube[color];
+        return '<div style="display:flex;gap:12px;align-items:flex-start;padding:10px;background:rgba(0,0,0,0.2);border-radius:10px;margin-bottom:8px;border-left:3px solid '+vacu.hex+'">'
+          +'<div style="flex-shrink:0;text-align:center">'
+          +'<div style="width:28px;height:40px;border-radius:4px 4px 2px 2px;background:'+vacu.hex+';border:2px solid rgba(0,0,0,0.3);margin-bottom:4px"></div>'
+          +'<div style="font-size:9px;color:rgba(240,250,247,0.5)">'+(idx+1)+'<sup>st</sup></div>'
+          +'</div>'
+          +'<div style="flex:1">'
+          +'<div style="font-size:12px;font-weight:600;color:#F0FAF7">'+vacu.label+'</div>'
+          +'<div style="font-size:11px;color:rgba(240,250,247,0.5);margin-top:2px">'+vacu.additive+' \xb7 '+vacu.inv+'</div>'
+          +'<div style="font-size:11px;color:rgba(240,250,247,0.4);margin-top:2px;font-style:italic">'+vacu.note+'</div>'
+          +'<div style="margin-top:6px">'+tests.map(function(t){ return '<span style="font-size:11px;background:rgba(0,196,154,0.1);color:var(--teal);padding:2px 7px;border-radius:4px;margin-right:4px">'+t.test_name+'</span>'; }).join('')+'</div>'
+          +'</div></div>';
+      }).join('');
+
+  // Show barcode panel
+  var bp = document.getElementById('barcode-panel');
+  var bl = document.getElementById('barcode-labels-list');
+  if (bp && bl) {
+    bp.style.display='block';
+    bl.innerHTML = orders.map(function(o){
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#080C0B;border-radius:6px;margin-bottom:5px;font-family:monospace;font-size:12px">'
+        +'<span style="color:var(--teal);font-weight:700">'+(o.accession_number||'')+'</span>'
+        +'<span style="color:rgba(240,250,247,0.7)">'+o.test_name+'</span>'
+        +'</div>';
+    }).join('');
+  }
+}
+
+function printBarcodeLabels() {
+  if (!selectedPatientOrders.length) return;
+  var h = hospitalSettings||{};
+  var patSearch = document.getElementById('lab-patient-search');
+  var patName = patSearch ? patSearch.value : 'Patient';
+  var today = new Date().toLocaleDateString('en-IN');
+
+  var labels = selectedPatientOrders.map(function(o) {
+    var vacu = o.vacutainer_color ? VACU_MAP[o.vacutainer_color] : null;
+    var vacuColor = vacu ? vacu.hex : '#888';
+    return '<div style="width:6cm;height:2.5cm;border:1px solid #333;border-radius:4px;padding:6px;margin:4px;display:inline-block;page-break-inside:avoid;border-left:6px solid '+vacuColor+'">'
+      +'<div style="font-size:14px;font-weight:700;font-family:monospace">'+(o.accession_number||'')+'</div>'
+      +'<div style="font-size:10px;font-weight:600;margin-top:2px">'+patName+'</div>'
+      +'<div style="font-size:9px;color:#555;margin-top:1px">'+o.test_name+' \xb7 '+today+'</div>'
+      +'<div style="font-size:9px;color:#555">'+(vacu?vacu.label:'')+' \xb7 '+(h.name||'Lab')+'</div>'
+      +'<svg viewBox="0 0 200 30" width="100%" height="24" style="margin-top:3px">'
+      +'<rect x="0" y="0" width="3" height="30" fill="#333"/><rect x="5" y="0" width="2" height="30" fill="#333"/><rect x="9" y="0" width="4" height="30" fill="#333"/><rect x="15" y="0" width="2" height="30" fill="#333"/><rect x="20" y="0" width="3" height="30" fill="#333"/><rect x="25" y="0" width="2" height="30" fill="#333"/><rect x="29" y="0" width="5" height="30" fill="#333"/><rect x="37" y="0" width="3" height="30" fill="#333"/><rect x="43" y="0" width="2" height="30" fill="#333"/><rect x="47" y="0" width="4" height="30" fill="#333"/>'
+      +'</svg></div>';
+  }).join('');
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Barcode Labels</title>'
+    +'<style>@page{size:A4;margin:10mm}body{font-family:Arial,sans-serif;margin:0}@media print{.np{display:none}}</style></head><body>'
+    +'<div class="np" style="position:fixed;top:10px;right:10px"><button onclick="window.print()" style="background:#00C49A;color:#000;border:none;padding:8px 16px;border-radius:6px;font-weight:700;cursor:pointer">Print Labels</button></div>'
+    +'<div style="padding:10px">'+labels+'</div></body></html>';
+  var win=window.open('','_blank','width=700,height=500');
+  if(win){ win.document.write(html); win.document.close(); }
+}
+
+// ── RESULT ENTRY ──────────────────────────────────────────────────────
+async function loadResultsEntry() {
+  var el = document.getElementById('results-entry-list'); if(!el) return;
+  el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div>';
+  try {
+    var date = document.getElementById('lab-filter-date')?.value || new Date().toISOString().split('T')[0];
+    var data = await apiCall('/hospitals/'+mwHospitalId+'/investigations/orders?date='+date+'&status=sample_collected');
+    var orders = (data.data||[]).filter(function(o){ return o.status==='sample_collected'||o.status==='processing'; });
+    if (!orders.length) { el.innerHTML='<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No samples pending result entry for today.</div>'; return; }
+    var rows = orders.map(function(o) {
+      var name=((o.first_name||'')+(o.last_name?' '+o.last_name:'')).trim()||'Patient';
+      return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+        +'<td style="padding:10px 12px;font-family:monospace;font-size:12px;color:var(--teal)">'+(o.accession_number||'\u2014')+'</td>'
+        +'<td style="padding:10px 12px"><div style="font-weight:600">'+name+'</div><div style="font-size:11px;color:rgba(240,250,247,0.4)">'+(o.mrn||'')+'</div></td>'
+        +'<td style="padding:10px 12px;font-size:13px">'+o.test_name+'</td>'
+        +'<td style="padding:10px 12px"><span style="font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(0,196,154,0.1);color:var(--teal)">'+(o.dept_type||'LAB')+'</span></td>'
+        +'<td style="padding:10px 12px"><button class="action-btn enter-result-btn" data-oid="'+o.id+'" style="font-size:11px;padding:5px 12px;background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">Enter Results</button></td>'
+        +'</tr>';
+    }).join('');
+    el.innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2);background:rgba(0,196,154,0.03)">'
+      +['Accession','Patient','Test','Dept','Action'].map(function(h){ return '<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">'+h+'</th>'; }).join('')
+      +'</tr></thead><tbody>'+rows+'</tbody></table>';
+    el.querySelectorAll('.enter-result-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){ openResultEntry(this.dataset.oid); });
+    });
+  } catch(e) { el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Error loading results.</div>'; }
+}
+
+function filterResultsEntry(val) { /* TODO: filter */ }
+
+async function openResultEntry(orderId) {
+  var order = labOrdersData.find(function(o){ return String(o.id)===String(orderId); });
+  if (!order) {
+    // Try fetching
+    var d = await apiCall('/hospitals/'+mwHospitalId+'/investigations/orders?date='+new Date().toISOString().split('T')[0]);
+    var found = (d.data||[]).find(function(o){ return String(o.id)===String(orderId); });
+    if (found) order = found; else { showToast('Order not found','error'); return; }
+  }
+  currentLabOrder = order;
+
+  var modal = document.getElementById('resultEntryModal'); if(!modal) return;
+  var nameEl = document.getElementById('rem-test-name'); if(nameEl) nameEl.textContent=order.test_name;
+  var patEl  = document.getElementById('rem-patient-name');
+  if(patEl) {
+    var pName = ((order.first_name||'')+(order.last_name?' '+order.last_name:'')).trim()||'Patient';
+    patEl.textContent = pName + ' \xb7 ' + (order.accession_number||'') + ' \xb7 ' + (order.mrn||'');
+  }
+
+  // Build parameter inputs from test_master
+  var params = [];
+  try { params = order.parameters ? JSON.parse(order.parameters) : []; } catch(e){}
+  buildParamInputs(params, order);
+
+  modal.style.display='flex';
+  document.getElementById('closeResultEntry').onclick=function(){ modal.style.display='none'; };
+  document.getElementById('cancelResultEntry').onclick=function(){ modal.style.display='none'; };
+  document.getElementById('saveResultEntry').onclick=function(){ submitResultEntry(); };
+}
+
+function buildParamInputs(params, order) {
+  var el = document.getElementById('rem-params-list'); if(!el) return;
+  if (!params.length) {
+    // Free-text result for radiology/pathology
+    el.innerHTML='<div style="margin-bottom:12px">'
+      +'<label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:6px">Result / Findings</label>'
+      +'<textarea id="rem-free-result" rows="6" class="form-input" style="width:100%;resize:vertical" placeholder="Enter test findings, observations, impressions..."></textarea>'
+      +'</div>';
+    return;
+  }
+
+  var html = '<table style="width:100%;border-collapse:collapse;margin-bottom:10px">'
+    +'<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.15)">'
+    +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Parameter</th>'
+    +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Result</th>'
+    +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Unit</th>'
+    +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Normal Range</th>'
+    +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Flag</th>'
+    +'</tr></thead><tbody>';
+
+  params.forEach(function(p, i) {
+    var normalRange = p.normal || p.normal_male || '';
+    html += '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+      +'<td style="padding:7px 10px;font-size:13px;font-weight:500">'+p.name+'</td>'
+      +'<td style="padding:7px 8px"><input type="text" id="param-val-'+i+'" class="form-input" style="width:90px;padding:5px 8px;font-size:13px" placeholder="Value" oninput="flagParamRow('+i+',this.value,\''+normalRange+'\',\''+p.low_flag+'\',\''+p.high_flag+'\')"></td>'
+      +'<td style="padding:7px 10px;font-size:12px;color:rgba(240,250,247,0.5)">'+p.unit+'</td>'
+      +'<td style="padding:7px 10px;font-size:12px;color:rgba(240,250,247,0.5)">'+normalRange+'</td>'
+      +'<td style="padding:7px 10px" id="param-flag-'+i+'"><span style="font-size:12px;color:rgba(240,250,247,0.3)">--</span></td>'
+      +'</tr>';
+  });
+
+  el.innerHTML = html + '</tbody></table>';
+}
+
+function flagParamRow(idx, val, normalRange, lowFlag, highFlag) {
+  var flagEl = document.getElementById('param-flag-'+idx); if(!flagEl) return;
+  var num = parseFloat(val);
+  if (isNaN(num) || !val) { flagEl.innerHTML='<span style="font-size:12px;color:rgba(240,250,247,0.3)">--</span>'; return; }
+  
+  var flag = '';
+  var color = '';
+  if (highFlag && num >= parseFloat(highFlag)) { flag='H'; color='#E24B4A'; }
+  else if (lowFlag && num <= parseFloat(lowFlag)) { flag='L'; color='#EF9F27'; }
+  else { flag='N'; color='#00C49A'; }
+  
+  flagEl.innerHTML='<span style="font-size:12px;font-weight:700;color:'+color+'">'+flag+'</span>';
+}
+
+async function submitResultEntry() {
+  if (!currentLabOrder) return;
+  var btn = document.getElementById('saveResultEntry');
+  if(btn) btn.textContent='Saving...';
+
+  var params = [];
+  try { params = currentLabOrder.parameters ? JSON.parse(currentLabOrder.parameters) : []; } catch(e){}
+
+  var resultValues = [];
+  if (params.length) {
+    params.forEach(function(p, i) {
+      var valEl = document.getElementById('param-val-'+i);
+      if (valEl && valEl.value) {
+        resultValues.push({
+          name: p.name, unit: p.unit,
+          value: valEl.value,
+          normal: p.normal||p.normal_male||'',
+          low_flag: p.low_flag||'', high_flag: p.high_flag||''
+        });
+      }
+    });
+  } else {
+    var freeEl = document.getElementById('rem-free-result');
+    if (freeEl && freeEl.value) resultValues.push({ name: 'Result', value: freeEl.value, unit: '', normal: '' });
+  }
+
+  if (!resultValues.length) { showToast('Enter at least one result value','error'); if(btn) btn.textContent='Save Results & Generate AI Report'; return; }
+
+  var techComment = document.getElementById('rem-tech-comment')?.value || '';
+  var today = new Date().toISOString().split('T')[0];
+
+  var data = await apiCall('/hospitals/'+mwHospitalId+'/investigations/results', 'POST', {
+    order_id:      currentLabOrder.id,
+    patient_id:    currentLabOrder.patient_id,
+    visit_id:      currentLabOrder.visit_id,
+    test_name:     currentLabOrder.test_name,
+    dept_type:     currentLabOrder.dept_type,
+    result_date:   today,
+    performed_by:  (mwUser&&(mwUser.name||mwUser.email))||'Lab Tech',
+    result_values: resultValues,
+    tech_comment:  techComment,
+    status:        'final'
+  });
+
+  if (data.success) {
+    showToast('Results saved. AI analysis: '+data.data.overall_status+' \u2713', 'success');
+    document.getElementById('resultEntryModal').style.display='none';
+    loadLabWorklist();
+    loadApproveList();
+    if(btn) btn.textContent='Save Results & Generate AI Report';
+  } else {
+    showToast('Error: '+data.message,'error');
+    if(btn) btn.textContent='Save Results & Generate AI Report';
+  }
+}
+
+// ── APPROVE LIST ──────────────────────────────────────────────────────
+async function loadApproveList() {
+  var el = document.getElementById('approve-list'); if(!el) return;
+  el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div>';
+  try {
+    var data = await apiCall('/hospitals/'+mwHospitalId+'/investigations/results?approved=false');
+    var results = data.data||[];
+    if (!results.length) { el.innerHTML='<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No results pending approval.</div>'; return; }
+    labResultsData = results;
+
+    var sc = {normal:'#00C49A',borderline:'#EF9F27',abnormal:'#E24B4A',critical:'#ff0000',pending:'#888'};
+    var rows = results.map(function(r) {
+      var name=((r.first_name||'')+(r.last_name?' '+r.last_name:'')).trim()||'Patient';
+      var flags = Array.isArray(r.ai_flags)?r.ai_flags:(r.ai_flags?JSON.parse(r.ai_flags||'[]'):[]);
+      var crits = Array.isArray(r.critical_flags)?r.critical_flags:(r.critical_flags?JSON.parse(r.critical_flags||'[]'):[]);
+      var statusColor = sc[r.overall_status]||'#888';
+      return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+        +'<td style="padding:10px 12px"><div style="font-weight:600">'+name+'</div><div style="font-size:11px;color:rgba(240,250,247,0.4)">'+(r.accession_number||r.mrn||'')+'</div></td>'
+        +'<td style="padding:10px 12px;font-size:13px;font-weight:600">'+r.test_name+'</td>'
+        +'<td style="padding:10px 12px;font-size:12px;color:rgba(240,250,247,0.6)">'+r.result_date+'</td>'
+        +'<td style="padding:10px 12px"><span style="font-size:12px;font-weight:700;color:'+statusColor+';">'+(r.overall_status||'pending').toUpperCase()+'</span>'+(crits.length?'<div style="font-size:10px;color:#E24B4A;margin-top:2px">\u26a0 CRITICAL</div>':'')+'</td>'
+        +'<td style="padding:10px 12px;font-size:11px;color:rgba(240,250,247,0.5);max-width:180px">'+(r.ai_summary||'').substring(0,80)+'</td>'
+        +'<td style="padding:10px 12px"><button class="action-btn review-btn" data-rid="'+r.id+'" style="font-size:11px;padding:5px 12px;background:rgba(0,196,154,0.1);border-color:var(--teal);color:var(--teal)">Review &amp; Approve</button></td>'
+        +'</tr>';
+    }).join('');
+    el.innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2);background:rgba(0,196,154,0.03)">'
+      +['Patient','Test','Date','Status','AI Summary','Action'].map(function(h){ return '<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">'+h+'</th>'; }).join('')
+      +'</tr></thead><tbody>'+rows+'</tbody></table>';
+    el.querySelectorAll('.review-btn').forEach(function(btn){
+      btn.addEventListener('click', function(){ openApproveModal(this.dataset.rid); });
+    });
+  } catch(e) { el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Error loading results.</div>'; }
+}
+
+async function openApproveModal(resultId) {
+  var result = labResultsData.find(function(r){ return String(r.id)===String(resultId); });
+  if (!result) return;
+  currentLabResult = result;
+
+  var modal = document.getElementById('approveModal'); if(!modal) return;
+  var body  = document.getElementById('approve-modal-body'); if(!body) return;
+
+  var name = ((result.first_name||'')+(result.last_name?' '+result.last_name:'')).trim()||'Patient';
+  var rvs  = Array.isArray(result.result_values)?result.result_values:(result.result_values?JSON.parse(result.result_values||'[]'):[]);
+  var flags  = Array.isArray(result.ai_flags)?result.ai_flags:(result.ai_flags?JSON.parse(result.ai_flags||'[]'):[]);
+  var crits  = Array.isArray(result.critical_flags)?result.critical_flags:(result.critical_flags?JSON.parse(result.critical_flags||'[]'):[]);
+
+  var statusColor = {normal:'#00C49A',borderline:'#EF9F27',abnormal:'#E24B4A',critical:'#ff0000',pending:'#888'}[result.overall_status]||'#888';
+
+  // Results table
+  var rvHTML = rvs.length ? '<table style="width:100%;border-collapse:collapse;margin-bottom:14px"><thead><tr style="background:rgba(0,196,154,0.08)">'
+    +['Parameter','Value','Unit','Range','Flag'].map(function(h){ return '<th style="padding:6px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">'+h+'</th>'; }).join('')
+    +'</tr></thead><tbody>'
+    +rvs.map(function(rv) {
+      var flagColor = crits.includes(rv.name)?'#E24B4A':flags.includes(rv.name)?'#EF9F27':'#00C49A';
+      var flagLabel = crits.includes(rv.name)?'\u25cf CRITICAL':flags.includes(rv.name)?'\u25cf ABNORMAL':'\u25cf NORMAL';
+      return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.08)">'
+        +'<td style="padding:7px 10px;font-weight:600;font-size:13px">'+rv.name+'</td>'
+        +'<td style="padding:7px 10px;font-size:14px;font-weight:700;color:'+flagColor+'">'+rv.value+'</td>'
+        +'<td style="padding:7px 10px;font-size:12px;color:rgba(240,250,247,0.5)">'+rv.unit+'</td>'
+        +'<td style="padding:7px 10px;font-size:12px;color:rgba(240,250,247,0.5)">'+rv.normal+'</td>'
+        +'<td style="padding:7px 10px;font-size:11px;font-weight:700;color:'+flagColor+'">'+flagLabel+'</td>'
+        +'</tr>';
+    }).join('')
+    +'</tbody></table>' : '<div style="color:rgba(240,250,247,0.4);padding:12px 0">No parameter data available.</div>';
+
+  body.innerHTML = '<div style="background:#080C0B;border-radius:10px;padding:12px 14px;margin-bottom:14px;display:flex;gap:16px;flex-wrap:wrap">'
+    +'<div><span style="font-size:11px;color:rgba(240,250,247,0.5)">Patient: </span><span style="font-weight:600">'+name+'</span></div>'
+    +'<div><span style="font-size:11px;color:rgba(240,250,247,0.5)">Test: </span><span style="font-weight:600">'+result.test_name+'</span></div>'
+    +'<div><span style="font-size:11px;color:rgba(240,250,247,0.5)">Status: </span><span style="font-weight:700;color:'+statusColor+'">'+(result.overall_status||'').toUpperCase()+'</span></div>'
+    +'</div>'
+    + rvHTML
+    +'<div style="background:rgba(127,119,221,0.1);border:0.5px solid rgba(127,119,221,0.3);border-radius:10px;padding:12px 14px;margin-bottom:14px">'
+    +'<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#AFA9EC;margin-bottom:6px">\u2728 AI Interpretation</div>'
+    +'<div style="font-size:13px;color:#F0FAF7;line-height:1.6">'+(result.ai_summary||'No AI summary available.')+'</div>'
+    +(crits.length?'<div style="margin-top:8px;font-size:12px;color:#E24B4A;font-weight:600">\u26a0 Critical values: '+crits.join(', ')+'</div>':'')
+    +'</div>'
+    +'<div><label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:4px">Pathologist / Biochemist Comment</label>'
+    +'<textarea id="pathologist-comment" rows="3" class="form-input" style="width:100%;resize:none" placeholder="Add your interpretation, clinical correlation, or remarks..."></textarea></div>';
+
+  modal.style.display='flex';
+  document.getElementById('closeApproveModal').onclick=function(){ modal.style.display='none'; };
+
+  document.getElementById('printLabReport').onclick=function(){ printLabReportForResult(currentLabResult); };
+  document.getElementById('sendPatientWA').onclick=function(){
+    var phone = prompt('Patient WhatsApp number (10 digits):');
+    if (phone) dispatchLabResult(currentLabResult.id, phone);
+  };
+  document.getElementById('approveResultBtn').onclick=function(){ approveLabResult(); };
+}
+
+async function approveLabResult() {
+  if (!currentLabResult) return;
+  var comment = document.getElementById('pathologist-comment')?.value || '';
+  var approvedBy = (mwUser&&(mwUser.name||mwUser.email))||'Pathologist';
+
+  var data = await apiCall('/hospitals/'+mwHospitalId+'/investigations/results/'+currentLabResult.id+'/approve', 'PUT', {
+    approved_by: approvedBy,
+    pathologist_comment: comment
+  });
+  if (data.success) {
+    showToast('Result approved \u2713 Ready to send to patient','success');
+    document.getElementById('approveModal').style.display='none';
+    loadApproveList();
+  } else {
+    showToast('Error: '+data.message,'error');
+  }
+}
+
+async function dispatchLabResult(resultId, phone) {
+  var data = await apiCall('/hospitals/'+mwHospitalId+'/investigations/results/'+resultId+'/dispatch','POST',{ patient_phone: phone });
+  if (data.success) showToast('Results sent to patient via WhatsApp \u2713','success');
+  else showToast('Error: '+data.message,'error');
+}
+
+function printLabReportForResult(result) {
+  if (!result) return;
+  var h = hospitalSettings||{};
+  var name = ((result.first_name||'')+(result.last_name?' '+result.last_name:'')).trim()||'Patient';
+  var rvs  = Array.isArray(result.result_values)?result.result_values:(result.result_values?JSON.parse(result.result_values||'[]'):[]);
+  var flags  = Array.isArray(result.ai_flags)?result.ai_flags:(result.ai_flags?JSON.parse(result.ai_flags||'[]'):[]);
+  var crits  = Array.isArray(result.critical_flags)?result.critical_flags:(result.critical_flags?JSON.parse(result.critical_flags||'[]'):[]);
+  var pathComment = document.getElementById('pathologist-comment')?.value || result.pathologist_comment || '';
+  var approvedBy = result.approved_by || document.getElementById('pathologist-comment')?.dataset?.approver || (mwUser&&(mwUser.name||mwUser.email))||'Pathologist';
+
+  var rowsHTML = rvs.map(function(rv) {
+    var isCrit = crits.includes(rv.name);
+    var isAbnl = flags.includes(rv.name);
+    var flagColor = isCrit?'#E24B4A':isAbnl?'#E67E22':'#27AE60';
+    var flagLabel = isCrit?'\u25cf CRITICAL':isAbnl?'\u25cf ABNORMAL':'\u25cf NORMAL';
+    var rowBg = isCrit?'#fff5f5':isAbnl?'#fffbf0':'#f0faf7';
+    return '<tr style="background:'+rowBg+'">'
+      +'<td style="padding:7px 10px;border:1px solid #dde;font-weight:500">'+rv.name+'</td>'
+      +'<td style="padding:7px 10px;border:1px solid #dde;font-weight:700;color:'+flagColor+'">'+rv.value+'</td>'
+      +'<td style="padding:7px 10px;border:1px solid #dde;color:#555">'+rv.unit+'</td>'
+      +'<td style="padding:7px 10px;border:1px solid #dde;color:#555">'+rv.normal+'</td>'
+      +'<td style="padding:7px 10px;border:1px solid #dde;font-weight:700;font-size:11px;color:'+flagColor+'">'+flagLabel+'</td>'
+      +'</tr>';
+  }).join('');
+
+  var overallColor = {normal:'#27AE60',borderline:'#E67E22',abnormal:'#E24B4A',critical:'#c0392b'}[result.overall_status]||'#555';
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Lab Report - '+name+'</title>'
+    +'<style>body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#1a1a1a;font-size:13px;line-height:1.5}.sec{margin-bottom:14px}.sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#00C49A;border-bottom:1px solid #e8faf5;padding-bottom:3px;margin-bottom:8px}@media print{.np{display:none}body{-webkit-print-color-adjust:exact}}</style></head><body>'
+    +'<div class="np" style="position:fixed;top:14px;right:14px;display:flex;gap:8px"><button onclick="window.print()" style="background:#00C49A;color:#000;border:none;padding:9px 20px;border-radius:8px;font-weight:700;cursor:pointer">Print / PDF</button><button onclick="window.close()" style="background:#eee;border:none;padding:9px 16px;border-radius:8px;cursor:pointer">Close</button></div>'
+    // Header
+    +'<div style="display:flex;justify-content:space-between;border-bottom:3px solid #00C49A;padding-bottom:12px;margin-bottom:14px">'
+    +'<div style="display:flex;gap:12px;align-items:center">'+(h.logo_url?'<img src="'+h.logo_url+'" style="height:52px;object-fit:contain">':'')
+    +'<div><div style="font-size:18px;font-weight:800;color:#00C49A">'+(h.name||'Lab')+'</div>'
+    +'<div style="font-size:11px;color:#555">'+(h.address||'')+((h.city)?', '+h.city:'')+'</div>'
+    +'<div style="font-size:11px;color:#777">'+(h.phone||'')+'</div></div></div>'
+    +'<div style="text-align:right"><div style="font-weight:700;font-size:15px">LABORATORY REPORT</div>'
+    +'<div style="font-size:12px;margin-top:4px">Date: '+result.result_date+'</div>'
+    +'<div style="font-size:12px">Accession: '+(result.accession_number||'\u2014')+'</div></div></div>'
+    // Patient info
+    +'<div style="background:#f0faf7;padding:8px 14px;border-radius:6px;margin-bottom:12px;display:flex;gap:20px;flex-wrap:wrap;font-size:13px">'
+    +'<div><b>Patient:</b> '+name+'</div>'
+    +'<div><b>MRN:</b> '+(result.mrn||'\u2014')+'</div>'
+    +'<div><b>Age/Gender:</b> '+(result.age||'')+(result.gender?' / '+result.gender:'')+'</div>'
+    +'</div>'
+    // Test heading
+    +'<div style="margin-bottom:12px"><div style="font-size:15px;font-weight:700">'+result.test_name+'</div>'
+    +'<div style="font-size:13px;font-weight:700;color:'+overallColor+';margin-top:4px">Overall: '+(result.overall_status||'').toUpperCase()+'</div></div>'
+    // Results table
+    +(rvs.length?'<table style="width:100%;border-collapse:collapse;margin-bottom:14px"><thead><tr style="background:#e8faf5">'
+      +'<th style="padding:7px 10px;border:1px solid #dde;text-align:left;font-size:11px">Parameter</th>'
+      +'<th style="padding:7px 10px;border:1px solid #dde;text-align:left;font-size:11px">Value</th>'
+      +'<th style="padding:7px 10px;border:1px solid #dde;text-align:left;font-size:11px">Unit</th>'
+      +'<th style="padding:7px 10px;border:1px solid #dde;text-align:left;font-size:11px">Reference Range</th>'
+      +'<th style="padding:7px 10px;border:1px solid #dde;text-align:left;font-size:11px">Status</th>'
+      +'</tr></thead><tbody>'+rowsHTML+'</tbody></table>':'')
+    // AI interpretation
+    +(result.ai_summary?'<div class="sec"><div class="sec-title">AI Clinical Interpretation</div><div style="background:#f9f0ff;padding:10px 14px;border-radius:6px;border-left:3px solid #9B59B6">'+result.ai_summary+'</div>'+(crits.length?'<div style="margin-top:6px;font-size:12px;color:#E24B4A;font-weight:600">\u26a0 Critical values requiring immediate attention: '+crits.join(', ')+'</div>':'')+'</div>':'')
+    // Pathologist comment
+    +(pathComment?'<div class="sec"><div class="sec-title">Pathologist Remarks</div><div>'+pathComment+'</div></div>':'')
+    // Approval
+    +'<div style="margin-top:20px;display:flex;justify-content:flex-end">'
+    +'<div style="text-align:center;min-width:200px">'
+    +'<div style="height:40px;border-bottom:1px solid #333;margin-bottom:4px"></div>'
+    +'<div style="font-size:12px;font-weight:600">'+approvedBy+'</div>'
+    +'<div style="font-size:11px;color:#777">Biochemist / Pathologist</div>'
+    +'<div style="font-size:10px;color:#aaa;margin-top:2px">Approved: '+new Date().toLocaleString('en-IN')+'</div>'
+    +'</div></div>'
+    +'<div style="margin-top:14px;padding-top:10px;border-top:1px solid #eee;display:flex;justify-content:space-between;font-size:10px;color:#aaa">'
+    +'<span>MediWhats \u2014 AI Hospital Manager</span><span>Printed: '+new Date().toLocaleString('en-IN')+'</span></div>'
+    +'</body></html>';
+
+  var win=window.open('','_blank','width=900,height=750');
+  if(win){ win.document.write(html); win.document.close(); }
+}
 </script>
 
 <!-- NEW BILL MODAL -->
