@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773966415 -->
+<!-- MediWhats v23 BUILD:1773967620 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2095,43 +2095,195 @@ async function loadVisitHistory(patientId) {
 }
 
 async function loadVisitDetail(visitId, patientId) {
-  editingVisitId = visitId;
+  // Show visit in a read-only popup first with print/edit options
+  openVisitViewer(visitId, patientId);
+}
+
+async function openVisitViewer(visitId, patientId) {
+  var modal = document.getElementById('visitViewerModal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'visitViewerModal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:7000;display:flex;align-items:center;justify-content:center;padding:20px';
+    document.body.appendChild(modal);
+  }
+  modal.innerHTML = '<div style="background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:16px;width:90%;max-width:680px;max-height:88vh;overflow-y:auto">'
+    + '<div style="padding:14px 20px;border-bottom:0.5px solid rgba(0,196,154,0.2);display:flex;justify-content:space-between;align-items:center">'
+    + '<div style="font-weight:700;font-size:15px">Visit Record</div>'
+    + '<button id="closeVisitViewer" style="background:none;border:none;color:rgba(240,250,247,0.5);font-size:22px;cursor:pointer">&#215;</button>'
+    + '</div>'
+    + '<div id="visitViewerBody" style="padding:20px"><div style="text-align:center;padding:30px;color:rgba(240,250,247,0.4)">Loading...</div></div>'
+    + '<div style="padding:14px 20px;border-top:0.5px solid rgba(0,196,154,0.15);display:flex;gap:10px;flex-wrap:wrap">'
+    + '<button id="vvPrintBtn" style="padding:9px 18px;background:rgba(255,255,255,0.06);border:0.5px solid rgba(240,250,247,0.2);color:#F0FAF7;border-radius:8px;cursor:pointer;font-size:13px">&#128438; Print / PDF</button>'
+    + '<button id="vvWABtn" style="padding:9px 18px;background:rgba(37,211,102,0.1);border:0.5px solid rgba(37,211,102,0.4);color:#25d366;border-radius:8px;cursor:pointer;font-size:13px">&#128241; Send WhatsApp</button>'
+    + '<button id="vvEditBtn" style="padding:9px 18px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:8px;cursor:pointer;font-size:13px;margin-left:auto">&#9998; Edit Visit</button>'
+    + '</div></div>';
+  modal.style.display = 'flex';
+  document.getElementById('closeVisitViewer').onclick = function(){ modal.style.display='none'; };
+
   try {
-    var data = await apiCall('/hospitals/' + mwHospitalId + '/visits/' + patientId + '/' + visitId);
-    if (!data.success) return;
+    var data = await apiCall('/hospitals/' + mwHospitalId + '/patients/' + patientId + '/visits/' + visitId);
+    if (!data.success) { document.getElementById('visitViewerBody').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4)">Failed to load visit.</div>'; return; }
     var v = data.data;
-    // Populate form
-    setVal('vr_dept', v.department);
-    setVal('vr_date', v.visit_date);
-    setVal('vr_type', v.visit_type);
-    setVal('vr_complaint', v.chief_complaint);
-    setVal('vr_duration', v.duration);
-    setVal('vr_history', v.history);
-    setVal('vr_allergies', v.allergies);
-    setVal('vr_bp_s', v.bp_systolic);
-    setVal('vr_bp_d', v.bp_diastolic);
-    setVal('vr_temp', v.temperature);
-    setVal('vr_pulse', v.pulse);
-    setVal('vr_spo2', v.spo2);
-    setVal('vr_weight', v.weight);
-    setVal('vr_height', v.height);
-    setVal('vr_exam', v.examination_notes);
-    setVal('vr_dx', v.diagnosis_primary);
-    setVal('vr_dx2', v.diagnosis_secondary);
-    setVal('vr_icd', v.icd_code);
-    setVal('vr_advice', v.advice);
-    setVal('vr_followup', v.followup_date);
-    setVal('vr_followup_notes', v.followup_instructions);
-    visitRxRows  = v.prescription  || [];
-    visitLabRows = v.lab_requests  || [];
-    visitRadRows = v.radiology_requests || [];
-    renderRxTable();
-    renderLabTable();
-    renderRadTable();
-    loadDeptSection(v.department, v.dept_data || {});
-    switchPrTab('subjective');
-    document.getElementById('prForm').scrollIntoView({ behavior: 'smooth' });
-  } catch(e) { console.error('Load visit detail error:', e); }
+    renderVisitViewer(v, patientId);
+
+    // Wire buttons
+    document.getElementById('vvPrintBtn').onclick = function(){ printVisitData(v, patientId); };
+    document.getElementById('vvWABtn').onclick = function(){ sendVisitDataWhatsApp(v, patientId); };
+    document.getElementById('vvEditBtn').onclick = function(){
+      modal.style.display = 'none';
+      editVisitRecord(visitId, patientId, v);
+    };
+  } catch(e) {
+    document.getElementById('visitViewerBody').innerHTML = '<div style="padding:20px;text-align:center;color:rgba(240,250,247,0.4)">Error loading visit.</div>';
+  }
+}
+
+function renderVisitViewer(v, patientId) {
+  var el = document.getElementById('visitViewerBody'); if(!el) return;
+  var rx = Array.isArray(v.prescription) ? v.prescription : (v.prescription ? JSON.parse(v.prescription) : []);
+  var labs = Array.isArray(v.lab_requests) ? v.lab_requests : (v.lab_requests ? JSON.parse(v.lab_requests) : []);
+  var dt = v.visit_date || (v.created_at ? new Date(v.created_at*1000).toLocaleDateString('en-IN') : '');
+
+  var sec = function(title, content) {
+    if (!content) return '';
+    return '<div style="margin-bottom:14px">'
+      + '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal);margin-bottom:6px">'+title+'</div>'
+      + '<div style="font-size:13px;color:#F0FAF7;line-height:1.5">'+content+'</div>'
+      + '</div>';
+  };
+
+  // Vitals row
+  var vitals = [];
+  if (v.bp_systolic && v.bp_diastolic) vitals.push('<span style="background:rgba(0,196,154,0.1);padding:4px 10px;border-radius:6px;font-size:12px">BP '+v.bp_systolic+'/'+v.bp_diastolic+'</span>');
+  if (v.temperature) vitals.push('<span style="background:rgba(0,196,154,0.1);padding:4px 10px;border-radius:6px;font-size:12px">Temp '+v.temperature+'&#176;F</span>');
+  if (v.pulse) vitals.push('<span style="background:rgba(0,196,154,0.1);padding:4px 10px;border-radius:6px;font-size:12px">Pulse '+v.pulse+'</span>');
+  if (v.spo2) vitals.push('<span style="background:rgba(0,196,154,0.1);padding:4px 10px;border-radius:6px;font-size:12px">SpO2 '+v.spo2+'%</span>');
+  if (v.weight) vitals.push('<span style="background:rgba(0,196,154,0.1);padding:4px 10px;border-radius:6px;font-size:12px">Wt '+v.weight+'kg</span>');
+  if (v.bmi) vitals.push('<span style="background:rgba(0,196,154,0.1);padding:4px 10px;border-radius:6px;font-size:12px">BMI '+v.bmi+'</span>');
+
+  // Rx table
+  var rxHTML = '';
+  if (rx.length) {
+    rxHTML = '<table style="width:100%;border-collapse:collapse;margin-top:4px">'
+      + '<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.15)">'
+      + ['Drug','Dose','Freq','Duration'].map(function(h){ return '<th style="padding:5px 8px;text-align:left;font-size:10px;color:rgba(240,250,247,0.4);text-transform:uppercase">'+h+'</th>'; }).join('')
+      + '</tr></thead><tbody>'
+      + rx.map(function(r){
+          return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+            +'<td style="padding:6px 8px;font-weight:600;font-size:13px">'+r.drug+' <span style="font-weight:400;font-size:11px;color:rgba(240,250,247,0.5)">'+r.strength+'</span></td>'
+            +'<td style="padding:6px 8px;font-size:12px">'+r.dose+'</td>'
+            +'<td style="padding:6px 8px;font-size:12px">'+r.freq+'</td>'
+            +'<td style="padding:6px 8px;font-size:12px">'+r.duration+'</td>'
+            +'</tr>';
+        }).join('')
+      + '</tbody></table>';
+  }
+
+  el.innerHTML = '<div style="background:#080C0B;border-radius:10px;padding:12px 16px;margin-bottom:16px;display:flex;gap:20px;flex-wrap:wrap">'
+    + '<div style="font-size:12px;color:rgba(240,250,247,0.5)">Date: <span style="color:#F0FAF7;font-weight:600">'+dt+'</span></div>'
+    + '<div style="font-size:12px;color:rgba(240,250,247,0.5)">Dept: <span style="color:#F0FAF7;font-weight:600">'+(v.department||'General')+'</span></div>'
+    + '<div style="font-size:12px;color:rgba(240,250,247,0.5)">Type: <span style="color:#F0FAF7;font-weight:600">'+(v.visit_type||'OPD')+'</span></div>'
+    + '</div>'
+    + (vitals.length ? '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal);margin-bottom:8px">Vitals</div><div style="display:flex;gap:8px;flex-wrap:wrap">'+vitals.join('')+'</div></div>' : '')
+    + sec('Chief Complaint', v.chief_complaint + (v.duration?' ('+v.duration+')':''))
+    + sec('History', v.history)
+    + sec('Examination', v.examination_notes)
+    + (v.diagnosis_primary ? '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal);margin-bottom:6px">Diagnosis</div><div style="font-size:15px;font-weight:700;color:#F0FAF7">'+v.diagnosis_primary+'</div>'+(v.diagnosis_secondary?'<div style="font-size:13px;color:rgba(240,250,247,0.6);margin-top:2px">'+v.diagnosis_secondary+'</div>':'')+(v.icd_code?'<div style="font-size:11px;color:rgba(240,250,247,0.4);margin-top:2px">ICD: '+v.icd_code+'</div>':'')+'</div>' : '')
+    + (rx.length ? '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal);margin-bottom:6px">Prescription (Rx)</div>'+rxHTML+'</div>' : '')
+    + (labs.length ? '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal);margin-bottom:6px">Investigations Ordered</div>'
+      + labs.map(function(l,i){ return '<div style="font-size:13px;padding:4px 0;border-bottom:0.5px solid rgba(0,196,154,0.08)">'+(i+1)+'. '+l.test+'</div>'; }).join('')
+      + '</div>' : '')
+    + sec('Advice', v.advice)
+    + (v.followup_date ? '<div style="margin-bottom:14px"><div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:var(--teal);margin-bottom:6px">Follow-up</div><div style="font-size:13px;color:#F0FAF7"><span style="background:rgba(0,196,154,0.12);padding:4px 12px;border-radius:6px">'+v.followup_date+'</span>'+(v.followup_instructions?' — '+v.followup_instructions:'')+'</div></div>' : '');
+}
+
+function editVisitRecord(visitId, patientId, v) {
+  editingVisitId = visitId;
+  var setV = function(id, val){ var el=document.getElementById(id); if(el&&val!==null&&val!==undefined) el.value=val; };
+  setV('vr_dept', v.department); setV('vr_date', v.visit_date); setV('vr_type', v.visit_type);
+  setV('vr_complaint', v.chief_complaint); setV('vr_duration', v.duration); setV('vr_history', v.history);
+  setV('vr_allergies', v.allergies); setV('vr_bp_s', v.bp_systolic); setV('vr_bp_d', v.bp_diastolic);
+  setV('vr_temp', v.temperature); setV('vr_pulse', v.pulse); setV('vr_spo2', v.spo2);
+  setV('vr_weight', v.weight); setV('vr_height', v.height);
+  setV('vr_exam', v.examination_notes); setV('vr_dx', v.diagnosis_primary);
+  setV('vr_dx2', v.diagnosis_secondary); setV('vr_icd', v.icd_code);
+  setV('vr_advice', v.advice); setV('vr_followup', v.followup_date);
+  setV('vr_followup_notes', v.followup_instructions);
+  visitRxRows  = Array.isArray(v.prescription) ? v.prescription : (v.prescription ? JSON.parse(v.prescription||'[]') : []);
+  visitLabRows = Array.isArray(v.lab_requests) ? v.lab_requests : (v.lab_requests ? JSON.parse(v.lab_requests||'[]') : []);
+  visitRadRows = Array.isArray(v.radiology_requests) ? v.radiology_requests : [];
+  if(typeof renderRxTable==='function') renderRxTable();
+  if(typeof renderLabTable==='function') renderLabTable();
+  if(typeof switchPrTab==='function') switchPrTab('subjective');
+}
+
+function printVisitData(v, patientId) {
+  var h = hospitalSettings || {};
+  var rx = Array.isArray(v.prescription) ? v.prescription : (v.prescription ? JSON.parse(v.prescription||'[]') : []);
+  var labs = Array.isArray(v.lab_requests) ? v.lab_requests : (v.lab_requests ? JSON.parse(v.lab_requests||'[]') : []);
+  var patName = activeVisitPatient ? activeVisitPatient.name : 'Patient';
+  var doctor = (mwUser&&(mwUser.name||mwUser.email))||'Dr.';
+
+  var rxHTML = rx.length ? '<table style="width:100%;border-collapse:collapse;margin-top:6px">'
+    + '<thead><tr style="background:#f0faf7"><th style="padding:6px 8px;border:1px solid #dde;text-align:left;font-size:11px">#</th><th style="padding:6px 8px;border:1px solid #dde;text-align:left;font-size:11px">Drug</th><th style="padding:6px 8px;border:1px solid #dde;font-size:11px">Dose</th><th style="padding:6px 8px;border:1px solid #dde;font-size:11px">Freq</th><th style="padding:6px 8px;border:1px solid #dde;font-size:11px">Duration</th></tr></thead><tbody>'
+    + rx.map(function(r,i){ return '<tr><td style="padding:5px 8px;border:1px solid #dde">'+(i+1)+'</td><td style="padding:5px 8px;border:1px solid #dde;font-weight:600">'+r.drug+' '+r.strength+'</td><td style="padding:5px 8px;border:1px solid #dde;text-align:center">'+r.dose+'</td><td style="padding:5px 8px;border:1px solid #dde">'+r.freq+'</td><td style="padding:5px 8px;border:1px solid #dde">'+r.duration+'</td></tr>'; }).join('')
+    + '</tbody></table>' : '';
+
+  var vitals = [];
+  if (v.bp_systolic&&v.bp_diastolic) vitals.push('BP: '+v.bp_systolic+'/'+v.bp_diastolic+' mmHg');
+  if (v.temperature) vitals.push('Temp: '+v.temperature+'°F');
+  if (v.pulse) vitals.push('Pulse: '+v.pulse+' bpm');
+  if (v.spo2) vitals.push('SpO2: '+v.spo2+'%');
+  if (v.weight) vitals.push('Wt: '+v.weight+' kg');
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Visit - '+patName+'</title>'
+    +'<style>body{font-family:Arial,sans-serif;margin:0;padding:20px;color:#1a1a1a;font-size:13px;line-height:1.5}.sec-title{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#00C49A;border-bottom:1px solid #e8faf5;padding-bottom:3px;margin:12px 0 6px}@media print{.np{display:none}}</style></head><body>'
+    +'<div class="np" style="position:fixed;top:14px;right:14px;display:flex;gap:8px"><button onclick="window.print()" style="background:#00C49A;color:#000;border:none;padding:9px 20px;border-radius:8px;font-weight:700;cursor:pointer">Print / PDF</button><button onclick="window.close()" style="background:#eee;border:none;padding:9px 16px;border-radius:8px;cursor:pointer">Close</button></div>'
+    // Header
+    +'<div style="display:flex;justify-content:space-between;border-bottom:3px solid #00C49A;padding-bottom:12px;margin-bottom:14px">'
+    +'<div style="display:flex;gap:12px;align-items:center">'+(h.logo_url?'<img src="'+h.logo_url+'" style="height:52px;object-fit:contain">':'')
+    +'<div><div style="font-size:18px;font-weight:800;color:#00C49A">'+(h.name||'Clinic')+'</div>'
+    +'<div style="font-size:11px;color:#555">'+(h.address||'')+((h.city)?', '+h.city:'')+'</div>'
+    +'<div style="font-size:11px;color:#777">'+(h.phone||'')+'</div></div></div>'
+    +'<div style="text-align:right"><div style="font-weight:700;font-size:14px">CONSULTATION RECORD</div>'
+    +'<div style="font-size:12px;margin-top:4px">Date: '+(v.visit_date||'')+'</div>'
+    +'<div style="font-size:12px">Dr: '+doctor+'</div></div></div>'
+    // Patient
+    +'<div style="background:#f0faf7;padding:8px 12px;border-radius:6px;margin-bottom:12px;font-size:13px"><b>Patient:</b> '+patName+' &nbsp;&nbsp; <b>Dept:</b> '+(v.department||'General')+'</div>'
+    +(vitals.length ? '<div class="sec-title">Vitals</div><div style="display:flex;flex-wrap:wrap;gap:10px">'+vitals.map(function(vt){ return '<span style="background:#f0faf7;padding:4px 10px;border-radius:4px;font-size:12px">'+vt+'</span>'; }).join('')+'</div>' : '')
+    +(v.chief_complaint?'<div class="sec-title">Chief Complaint</div><div>'+v.chief_complaint+'</div>':'')
+    +(v.examination_notes?'<div class="sec-title">Examination</div><div>'+v.examination_notes+'</div>':'')
+    +(v.diagnosis_primary?'<div class="sec-title">Diagnosis</div><div style="font-size:15px;font-weight:700">'+v.diagnosis_primary+'</div>'+(v.diagnosis_secondary?'<div style="font-size:13px;color:#555">'+v.diagnosis_secondary+'</div>':''):'')
+    +(rx.length?'<div class="sec-title" style="margin-top:14px">Prescription (Rx)</div>'+rxHTML:'')
+    +(labs.length?'<div class="sec-title">Investigations Ordered</div><ul style="margin:0;padding-left:18px">'+labs.map(function(l){ return '<li>'+l.test+'</li>'; }).join('')+'</ul>':'')
+    +(v.advice?'<div class="sec-title">Advice</div><div>'+v.advice+'</div>':'')
+    +(v.followup_date?'<div class="sec-title">Follow-up</div><div>'+v.followup_date+(v.followup_instructions?' — '+v.followup_instructions:'')+'</div>':'')
+    +'<div style="margin-top:20px;padding-top:10px;border-top:1px solid #eee;display:flex;justify-content:space-between;font-size:10px;color:#aaa"><span>MediWhats — AI Hospital Manager</span><span>Printed: '+new Date().toLocaleString('en-IN')+'</span></div>'
+    +'</body></html>';
+
+  var win=window.open('','_blank','width=860,height=750');
+  if(win){ win.document.write(html); win.document.close(); }
+}
+
+function sendVisitDataWhatsApp(v, patientId) {
+  var phone = (activeVisitPatient&&activeVisitPatient.phone) || prompt('Patient WhatsApp number:');
+  if (!phone) return;
+  var h = hospitalSettings||{};
+  var patName = activeVisitPatient ? activeVisitPatient.name : 'Patient';
+  var rx = Array.isArray(v.prescription)?v.prescription:(v.prescription?JSON.parse(v.prescription||'[]'):[]);
+  var rxList = rx.map(function(r,i){ return (i+1)+'. '+r.drug+' '+r.strength+' — '+r.freq+' for '+r.duration; }).join('\n');
+  var msg = '*'+(h.name||'MediWhats')+' — Consultation Record*\n\n'
+    +'Date: '+(v.visit_date||new Date().toLocaleDateString('en-IN'))+'\n'
+    +'Patient: *'+patName+'*\n\n'
+    +(v.diagnosis_primary?'*Diagnosis:* '+v.diagnosis_primary+'\n\n':'')
+    +(rxList?'*Medicines:*\n'+rxList+'\n\n':'')
+    +(v.advice?'*Advice:* '+v.advice+'\n\n':'')
+    +(v.followup_date?'*Follow-up:* '+v.followup_date+'\n\n':'')
+    +'_MediWhats — AI Hospital Manager_';
+  var clean=phone.replace(/\D/g,'').replace(/^91/,'');
+  window.open('https://wa.me/91'+clean+'?text='+encodeURIComponent(msg),'_blank');
+  showToast('Opening WhatsApp...','success');
 }
 
 function setVal(id, val) {
