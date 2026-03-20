@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773976419 -->
+<!-- MediWhats v23 BUILD:1773977621 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5195,28 +5195,40 @@ async function submitResultEntry() {
   var btn = document.getElementById('saveResultEntry');
   if(btn) btn.textContent='Saving...';
 
-  var params = [];
-  try { params = currentLabOrder.parameters ? JSON.parse(currentLabOrder.parameters) : []; } catch(e){}
+  // ALWAYS use window.currentParamSet — this is what is shown on screen
+  // (comes from LAB_MASTER, not from order.parameters which may be empty in DB)
+  var screenParams = window.currentParamSet || [];
 
   var resultValues = [];
-  if (params.length) {
-    params.forEach(function(p, i) {
+  if (screenParams.length) {
+    screenParams.forEach(function(p, i) {
       var valEl = document.getElementById('param-val-'+i);
-      if (valEl && valEl.value) {
+      if (valEl && valEl.value && valEl.value.trim() !== '') {
         resultValues.push({
-          name: p.name, unit: p.unit,
-          value: valEl.value,
-          normal: p.normal||p.normal_male||'',
-          low_flag: p.low_flag||'', high_flag: p.high_flag||''
+          name:      p.name,
+          unit:      p.unit || '',
+          value:     valEl.value.trim(),
+          normal:    p.normal || p.normal_m || p.normal_male || '',
+          low:       p.low  || '',
+          high:      p.high || '',
+          crit_low:  p.crit_low  || '',
+          crit_high: p.crit_high || ''
         });
       }
     });
   } else {
+    // Free-text fallback (radiology, pathology, unknown test)
     var freeEl = document.getElementById('rem-free-result');
-    if (freeEl && freeEl.value) resultValues.push({ name: 'Result', value: freeEl.value, unit: '', normal: '' });
+    if (freeEl && freeEl.value && freeEl.value.trim()) {
+      resultValues.push({ name: 'Result', value: freeEl.value.trim(), unit: '', normal: '' });
+    }
   }
 
-  if (!resultValues.length) { showToast('Enter at least one result value','error'); if(btn) btn.textContent='Save Results & Generate AI Report'; return; }
+  if (!resultValues.length) {
+    showToast('Please enter at least one result value', 'error');
+    if(btn) btn.textContent='Save Results & Generate AI Report';
+    return;
+  }
 
   var techComment = document.getElementById('rem-tech-comment')?.value || '';
   var today = new Date().toISOString().split('T')[0];
