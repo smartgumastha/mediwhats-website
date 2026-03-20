@@ -1,4 +1,4 @@
-<!-- MediWhats v23 BUILD:1773970491 -->
+<!-- MediWhats v23 BUILD:1773972571 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -590,6 +590,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       <button onclick="showLabTab('collection')" id="lab-tab-collection" class="lab-tab">Collection</button>
       <button onclick="showLabTab('results')" id="lab-tab-results" class="lab-tab">Enter Results</button>
       <button onclick="showLabTab('approve')" id="lab-tab-approve" class="lab-tab">Approve</button>
+      <button onclick="showLabTab('reports')" id="lab-tab-reports" class="lab-tab">Reports</button>
     </div>
   </div>
 
@@ -687,6 +688,18 @@ tr:hover td{background:rgba(255,255,255,0.02)}
     </div>
   </div>
 </div>
+
+  <!-- APPROVED REPORTS TAB -->
+  <div id="lab-content-reports" style="display:none">
+    <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+      <input type="date" id="reports-filter-date" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.3);border-radius:8px;padding:8px 12px;color:#F0FAF7;font-size:13px">
+      <input type="text" id="reports-filter-search" placeholder="Search patient / test / accession..." oninput="filterReportsList(this.value)" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.3);border-radius:8px;padding:8px 12px;color:#F0FAF7;font-size:13px;width:240px">
+      <button onclick="loadReportsList()" style="padding:8px 16px;background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);color:var(--teal);border-radius:8px;cursor:pointer;font-size:13px">Refresh</button>
+    </div>
+    <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden" id="approved-reports-list">
+      <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading approved reports...</div>
+    </div>
+  </div>
 
 <!-- RESULT ENTRY MODAL -->
 <div id="resultEntryModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:6000;align-items:center;justify-content:center;padding:20px">
@@ -3764,6 +3777,377 @@ function sendTCLink(id, phone, roomUrl) {
 
 
 
+
+
+// ============================================================
+// LAB_MASTER — Complete test master data
+// Reference: IFCC, NABL, WHO, NCEP, ADA guidelines
+// All ranges are for adults unless noted. M=Male, F=Female
+// ============================================================
+var LAB_MASTER = {
+
+  // ── HAEMATOLOGY ──────────────────────────────────────────
+  CBC: {
+    name: 'Complete Blood Count (CBC)',
+    code: 'CBC',
+    dept: 'Haematology',
+    section: 'Haematology',
+    vacutainer: 'purple',
+    tubes: [{ color:'purple', label:'Purple (EDTA)', volume:'3 mL', count:1, inversions:8, notes:'Mix gently. DO NOT shake.' }],
+    fasting: false,
+    tat: '1 hour',
+    method: 'Automated hematology analyzer — impedance + optical scatter (5-part diff)',
+    special_instructions: 'Run within 4 hours of collection. If delayed, refrigerate at 4°C.',
+    params: [
+      { name:'WBC',       unit:'×10³/µL',  normal_m:'4.0–11.0',  normal_f:'4.0–11.0',  normal_child:'5.0–15.0', low:'4.0',  high:'11.0', crit_low:'2.0',  crit_high:'30.0', flag_low:'Leucopenia — check neutrophils', flag_high:'Leucocytosis — infection/inflammation' },
+      { name:'RBC',       unit:'×10⁶/µL',  normal_m:'4.5–5.9',   normal_f:'4.0–5.2',   normal_child:'3.8–5.5',  low:'4.5',  high:'5.9',  crit_low:'2.0',  crit_high:'7.0',  flag_low:'Anaemia',                        flag_high:'Polycythaemia' },
+      { name:'Haemoglobin', unit:'g/dL',   normal_m:'13.0–18.0', normal_f:'12.0–16.0', normal_child:'11.0–16.0',low:'13.0', high:'18.0', crit_low:'7.0',  crit_high:'20.0', flag_low:'Anaemia',                        flag_high:'Polycythaemia' },
+      { name:'Haematocrit', unit:'%',      normal_m:'40–52',     normal_f:'36–48',     normal_child:'33–45',    low:'40',   high:'52',   crit_low:'21',   crit_high:'60',   flag_low:'Anaemia/dehydration',            flag_high:'Polycythaemia' },
+      { name:'MCV',       unit:'fL',       normal_m:'80–100',    normal_f:'80–100',    normal_child:'70–90',    low:'80',   high:'100',  crit_low:'',     crit_high:'',     flag_low:'Microcytic (Fe/thal)',            flag_high:'Macrocytic (B12/folate)' },
+      { name:'MCH',       unit:'pg',       normal_m:'27–33',     normal_f:'27–33',     normal_child:'24–30',    low:'27',   high:'33',   crit_low:'',     crit_high:'',     flag_low:'Hypochromic',                    flag_high:'Hyperchromic' },
+      { name:'MCHC',      unit:'g/dL',     normal_m:'31.5–36',   normal_f:'31.5–36',   normal_child:'31–36',    low:'31.5', high:'36',   crit_low:'',     crit_high:'',     flag_low:'Hypochromic',                    flag_high:'Spherocytosis' },
+      { name:'RDW',       unit:'%',        normal_m:'11.5–14.5', normal_f:'11.5–14.5', normal_child:'11.5–15',  low:'11.5', high:'14.5', crit_low:'',     crit_high:'',     flag_low:'',                               flag_high:'Anisocytosis — mixed anaemia' },
+      { name:'Platelet Count', unit:'×10³/µL', normal_m:'150–400', normal_f:'150–400', normal_child:'150–400',  low:'150',  high:'400',  crit_low:'50',   crit_high:'1000', flag_low:'Thrombocytopenia',               flag_high:'Thrombocytosis' },
+      { name:'MPV',       unit:'fL',       normal_m:'7.5–12.5',  normal_f:'7.5–12.5',  normal_child:'7–13',     low:'7.5',  high:'12.5', crit_low:'',     crit_high:'',     flag_low:'',                               flag_high:'Large platelets — check for disorder' },
+      { name:'Neutrophils', unit:'%',      normal_m:'40–75',     normal_f:'40–75',     normal_child:'30–70',    low:'40',   high:'75',   crit_low:'10',   crit_high:'',     flag_low:'Neutropenia',                    flag_high:'Neutrophilia — bacterial infection' },
+      { name:'Lymphocytes', unit:'%',      normal_m:'20–45',     normal_f:'20–45',     normal_child:'25–50',    low:'20',   high:'45',   crit_low:'',     crit_high:'',     flag_low:'Lymphopenia',                    flag_high:'Lymphocytosis — viral infection' },
+      { name:'Monocytes', unit:'%',        normal_m:'2–10',      normal_f:'2–10',      normal_child:'2–10',     low:'2',    high:'10',   crit_low:'',     crit_high:'',     flag_low:'',                               flag_high:'Monocytosis' },
+      { name:'Eosinophils', unit:'%',      normal_m:'1–6',       normal_f:'1–6',       normal_child:'1–8',      low:'1',    high:'6',    crit_low:'',     crit_high:'',     flag_low:'',                               flag_high:'Eosinophilia — allergy/parasites' },
+      { name:'Basophils', unit:'%',        normal_m:'0–1',       normal_f:'0–1',       normal_child:'0–1',      low:'0',    high:'1',    crit_low:'',     crit_high:'',     flag_low:'',                               flag_high:'Basophilia' },
+      { name:'ESR',       unit:'mm/1hr',   normal_m:'0–15',      normal_f:'0–20',      normal_child:'0–10',     low:'0',    high:'15',   crit_low:'',     crit_high:'',     flag_low:'',                               flag_high:'Inflammation/infection/malignancy' }
+    ]
+  },
+
+  // ── BIOCHEMISTRY — LFT ───────────────────────────────────
+  LFT: {
+    name: 'Liver Function Test (LFT)',
+    code: 'LFT',
+    dept: 'Biochemistry',
+    section: 'Biochemistry',
+    vacutainer: 'yellow',
+    tubes: [{ color:'yellow', label:'Yellow (SST)', volume:'5 mL', count:1, inversions:5, notes:'Allow 30 min clotting. Centrifuge 2000 rpm × 10 min.' }],
+    fasting: false,
+    tat: '2 hours',
+    method: 'Colorimetric/Kinetic UV (IFCC) on automated biochemistry analyser',
+    special_instructions: 'Protect from haemolysis. Separate serum within 2 hours.',
+    params: [
+      { name:'Bilirubin Total',   unit:'mg/dL', normal_m:'0.2–1.2',  normal_f:'0.2–1.2',  normal_child:'0.2–1.0', low:'0.2',  high:'1.2',  crit_low:'',    crit_high:'15',  flag_low:'', flag_high:'Jaundice/haemolysis/cholestasis' },
+      { name:'Bilirubin Direct',  unit:'mg/dL', normal_m:'0.0–0.4',  normal_f:'0.0–0.4',  normal_child:'0.0–0.3', low:'0',    high:'0.4',  crit_low:'',    crit_high:'',    flag_low:'', flag_high:'Obstructive jaundice/hepatitis' },
+      { name:'Bilirubin Indirect',unit:'mg/dL', normal_m:'0.2–0.8',  normal_f:'0.2–0.8',  normal_child:'0.2–0.7', low:'0.2',  high:'0.8',  crit_low:'',    crit_high:'',    flag_low:'', flag_high:'Haemolysis/Gilberts syndrome' },
+      { name:'SGOT/AST',          unit:'U/L',   normal_m:'10–40',    normal_f:'10–35',    normal_child:'10–40',   low:'10',   high:'40',   crit_low:'',    crit_high:'500', flag_low:'', flag_high:'Hepatocellular damage/MI' },
+      { name:'SGPT/ALT',          unit:'U/L',   normal_m:'10–40',    normal_f:'7–35',     normal_child:'10–35',   low:'10',   high:'40',   crit_low:'',    crit_high:'500', flag_low:'', flag_high:'Liver cell damage (most specific)' },
+      { name:'ALP',               unit:'U/L',   normal_m:'44–147',   normal_f:'44–147',   normal_child:'100–350', low:'44',   high:'147',  crit_low:'',    crit_high:'',    flag_low:'', flag_high:'Cholestasis/bone disease' },
+      { name:'GGT',               unit:'U/L',   normal_m:'9–48',     normal_f:'9–36',     normal_child:'5–35',    low:'9',    high:'48',   crit_low:'',    crit_high:'',    flag_low:'', flag_high:'Alcohol/liver/biliary disease' },
+      { name:'Total Protein',     unit:'g/dL',  normal_m:'6.4–8.3',  normal_f:'6.4–8.3',  normal_child:'6.0–8.0', low:'6.4',  high:'8.3',  crit_low:'4.0', crit_high:'',    flag_low:'Malnutrition/liver disease', flag_high:'Dehydration/myeloma' },
+      { name:'Albumin',           unit:'g/dL',  normal_m:'3.5–5.0',  normal_f:'3.5–5.0',  normal_child:'3.5–5.0', low:'3.5',  high:'5.0',  crit_low:'2.0', crit_high:'',    flag_low:'Chronic liver disease/malnutrition', flag_high:'' },
+      { name:'Globulin',          unit:'g/dL',  normal_m:'2.0–3.5',  normal_f:'2.0–3.5',  normal_child:'2.0–3.5', low:'2.0',  high:'3.5',  crit_low:'',    crit_high:'',    flag_low:'', flag_high:'Infection/myeloma' },
+      { name:'A:G Ratio',         unit:'',      normal_m:'1.1–2.5',  normal_f:'1.1–2.5',  normal_child:'1.1–2.5', low:'1.1',  high:'2.5',  crit_low:'',    crit_high:'',    flag_low:'Liver disease', flag_high:'' }
+    ]
+  },
+
+  // ── BIOCHEMISTRY — KFT ───────────────────────────────────
+  KFT: {
+    name: 'Kidney Function Test (KFT)',
+    code: 'KFT',
+    dept: 'Biochemistry',
+    section: 'Biochemistry',
+    vacutainer: 'yellow',
+    tubes: [{ color:'yellow', label:'Yellow (SST)', volume:'5 mL', count:1, inversions:5, notes:'Allow 30 min clotting. Centrifuge.' }],
+    fasting: true,
+    tat: '2 hours',
+    method: 'Colorimetric: Jaffe (Creatinine), Urease-GLDH (Urea), Uricase (Uric acid), ISE (Electrolytes)',
+    special_instructions: '8–12 hours fasting recommended. Avoid heavy protein meal before test.',
+    params: [
+      { name:'Creatinine',  unit:'mg/dL',  normal_m:'0.7–1.3',   normal_f:'0.6–1.1',   normal_child:'0.3–0.7', low:'0.7',  high:'1.3',  crit_low:'',    crit_high:'10', flag_low:'', flag_high:'Renal impairment/dehydration' },
+      { name:'BUN',         unit:'mg/dL',  normal_m:'7–20',      normal_f:'7–20',       normal_child:'5–18',    low:'7',    high:'20',   crit_low:'',    crit_high:'100',flag_low:'', flag_high:'Renal failure/high protein diet' },
+      { name:'Urea',        unit:'mg/dL',  normal_m:'15–40',     normal_f:'15–40',      normal_child:'10–30',   low:'15',   high:'40',   crit_low:'',    crit_high:'200',flag_low:'', flag_high:'Uraemia/renal failure' },
+      { name:'Uric Acid',   unit:'mg/dL',  normal_m:'3.4–7.0',   normal_f:'2.4–6.0',   normal_child:'2.0–5.5', low:'3.4',  high:'7.0',  crit_low:'',    crit_high:'',   flag_low:'', flag_high:'Gout/renal disease' },
+      { name:'Sodium (Na)', unit:'mEq/L',  normal_m:'136–145',   normal_f:'136–145',   normal_child:'136–145', low:'136',  high:'145',  crit_low:'120', crit_high:'160',flag_low:'Hyponatraemia — check fluid status', flag_high:'Hypernatraemia' },
+      { name:'Potassium (K)',unit:'mEq/L', normal_m:'3.5–5.1',   normal_f:'3.5–5.1',   normal_child:'3.5–5.5', low:'3.5',  high:'5.1',  crit_low:'2.8', crit_high:'6.2',flag_low:'Hypokalaemia — cardiac risk', flag_high:'Hyperkalaemia — cardiac risk' },
+      { name:'Chloride (Cl)',unit:'mEq/L', normal_m:'98–107',    normal_f:'98–107',    normal_child:'98–107',  low:'98',   high:'107',  crit_low:'80',  crit_high:'115',flag_low:'', flag_high:'' },
+      { name:'eGFR',        unit:'mL/min/1.73m²', normal_m:'>60', normal_f:'>60',      normal_child:'>90',     low:'60',   high:'999',  crit_low:'',    crit_high:'',   flag_low:'Reduced renal function', flag_high:'' }
+    ]
+  },
+
+  // ── BIOCHEMISTRY — LIPID ─────────────────────────────────
+  LIPID: {
+    name: 'Lipid Profile',
+    code: 'LIPID',
+    dept: 'Biochemistry',
+    section: 'Biochemistry',
+    vacutainer: 'yellow',
+    tubes: [{ color:'yellow', label:'Yellow (SST)', volume:'5 mL', count:1, inversions:5, notes:'Centrifuge after 30 min clotting. Use serum.' }],
+    fasting: true,
+    tat: '2 hours',
+    method: 'Enzymatic colorimetric (Cholesterol oxidase-CHOD-PAP). LDL by Friedewald formula. Triglycerides: GPO-PAP method.',
+    special_instructions: '12–14 hours fasting MANDATORY. No alcohol 24h before. Avoid vigorous exercise.',
+    params: [
+      { name:'Total Cholesterol', unit:'mg/dL', normal_m:'<200',     normal_f:'<200',     normal_child:'<170',    low:'0',    high:'200',  crit_low:'',    crit_high:'300',flag_low:'', flag_high:'Hypercholesterolaemia — CVD risk' },
+      { name:'HDL Cholesterol',   unit:'mg/dL', normal_m:'>40',      normal_f:'>50',      normal_child:'>45',     low:'40',   high:'999',  crit_low:'25',  crit_high:'',   flag_low:'Low HDL — CVD risk factor', flag_high:'' },
+      { name:'LDL Cholesterol',   unit:'mg/dL', normal_m:'<100',     normal_f:'<100',     normal_child:'<110',    low:'0',    high:'100',  crit_low:'',    crit_high:'190',flag_low:'', flag_high:'High LDL — primary CVD risk' },
+      { name:'VLDL Cholesterol',  unit:'mg/dL', normal_m:'5–40',     normal_f:'5–40',     normal_child:'5–35',    low:'5',    high:'40',   crit_low:'',    crit_high:'',   flag_low:'', flag_high:'Hypertriglyceridaemia' },
+      { name:'Triglycerides',     unit:'mg/dL', normal_m:'<150',     normal_f:'<150',     normal_child:'<130',    low:'0',    high:'150',  crit_low:'',    crit_high:'500',flag_low:'', flag_high:'Hypertriglyceridaemia — pancreatitis risk if >500' },
+      { name:'TC:HDL Ratio',      unit:'',      normal_m:'<4.5',     normal_f:'<4.0',     normal_child:'<4.5',    low:'0',    high:'4.5',  crit_low:'',    crit_high:'',   flag_low:'', flag_high:'High cardiovascular risk' }
+    ]
+  },
+
+  // ── ENDOCRINOLOGY — TFT ──────────────────────────────────
+  TFT: {
+    name: 'Thyroid Function Test (TFT)',
+    code: 'TFT',
+    dept: 'Biochemistry',
+    section: 'Endocrinology',
+    vacutainer: 'yellow',
+    tubes: [{ color:'yellow', label:'Yellow (SST)', volume:'5 mL', count:1, inversions:5, notes:'Separate serum promptly. Stable 7 days at 4°C.' }],
+    fasting: false,
+    tat: '3 hours',
+    method: 'CLIA (Chemiluminescence immunoassay) or ELISA on automated immunoanalyser',
+    special_instructions: 'Collect before taking thyroid medication. Note if on biotin supplements (interferes with CLIA).',
+    params: [
+      { name:'TSH',   unit:'µIU/mL', normal_m:'0.4–4.0',  normal_f:'0.4–4.0',  normal_child:'0.5–5.0',  low:'0.4',  high:'4.0',  crit_low:'0.1', crit_high:'10', flag_low:'Hyperthyroidism', flag_high:'Hypothyroidism' },
+      { name:'Free T4 (FT4)', unit:'ng/dL', normal_m:'0.8–1.8', normal_f:'0.8–1.8', normal_child:'0.8–2.2', low:'0.8', high:'1.8', crit_low:'0.5', crit_high:'4.0', flag_low:'Hypothyroidism', flag_high:'Hyperthyroidism/thyrotoxicosis' },
+      { name:'Free T3 (FT3)', unit:'pg/mL', normal_m:'2.3–4.2', normal_f:'2.3–4.2', normal_child:'2.0–4.5', low:'2.3', high:'4.2', crit_low:'', crit_high:'', flag_low:'Hypothyroidism', flag_high:'Hyperthyroidism' },
+      { name:'Total T4',      unit:'µg/dL', normal_m:'5.1–14.1',normal_f:'5.1–14.1',normal_child:'4.5–12', low:'5.1', high:'14.1', crit_low:'', crit_high:'', flag_low:'', flag_high:'' }
+    ]
+  },
+
+  // ── DIABETES ─────────────────────────────────────────────
+  BSF: {
+    name: 'Blood Sugar Fasting',
+    code: 'BSF',
+    dept: 'Biochemistry',
+    section: 'Biochemistry',
+    vacutainer: 'grey',
+    tubes: [{ color:'grey', label:'Grey (Fluoride)', volume:'3 mL', count:1, inversions:8, notes:'Mix immediately. Keep on ice. Process within 30 min or glycolysis causes falsely low result.' }],
+    fasting: true,
+    tat: '30 minutes',
+    method: 'Hexokinase method (reference) or GOD-PAP enzymatic on auto-analyser',
+    special_instructions: '8–10 hours fasting. No medication except essential drugs. Collect before morning dose.',
+    params: [
+      { name:'Glucose (Fasting)', unit:'mg/dL', normal_m:'70–100', normal_f:'70–100', normal_child:'60–100', low:'70', high:'100', crit_low:'40', crit_high:'500', flag_low:'Hypoglycaemia — immediate action needed if <40', flag_high:'Diabetes/prediabetes — IFG 100–125, DM ≥126' }
+    ]
+  },
+
+  HBA1C: {
+    name: 'HbA1c (Glycated Haemoglobin)',
+    code: 'HBA1C',
+    dept: 'Biochemistry',
+    section: 'Biochemistry',
+    vacutainer: 'purple',
+    tubes: [{ color:'purple', label:'Purple (EDTA)', volume:'3 mL', count:1, inversions:8, notes:'Stable up to 7 days at 4°C. No fasting required.' }],
+    fasting: false,
+    tat: '2 hours',
+    method: 'HPLC (High Performance Liquid Chromatography) — Gold standard for HbA1c',
+    special_instructions: 'No fasting needed. Not valid in haemoglobinopathies, haemolytic anaemia.',
+    params: [
+      { name:'HbA1c',     unit:'%',      normal_m:'<5.7',     normal_f:'<5.7',     normal_child:'<5.7',    low:'0', high:'5.7', crit_low:'', crit_high:'14', flag_low:'', flag_high:'Prediabetes 5.7–6.4%, DM ≥6.5%' },
+      { name:'HbA1c (mmol/mol)', unit:'mmol/mol', normal_m:'<39', normal_f:'<39', normal_child:'<39', low:'0', high:'39', crit_low:'', crit_high:'', flag_low:'', flag_high:'Prediabetes 39–47, DM ≥48' },
+      { name:'Estimated Average Glucose', unit:'mg/dL', normal_m:'<117', normal_f:'<117', normal_child:'<117', low:'0', high:'117', crit_low:'', crit_high:'', flag_low:'', flag_high:'' }
+    ]
+  },
+
+  // ── URINE ─────────────────────────────────────────────────
+  URE: {
+    name: 'Urine Routine & Microscopy',
+    code: 'URE',
+    dept: 'Microbiology',
+    section: 'Urine',
+    vacutainer: 'white_container',
+    tubes: [{ color:'white_container', label:'Urine Container', volume:'15–30 mL', count:1, inversions:0, notes:'Midstream clean-catch urine. Process within 2 hours. Refrigerate if delayed.' }],
+    fasting: false,
+    tat: '1 hour',
+    method: 'Dipstick + automated urine analyser + manual microscopy',
+    special_instructions: 'Midstream catch. Clean genitalia first. First morning specimen preferred.',
+    params: [
+      { name:'Colour',          unit:'',      normal_m:'Yellow',  normal_f:'Yellow',  normal_child:'Yellow',  low:'',   high:'',    crit_low:'', crit_high:'', flag_low:'', flag_high:'Dark/bloody/cloudy — investigate' },
+      { name:'Appearance',      unit:'',      normal_m:'Clear',   normal_f:'Clear',   normal_child:'Clear',   low:'',   high:'',    crit_low:'', crit_high:'', flag_low:'', flag_high:'Turbid — infection/crystals' },
+      { name:'pH',              unit:'',      normal_m:'5.0–8.0', normal_f:'5.0–8.0', normal_child:'5.0–8.0',low:'5.0', high:'8.0',crit_low:'', crit_high:'', flag_low:'', flag_high:'' },
+      { name:'Specific Gravity',unit:'',      normal_m:'1.005–1.030',normal_f:'1.005–1.030',normal_child:'1.005–1.030',low:'1.005',high:'1.030',crit_low:'',crit_high:'',flag_low:'Dilute urine',flag_high:'Concentrated urine' },
+      { name:'Protein',         unit:'',      normal_m:'Negative',normal_f:'Negative',normal_child:'Negative',low:'',   high:'',    crit_low:'', crit_high:'', flag_low:'', flag_high:'Proteinuria — renal disease' },
+      { name:'Glucose',         unit:'',      normal_m:'Negative',normal_f:'Negative',normal_child:'Negative',low:'',   high:'',    crit_low:'', crit_high:'', flag_low:'', flag_high:'Glycosuria — diabetes/renal threshold' },
+      { name:'Ketones',         unit:'',      normal_m:'Negative',normal_f:'Negative',normal_child:'Negative',low:'',   high:'',    crit_low:'', crit_high:'', flag_low:'', flag_high:'DKA/starvation/fever' },
+      { name:'Bilirubin',       unit:'',      normal_m:'Negative',normal_f:'Negative',normal_child:'Negative',low:'',   high:'',    crit_low:'', crit_high:'', flag_low:'', flag_high:'Liver disease/biliary obstruction' },
+      { name:'Blood/RBC',       unit:'',      normal_m:'Negative',normal_f:'Negative',normal_child:'Negative',low:'',   high:'',    crit_low:'', crit_high:'', flag_low:'', flag_high:'UTI/stones/glomerulonephritis' },
+      { name:'Leucocytes',      unit:'',      normal_m:'Negative',normal_f:'Negative',normal_child:'Negative',low:'',   high:'',    crit_low:'', crit_high:'', flag_low:'', flag_high:'Pyuria — UTI' },
+      { name:'Nitrite',         unit:'',      normal_m:'Negative',normal_f:'Negative',normal_child:'Negative',low:'',   high:'',    crit_low:'', crit_high:'', flag_low:'', flag_high:'Bacterial UTI (gram-negative)' },
+      { name:'Pus Cells (HPF)', unit:'/HPF',  normal_m:'0–5',    normal_f:'0–5',    normal_child:'0–5',     low:'0',  high:'5',   crit_low:'', crit_high:'', flag_low:'', flag_high:'>10/HPF — significant pyuria/UTI' },
+      { name:'RBC (HPF)',       unit:'/HPF',  normal_m:'0–2',    normal_f:'0–2',    normal_child:'0–2',     low:'0',  high:'2',   crit_low:'', crit_high:'', flag_low:'', flag_high:'Haematuria — renal/bladder cause' },
+      { name:'Epithelial Cells',unit:'/HPF',  normal_m:'0–5',    normal_f:'0–8',    normal_child:'0–5',     low:'0',  high:'5',   crit_low:'', crit_high:'', flag_low:'', flag_high:'Contamination if excess' },
+      { name:'Casts',           unit:'',      normal_m:'None',   normal_f:'None',   normal_child:'None',    low:'',   high:'',    crit_low:'', crit_high:'', flag_low:'', flag_high:'RBC casts = glomerulonephritis' },
+      { name:'Crystals',        unit:'',      normal_m:'None/few',normal_f:'None/few',normal_child:'None/few',low:'',  high:'',   crit_low:'', crit_high:'', flag_low:'', flag_high:'Oxalate/urate/phosphate crystals' }
+    ]
+  },
+
+  // ── SEROLOGY ─────────────────────────────────────────────
+  WIDAL: {
+    name: 'Widal Test (Typhoid)',
+    code: 'WIDAL',
+    dept: 'Serology',
+    section: 'Serology',
+    vacutainer: 'red',
+    tubes: [{ color:'red', label:'Red (Plain)', volume:'5 mL', count:1, inversions:0, notes:'Plain tube. No additive. Allow to clot 30 min. Centrifuge.' }],
+    fasting: false,
+    tat: '3 hours',
+    method: 'Tube Widal agglutination test (semi-quantitative)',
+    special_instructions: 'Collect after day 5 of fever for reliable results. Single titre less reliable than rising titre.',
+    params: [
+      { name:'S. typhi H (flagellar)', unit:'titre', normal_m:'<1:80', normal_f:'<1:80', normal_child:'<1:40', low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'≥1:160 significant in non-endemic area' },
+      { name:'S. typhi O (somatic)',   unit:'titre', normal_m:'<1:80', normal_f:'<1:80', normal_child:'<1:40', low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'≥1:160 recent/active infection' },
+      { name:'S. paratyphi AH',        unit:'titre', normal_m:'<1:80', normal_f:'<1:80', normal_child:'<1:40', low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'≥1:160 paratyphoid A' },
+      { name:'S. paratyphi BH',        unit:'titre', normal_m:'<1:80', normal_f:'<1:80', normal_child:'<1:40', low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'≥1:160 paratyphoid B' }
+    ]
+  },
+
+  DENGUE_NS1: {
+    name: 'Dengue NS1 Antigen',
+    code: 'DENGUE_NS1',
+    dept: 'Serology',
+    section: 'Serology',
+    vacutainer: 'yellow',
+    tubes: [{ color:'yellow', label:'Yellow (SST)', volume:'3 mL', count:1, inversions:5, notes:'Separate serum. Stable 5 days at 4°C.' }],
+    fasting: false,
+    tat: '2 hours',
+    method: 'ELISA or Rapid Immunochromatographic test (ICT)',
+    special_instructions: 'Best within first 5 days of fever. Negative NS1 does not rule out dengue after day 5 — check IgM.',
+    params: [
+      { name:'NS1 Antigen', unit:'', normal_m:'Negative', normal_f:'Negative', normal_child:'Negative', low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'Positive — acute dengue infection (days 1–5)' },
+      { name:'Dengue IgM',  unit:'', normal_m:'Negative', normal_f:'Negative', normal_child:'Negative', low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'Positive — current/recent infection (≥day 5)' },
+      { name:'Dengue IgG',  unit:'', normal_m:'Negative', normal_f:'Negative', normal_child:'Negative', low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'Positive — secondary dengue/past exposure' }
+    ]
+  },
+
+  HBSAG: {
+    name: 'HBsAg (Hepatitis B Surface Antigen)',
+    code: 'HBSAG',
+    dept: 'Serology',
+    section: 'Serology',
+    vacutainer: 'yellow',
+    tubes: [{ color:'yellow', label:'Yellow (SST)', volume:'3 mL', count:1, inversions:5, notes:'Separate serum. Run ELISA/CLIA.' }],
+    fasting: false,
+    tat: '3 hours',
+    method: 'ELISA (3rd generation) or CLIA',
+    special_instructions: 'Positive requires confirmatory testing. CLIA more sensitive than rapid card test.',
+    params: [
+      { name:'HBsAg', unit:'', normal_m:'Negative', normal_f:'Negative', normal_child:'Negative', low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'Positive — active HBV infection or carrier state' }
+    ]
+  },
+
+  // ── COAGULATION ──────────────────────────────────────────
+  PT_INR: {
+    name: 'PT/INR (Prothrombin Time)',
+    code: 'PT_INR',
+    dept: 'Haematology',
+    section: 'Coagulation',
+    vacutainer: 'light_blue',
+    tubes: [{ color:'light_blue', label:'Light Blue (Citrate)', volume:'2.7 mL', count:1, inversions:4, notes:'MUST fill tube to mark — incorrect volume invalidates result. Run within 4 hours.' }],
+    fasting: false,
+    tat: '1 hour',
+    method: 'Optical/mechanical clot detection on coagulation analyser (Stago/IL)',
+    special_instructions: 'Fill citrate tube EXACTLY to the mark. Do not overfill or underfill. Send to lab immediately.',
+    params: [
+      { name:'Prothrombin Time (PT)', unit:'seconds', normal_m:'11–14', normal_f:'11–14', normal_child:'11–14', low:'11', high:'14', crit_low:'', crit_high:'30', flag_low:'', flag_high:'Prolonged — liver disease/warfarin/VitK deficiency' },
+      { name:'INR',                   unit:'',         normal_m:'0.8–1.2', normal_f:'0.8–1.2', normal_child:'0.8–1.2', low:'0.8', high:'1.2', crit_low:'', crit_high:'4.0', flag_low:'', flag_high:'>2.0 = anticoagulated; >4 = bleeding risk' },
+      { name:'Control PT',            unit:'seconds',  normal_m:'11–14',   normal_f:'11–14',   normal_child:'11–14',   low:'11',  high:'14',  crit_low:'', crit_high:'',    flag_low:'', flag_high:'' }
+    ]
+  },
+
+  APTT: {
+    name: 'aPTT (Activated Partial Thromboplastin Time)',
+    code: 'APTT',
+    dept: 'Haematology',
+    section: 'Coagulation',
+    vacutainer: 'light_blue',
+    tubes: [{ color:'light_blue', label:'Light Blue (Citrate)', volume:'2.7 mL', count:1, inversions:4, notes:'Fill to mark. Process within 4 hours.' }],
+    fasting: false,
+    tat: '1 hour',
+    method: 'Optical clot detection on coagulation analyser',
+    special_instructions: 'Fill to the mark exactly. Note if patient is on heparin therapy.',
+    params: [
+      { name:'aPTT',       unit:'seconds', normal_m:'25–38',  normal_f:'25–38',  normal_child:'25–40',  low:'25', high:'38', crit_low:'', crit_high:'70', flag_low:'', flag_high:'Prolonged — heparin/haemophilia/DIC' },
+      { name:'Control aPTT',unit:'seconds',normal_m:'25–38',  normal_f:'25–38',  normal_child:'25–40',  low:'25', high:'38', crit_low:'', crit_high:'',   flag_low:'', flag_high:'' }
+    ]
+  },
+
+  // ── VITAMINS / MINERALS ──────────────────────────────────
+  VIT_D: {
+    name: 'Vitamin D (25-OH)',
+    code: 'VIT_D',
+    dept: 'Biochemistry',
+    section: 'Endocrinology',
+    vacutainer: 'yellow',
+    tubes: [{ color:'yellow', label:'Yellow (SST)', volume:'3 mL', count:1, inversions:5, notes:'Protect from light. Stable 7 days at 4°C.' }],
+    fasting: false,
+    tat: '4 hours',
+    method: 'CLIA (Chemiluminescence) or ELISA immunoassay',
+    special_instructions: 'No fasting. Protect sample from direct light.',
+    params: [
+      { name:'25-OH Vitamin D', unit:'ng/mL', normal_m:'30–100', normal_f:'30–100', normal_child:'20–100', low:'30', high:'100', crit_low:'10', crit_high:'', flag_low:'Deficiency — <20: severe, 20–29: insufficient', flag_high:'>150 toxicity risk' }
+    ]
+  },
+
+  B12: {
+    name: 'Vitamin B12',
+    code: 'B12',
+    dept: 'Biochemistry',
+    section: 'Endocrinology',
+    vacutainer: 'yellow',
+    tubes: [{ color:'yellow', label:'Yellow (SST)', volume:'3 mL', count:1, inversions:5, notes:'Separate serum. Protect from light. Stable 24h at 4°C.' }],
+    fasting: false,
+    tat: '3 hours',
+    method: 'CLIA (Chemiluminescence immunoassay)',
+    special_instructions: 'No fasting needed. Note if on metformin or PPI — reduces B12.',
+    params: [
+      { name:'Vitamin B12', unit:'pg/mL', normal_m:'200–900', normal_f:'200–900', normal_child:'200–900', low:'200', high:'900', crit_low:'100', crit_high:'', flag_low:'Deficiency — neurological/megaloblastic anaemia risk', flag_high:'' }
+    ]
+  },
+
+  // ── MALARIA ──────────────────────────────────────────────
+  MP: {
+    name: 'Malaria Parasite (MP)',
+    code: 'MP',
+    dept: 'Haematology',
+    section: 'Parasitology',
+    vacutainer: 'purple',
+    tubes: [{ color:'purple', label:'Purple (EDTA)', volume:'3 mL', count:1, inversions:8, notes:'Thick and thin blood smears must be prepared within 1 hour of collection.' }],
+    fasting: false,
+    tat: '2 hours',
+    method: 'Peripheral blood smear (Giemsa stain) + Rapid Diagnostic Test (RDT) for HRP2/pLDH',
+    special_instructions: 'Collect during febrile episode. Make blood smears at bedside for best results.',
+    params: [
+      { name:'Malaria Parasite',       unit:'',     normal_m:'Not seen', normal_f:'Not seen', normal_child:'Not seen', low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'Seen — specify species (P. falciparum/vivax/malariae)' },
+      { name:'Species',                unit:'',     normal_m:'—',       normal_f:'—',       normal_child:'—',         low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'' },
+      { name:'Parasitaemia (%)',        unit:'%',    normal_m:'0',       normal_f:'0',       normal_child:'0',         low:'', high:'', crit_low:'', crit_high:'5', flag_low:'', flag_high:'>5% = hyperparasitaemia — severe malaria' },
+      { name:'RDT P. falciparum',      unit:'',     normal_m:'Negative', normal_f:'Negative', normal_child:'Negative',low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'Positive — falciparum malaria' },
+      { name:'RDT P. vivax',           unit:'',     normal_m:'Negative', normal_f:'Negative', normal_child:'Negative',low:'', high:'', crit_low:'', crit_high:'', flag_low:'', flag_high:'Positive — vivax malaria' }
+    ]
+  }
+};
+
+// ── VACUTAINER MAP ────────────────────────────────────────
+var VACU_MAP = {
+  purple:          { hex:'#9B59B6', label:'Purple (EDTA)',        additive:'K2EDTA',              volume:'3 mL', inv:'8 inversions',   draw_order:6, note:'For CBC, HbA1c, malaria. Mix gently.' },
+  yellow:          { hex:'#F1C40F', label:'Yellow (SST/Gold)',     additive:'Gel + Clot activator', volume:'5 mL', inv:'5 inversions',   draw_order:3, note:'Allow 30 min to clot. Centrifuge. For LFT, KFT, Lipid, TFT.' },
+  grey:            { hex:'#888888', label:'Grey (Fluoride)',        additive:'NaF + K Oxalate',      volume:'3 mL', inv:'8 inversions',   draw_order:7, note:'For blood sugar. Keep on ice. Process within 30 min.' },
+  light_blue:      { hex:'#3498DB', label:'Light Blue (Citrate)',   additive:'3.2% Sodium Citrate',  volume:'2.7 mL',inv:'4 inversions',  draw_order:2, note:'MUST fill to mark. For PT, aPTT, INR.' },
+  green:           { hex:'#27AE60', label:'Green (Heparin)',        additive:'Li Heparin',           volume:'4 mL', inv:'8 inversions',   draw_order:5, note:'For electrolytes, ABG.' },
+  red:             { hex:'#E74C3C', label:'Red (Plain)',            additive:'No additive',          volume:'5 mL', inv:'None',           draw_order:1, note:'For serology, Widal, cross-match.' },
+  orange:          { hex:'#E67E22', label:'Orange (RST)',           additive:'Thrombin',             volume:'3 mL', inv:'6 inversions',   draw_order:4, note:'Emergency biochemistry — rapid serum.' },
+  white_container: { hex:'#BDC3C7', label:'Urine Container',       additive:'Sterile container',    volume:'15–30 mL', inv:'N/A',        draw_order:9, note:'Midstream clean-catch urine.' },
+  stool_container: { hex:'#A0522D', label:'Stool Container',       additive:'Sterile container',    volume:'5–10 g',   inv:'N/A',        draw_order:9, note:'Collect using spatula into container.' }
+};
+
+// CLSI draw order label
+var DRAW_ORDER_NOTES = [
+  '1. Blood culture bottles (if ordered)',
+  '2. Light blue (citrate) — fill EXACTLY to mark',
+  '3. Red (plain serum)',
+  '4. Gold/Yellow (SST) — clot activator',
+  '5. Green (heparin)',
+  '6. Purple (EDTA)',
+  '7. Grey (fluoride) — keep on ice'
+];
+
+
 // ===== OPD QUEUE =====
 var opdQueueTimer = null;
 
@@ -4191,7 +4575,7 @@ async function loadInvestigations() {
 }
 
 function showLabTab(tab) {
-  ['worklist','collection','results','approve'].forEach(function(t) {
+  ['worklist','collection','results','approve','reports'].forEach(function(t) {
     var content = document.getElementById('lab-content-'+t);
     var btn = document.getElementById('lab-tab-'+t);
     if (content) content.style.display = t===tab ? 'block' : 'none';
@@ -4201,6 +4585,7 @@ function showLabTab(tab) {
   });
   if (tab === 'results')  loadResultsEntry();
   if (tab === 'approve')  loadApproveList();
+  if (tab === 'reports')  loadReportsList();
   if (tab === 'collection') { /* patient search drives this */ }
 }
 
@@ -4366,48 +4751,94 @@ async function loadPatientLabOrders(patientId, patientName) {
 
 function showVacuGuide(orders, patientName) {
   var el = document.getElementById('vacu-guide'); if(!el) return;
-  if (!orders.length) { el.innerHTML='<div style="color:rgba(240,250,247,0.4);font-size:13px;text-align:center;padding:20px">No orders</div>'; return; }
+  if (!orders.length) { el.innerHTML='<div style="color:rgba(240,250,247,0.4);font-size:13px;text-align:center;padding:20px">Select a patient to see collection guide</div>'; return; }
 
-  // Group by vacutainer color
-  var byTube = {};
+  var VMAP = window.VACU_MAP || {};
+  var LMASTER = window.LAB_MASTER || {};
+
+  // Build tube map from LAB_MASTER
+  var tubeMap = {};
   orders.forEach(function(o) {
-    var color = o.vacutainer_color || 'unknown';
-    if (!byTube[color]) byTube[color] = [];
-    byTube[color].push(o);
+    var code = (o.test_code||'').toUpperCase();
+    var master = LMASTER[code];
+    var tubes = master && master.tubes ? master.tubes : [{ color: o.vacutainer_color||'yellow', label:'', volume:'5 mL', count:1, inversions:5, notes:'' }];
+    tubes.forEach(function(tube) {
+      var key = tube.color;
+      if (!tubeMap[key]) tubeMap[key] = { tube: tube, vacu: VMAP[key]||{hex:'#888',label:tube.label||key,additive:'',volume:tube.volume||'',inv:String(tube.inversions||0)+' inversions',note:tube.notes||''}, tests: [], fasting: false };
+      tubeMap[key].tests.push(o.test_name);
+      if (master && master.fasting) tubeMap[key].fasting = true;
+    });
   });
 
-  // Order of draw (CLSI standard)
-  var drawOrder = ['light_blue','red','yellow','green','purple','grey','white_container'];
-  var sortedColors = Object.keys(byTube).sort(function(a,b){
-    return (drawOrder.indexOf(a)+1||99)-(drawOrder.indexOf(b)+1||99);
+  var drawOrder = ['light_blue','red','yellow','orange','green','purple','grey','white_container','stool_container'];
+  var sorted = Object.keys(tubeMap).sort(function(a,b){
+    var ai=(drawOrder.indexOf(a)+1)||99, bi=(drawOrder.indexOf(b)+1)||99;
+    return ai-bi;
   });
 
-  el.innerHTML = '<div style="font-size:11px;color:rgba(240,250,247,0.5);margin-bottom:10px">Draw order (CLSI standard):</div>'
-    + sortedColors.map(function(color, idx) {
-        var vacu = VACU_MAP[color] || {hex:'#888',label:color,additive:'',inv:'',note:''};
-        var tests = byTube[color];
-        return '<div style="display:flex;gap:12px;align-items:flex-start;padding:10px;background:rgba(0,0,0,0.2);border-radius:10px;margin-bottom:8px;border-left:3px solid '+vacu.hex+'">'
-          +'<div style="flex-shrink:0;text-align:center">'
-          +'<div style="width:28px;height:40px;border-radius:4px 4px 2px 2px;background:'+vacu.hex+';border:2px solid rgba(0,0,0,0.3);margin-bottom:4px"></div>'
-          +'<div style="font-size:9px;color:rgba(240,250,247,0.5)">'+(idx+1)+'<sup>st</sup></div>'
+  var totalTubes = sorted.reduce(function(s,k){ return s+(tubeMap[k].tube.count||1); },0);
+
+  el.innerHTML = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
+    +'<div style="font-size:12px;font-weight:600;color:#F0FAF7">Collection plan for '+patientName+'</div>'
+    +'<div style="background:rgba(0,196,154,0.1);color:var(--teal);font-size:11px;font-weight:600;padding:3px 10px;border-radius:6px">'+totalTubes+' tube'+(totalTubes!==1?'s':'')+' needed</div>'
+    +'</div>'
+    + sorted.map(function(color, idx) {
+        var entry = tubeMap[color];
+        var vacu = entry.vacu;
+        var tube = entry.tube;
+        var invCount = parseInt(tube.inversions)||parseInt(vacu.inv)||0;
+        var dots = Array(Math.min(invCount,10)).fill(0).map(function(){
+          return '<div style="width:8px;height:8px;border-radius:50%;background:'+vacu.hex+';opacity:0.7"></div>';
+        }).join('');
+        return '<div class="vacu-tube-card" style="padding:12px;background:rgba(0,0,0,0.2);border-radius:12px;margin-bottom:8px;border-left:4px solid '+vacu.hex+'">'
+          +'<div style="display:flex;gap:12px;align-items:flex-start">'
+          +'<div style="text-align:center;flex-shrink:0">'
+          +'<div style="width:28px;height:40px;border-radius:4px 4px 2px 2px;background:'+vacu.hex+';border:2px solid rgba(255,255,255,0.15);margin:0 auto 3px"></div>'
+          +'<div style="font-size:9px;color:rgba(240,250,247,0.5);font-weight:600">'+(tube.count||1)+'\xd7</div>'
           +'</div>'
-          +'<div style="flex:1">'
-          +'<div style="font-size:12px;font-weight:600;color:#F0FAF7">'+vacu.label+'</div>'
-          +'<div style="font-size:11px;color:rgba(240,250,247,0.5);margin-top:2px">'+vacu.additive+' \xb7 '+vacu.inv+'</div>'
-          +'<div style="font-size:11px;color:rgba(240,250,247,0.4);margin-top:2px;font-style:italic">'+vacu.note+'</div>'
-          +'<div style="margin-top:6px">'+tests.map(function(t){ return '<span style="font-size:11px;background:rgba(0,196,154,0.1);color:var(--teal);padding:2px 7px;border-radius:4px;margin-right:4px">'+t.test_name+'</span>'; }).join('')+'</div>'
-          +'</div></div>';
+          +'<div style="flex:1;min-width:0">'
+          +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px">'
+          +'<div style="font-size:13px;font-weight:600;color:#F0FAF7">'+vacu.label+'</div>'
+          +(entry.fasting?'<span style="font-size:10px;background:rgba(239,159,39,0.2);color:#EF9F27;padding:2px 8px;border-radius:4px;font-weight:600;flex-shrink:0;margin-left:8px">FASTING</span>':'')
+          +'</div>'
+          +'<div style="font-size:11px;color:rgba(240,250,247,0.5);margin-bottom:2px">'+vacu.additive+' \xb7 '+(tube.volume||vacu.volume||'')+'</div>'
+          +'<div style="font-size:11px;color:rgba(240,250,247,0.4);font-style:italic;margin-bottom:6px">'+(tube.notes||vacu.note||'')+'</div>'
+          +'<div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:6px">'+entry.tests.map(function(t){ return '<span style="font-size:11px;background:rgba(0,196,154,0.1);color:var(--teal);padding:2px 8px;border-radius:4px">'+t+'</span>'; }).join('')+'</div>'
+          +(invCount?'<div style="display:flex;align-items:center;gap:6px"><span style="font-size:10px;color:rgba(240,250,247,0.4)">Inversions:</span><div style="display:flex;gap:2px">'+dots+'</div><span style="font-size:10px;color:rgba(240,250,247,0.5)">'+invCount+' gentle</span></div>':'')
+          +'</div>'
+          +'<div style="flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:4px">'
+          +'<input type="checkbox" class="tube-cb" data-color="'+color+'" style="width:20px;height:20px;cursor:pointer;accent-color:#00C49A">'
+          +'<span style="font-size:9px;color:rgba(240,250,247,0.4)">Collected</span>'
+          +'</div>'
+          +'</div>'
+          +'</div>';
       }).join('');
 
-  // Show barcode panel
-  var bp = document.getElementById('barcode-panel');
-  var bl = document.getElementById('barcode-labels-list');
-  if (bp && bl) {
+  setTimeout(function(){
+    el.querySelectorAll('.tube-cb').forEach(function(cb){
+      cb.addEventListener('change', function(){
+        var card = this.closest('.vacu-tube-card');
+        if(card) card.style.opacity = this.checked?'0.5':'1';
+        var all=el.querySelectorAll('.tube-cb'), done=el.querySelectorAll('.tube-cb:checked');
+        if(all.length && done.length===all.length) showToast('All tubes collected \u2713 Mark received in worklist','success');
+      });
+    });
+  },100);
+
+  // Barcode panel
+  var bp=document.getElementById('barcode-panel'), bl=document.getElementById('barcode-labels-list');
+  if(bp&&bl){
     bp.style.display='block';
-    bl.innerHTML = orders.map(function(o){
-      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 10px;background:#080C0B;border-radius:6px;margin-bottom:5px;font-family:monospace;font-size:12px">'
-        +'<span style="color:var(--teal);font-weight:700">'+(o.accession_number||'')+'</span>'
-        +'<span style="color:rgba(240,250,247,0.7)">'+o.test_name+'</span>'
+    var VMAP2 = window.VACU_MAP||{};
+    bl.innerHTML=orders.map(function(o){
+      var code=(o.test_code||'').toUpperCase();
+      var m=LMASTER[code];
+      var col=m&&m.tubes&&m.tubes[0]?m.tubes[0].color:(o.vacutainer_color||'yellow');
+      var v=VMAP2[col]||{hex:'#888',label:''};
+      return '<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 10px;background:#080C0B;border-radius:6px;margin-bottom:5px;border-left:3px solid '+v.hex+'">'
+        +'<span style="font-family:monospace;font-size:12px;color:var(--teal);font-weight:700">'+(o.accession_number||'ACC-'+String(o.id||'').slice(-6))+'</span>'
+        +'<span style="font-size:12px;color:rgba(240,250,247,0.8)">'+o.test_name+'</span>'
+        +'<span style="font-size:10px;color:rgba(240,250,247,0.4)">'+v.label+'</span>'
         +'</div>';
     }).join('');
   }
@@ -4500,38 +4931,123 @@ async function openResultEntry(orderId) {
   document.getElementById('saveResultEntry').onclick=function(){ submitResultEntry(); };
 }
 
+function getLabMasterParams(testCode, patientGender, patientAge) {
+  if (!window.LAB_MASTER) return null;
+  var master = window.LAB_MASTER[testCode];
+  if (!master || !master.params) return null;
+  var isChild = patientAge && parseInt(patientAge) < 18;
+  var isMale  = !patientGender || patientGender.toLowerCase().indexOf('f') !== 0;
+  return master.params.map(function(p) {
+    var range = isChild ? (p.normal_child||p.normal_m) : (isMale ? p.normal_m : p.normal_f);
+    return Object.assign({}, p, { normal: range||p.normal_m||'' });
+  });
+}
+
 function buildParamInputs(params, order) {
   var el = document.getElementById('rem-params-list'); if(!el) return;
-  if (!params.length) {
-    // Free-text result for radiology/pathology
-    el.innerHTML='<div style="margin-bottom:12px">'
-      +'<label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:6px">Result / Findings</label>'
-      +'<textarea id="rem-free-result" rows="6" class="form-input" style="width:100%;resize:vertical" placeholder="Enter test findings, observations, impressions..."></textarea>'
+  var testCode = order && order.test_code ? order.test_code.toUpperCase() : '';
+  var patient = window.patientsData && order && order.patient_id
+    ? (window.patientsData||[]).find(function(p){ return String(p.patient_id)===String(order.patient_id); })
+    : null;
+  var richParams = getLabMasterParams(testCode, patient ? patient.gender : null, patient ? patient.age : null);
+  var finalParams = richParams || (params && params.length ? params : null);
+  window.currentParamSet = finalParams || [];
+
+  var masterData = window.LAB_MASTER && window.LAB_MASTER[testCode];
+  var methodHTML = '';
+  if (masterData) {
+    methodHTML = '<div style="background:rgba(127,119,221,0.1);border:0.5px solid rgba(127,119,221,0.3);border-radius:8px;padding:8px 12px;margin-bottom:12px;font-size:12px">'
+      +'<div style="color:#AFA9EC;font-weight:600;margin-bottom:3px">Method</div>'
+      +'<div style="color:rgba(240,250,247,0.7)">'+masterData.method+'</div>'
+      +(masterData.special_instructions?'<div style="color:rgba(240,250,247,0.5);margin-top:4px;font-size:11px">' + masterData.special_instructions+'</div>':'')
+      +(masterData.fasting?'<div style="margin-top:6px"><span style="background:rgba(239,159,39,0.2);color:#EF9F27;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">FASTING REQUIRED</span></div>':'')
       +'</div>';
+  }
+
+  if (!finalParams || !finalParams.length) {
+    el.innerHTML = methodHTML + '<div style="margin-bottom:12px">'
+      +'<label style="display:block;font-size:10px;font-weight:700;color:rgba(240,250,247,0.5);text-transform:uppercase;margin-bottom:6px">Result / Findings</label>'
+      +'<textarea id="rem-free-result" rows="6" class="form-input" style="width:100%;resize:vertical" placeholder="Enter findings, observations, impressions..."></textarea></div>';
     return;
   }
 
-  var html = '<table style="width:100%;border-collapse:collapse;margin-bottom:10px">'
-    +'<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.15)">'
-    +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Parameter</th>'
-    +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Result</th>'
-    +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Unit</th>'
-    +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Normal Range</th>'
-    +'<th style="padding:6px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Flag</th>'
+  var gToggle = '';
+  if (masterData && masterData.params && masterData.params[0] && masterData.params[0].normal_m !== masterData.params[0].normal_f) {
+    gToggle = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">'
+      +'<span style="font-size:11px;color:rgba(240,250,247,0.5)">Ranges for:</span>'
+      +['M','F','C'].map(function(g){ return '<button onclick="rebuildParamsForGender(\''+g+'\')" id="gbtn-'+g+'" style="padding:3px 10px;border-radius:6px;border:0.5px solid '+(g==='M'?'var(--teal)':'rgba(0,196,154,0.3)')+';background:'+(g==='M'?'var(--teal)':'transparent')+';color:'+(g==='M'?'#000':'rgba(240,250,247,0.6)')+';font-size:11px;font-weight:600;cursor:pointer">'+(g==='M'?'Male':g==='F'?'Female':'Child')+'</button>'; }).join('')
+      +'</div>';
+  }
+
+  var tableHTML = '<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;min-width:500px;margin-bottom:10px">'
+    +'<thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.15);background:rgba(0,196,154,0.04)">'
+    +'<th style="padding:7px 10px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;width:30%">Parameter</th>'
+    +'<th style="padding:7px 8px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;width:18%">Value</th>'
+    +'<th style="padding:7px 8px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;width:12%">Unit</th>'
+    +'<th style="padding:7px 8px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase;width:20%">Ref Range</th>'
+    +'<th style="padding:7px 8px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">Flag</th>'
     +'</tr></thead><tbody>';
 
-  params.forEach(function(p, i) {
-    var normalRange = p.normal || p.normal_male || '';
-    html += '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
-      +'<td style="padding:7px 10px;font-size:13px;font-weight:500">'+p.name+'</td>'
-      +'<td style="padding:7px 8px"><input type="text" id="param-val-'+i+'" class="form-input" style="width:90px;padding:5px 8px;font-size:13px" placeholder="Value" oninput="flagParamRow('+i+',this.value,\''+normalRange+'\',\''+p.low_flag+'\',\''+p.high_flag+'\')"></td>'
-      +'<td style="padding:7px 10px;font-size:12px;color:rgba(240,250,247,0.5)">'+p.unit+'</td>'
-      +'<td style="padding:7px 10px;font-size:12px;color:rgba(240,250,247,0.5)">'+normalRange+'</td>'
-      +'<td style="padding:7px 10px" id="param-flag-'+i+'"><span style="font-size:12px;color:rgba(240,250,247,0.3)">--</span></td>'
+  finalParams.forEach(function(p, i) {
+    tableHTML += '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+      +'<td style="padding:7px 10px;font-size:13px;font-weight:500;color:#F0FAF7">'+p.name+'</td>'
+      +'<td style="padding:7px 8px"><input type="text" id="param-val-'+i+'" class="form-input" style="width:95px;padding:5px 8px;font-size:13px;font-weight:600" placeholder="\u2014" oninput="liveFlag('+i+',this.value)"></td>'
+      +'<td style="padding:7px 8px;font-size:11px;color:rgba(240,250,247,0.5)">'+p.unit+'</td>'
+      +'<td style="padding:7px 8px;font-size:11px;color:rgba(240,250,247,0.7);font-weight:500">'+(p.normal||'')+'</td>'
+      +'<td style="padding:7px 8px" id="param-flag-'+i+'"><span style="font-size:11px;color:rgba(240,250,247,0.3)">\u2014</span></td>'
       +'</tr>';
   });
 
-  el.innerHTML = html + '</tbody></table>';
+  el.innerHTML = methodHTML + gToggle + tableHTML + '</tbody></table></div>';
+}
+
+var currentParamSet = [];
+
+function liveFlag(idx, val) {
+  var flagEl = document.getElementById('param-flag-'+idx); if(!flagEl) return;
+  var params = window.currentParamSet || [];
+  var p = params[idx]; if(!p) return;
+  if (!val || val === '') { flagEl.innerHTML='<span style="font-size:11px;color:rgba(240,250,247,0.3)">\u2014</span>'; return; }
+
+  var lowerNormal = (p.normal||'').toLowerCase();
+  if (lowerNormal === 'negative' || lowerNormal === 'not seen' || lowerNormal === 'absent') {
+    var isPos = val.toLowerCase().indexOf('pos') === 0 || val.toLowerCase().indexOf('present') === 0;
+    flagEl.innerHTML='<span style="font-size:11px;font-weight:700;color:'+(isPos?'#E24B4A':'#00C49A')+'">'+(isPos?'POSITIVE':'NEGATIVE')+'</span>';
+    return;
+  }
+
+  var num = parseFloat(val);
+  if (isNaN(num)) { flagEl.innerHTML='<span style="font-size:11px;color:rgba(240,250,247,0.5)">'+val+'</span>'; return; }
+
+  var isCrit=false, isHigh=false, isAbnl=false;
+  if (p.crit_low && num <= parseFloat(p.crit_low)) { isCrit=true; isAbnl=true; isHigh=false; }
+  else if (p.crit_high && num >= parseFloat(p.crit_high)) { isCrit=true; isAbnl=true; isHigh=true; }
+  else if (p.high && !isNaN(parseFloat(p.high)) && num > parseFloat(p.high)) { isAbnl=true; isHigh=true; }
+  else if (p.low && !isNaN(parseFloat(p.low)) && num < parseFloat(p.low)) { isAbnl=true; isHigh=false; }
+
+  var col = isCrit?'#E24B4A': isAbnl?'#EF9F27':'#00C49A';
+  var lbl = isCrit?(isHigh?'CRIT H':'CRIT L'): isAbnl?(isHigh?'HIGH':'LOW'):'NORMAL';
+  var tip = isCrit?(isHigh?(p.flag_high||''):(p.flag_low||'')): isAbnl?(isHigh?(p.flag_high||''):(p.flag_low||'')):'';
+
+  flagEl.innerHTML='<div><span style="font-size:11px;font-weight:700;color:'+col+'">'+lbl+'</span>'
+    +(tip?'<div style="font-size:9px;color:rgba(240,250,247,0.4);max-width:160px;margin-top:1px">'+tip.substring(0,55)+'</div>':'')+'</div>';
+}
+
+function rebuildParamsForGender(g) {
+  if (!currentLabOrder) return;
+  var code = (currentLabOrder.test_code||'').toUpperCase();
+  var master = window.LAB_MASTER && window.LAB_MASTER[code];
+  if (!master) return;
+  var params = master.params.map(function(p) {
+    var r = g==='C'?(p.normal_child||p.normal_m): g==='F'?p.normal_f:p.normal_m;
+    return Object.assign({}, p, { normal: r });
+  });
+  window.currentParamSet = params;
+  buildParamInputs(params, currentLabOrder);
+  ['M','F','C'].forEach(function(x){
+    var btn=document.getElementById('gbtn-'+x);
+    if(btn){ btn.style.background=x===g?'var(--teal)':'transparent'; btn.style.color=x===g?'#000':'rgba(240,250,247,0.6)'; btn.style.borderColor=x===g?'var(--teal)':'rgba(0,196,154,0.3)'; }
+  });
 }
 
 function flagParamRow(idx, val, normalRange, lowFlag, highFlag) {
@@ -4794,6 +5310,85 @@ function printLabReportForResult(result) {
   var win=window.open('','_blank','width=900,height=750');
   if(win){ win.document.write(html); win.document.close(); }
 }
+
+
+
+// ── APPROVED REPORTS ──────────────────────────────────────
+var approvedReportsData = [];
+
+async function loadReportsList() {
+  var el = document.getElementById('approved-reports-list'); if(!el) return;
+  el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div>';
+  try {
+    var data = await apiCall('/hospitals/'+mwHospitalId+'/investigations/results?approved=true');
+    approvedReportsData = data.data||[];
+    renderReportsList(approvedReportsData);
+  } catch(e) {
+    el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Error loading reports.</div>';
+  }
+}
+
+function filterReportsList(val) {
+  if (!val) { renderReportsList(approvedReportsData); return; }
+  var q = val.toLowerCase();
+  renderReportsList(approvedReportsData.filter(function(r){
+    var name=((r.first_name||'')+(r.last_name?' '+r.last_name:'')).toLowerCase();
+    return name.includes(q)||(r.test_name||'').toLowerCase().includes(q)||(r.accession_number||'').toLowerCase().includes(q);
+  }));
+}
+
+function renderReportsList(results) {
+  var el = document.getElementById('approved-reports-list'); if(!el) return;
+  if (!results.length) {
+    el.innerHTML='<div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">No approved reports found.</div>';
+    return;
+  }
+  var sc = {normal:'#00C49A', borderline:'#EF9F27', abnormal:'#E24B4A', critical:'#ff3333', pending:'#888'};
+  var rows = results.map(function(r) {
+    var name=((r.first_name||'')+(r.last_name?' '+r.last_name:'')).trim()||'Patient';
+    var statusColor = sc[r.overall_status]||'#888';
+    var sentBadge = r.sent_to_patient
+      ? '<span style="font-size:10px;background:rgba(0,196,154,0.1);color:var(--teal);padding:2px 8px;border-radius:4px;font-weight:600">Sent</span>'
+      : '<span style="font-size:10px;background:rgba(240,250,247,0.06);color:rgba(240,250,247,0.4);padding:2px 8px;border-radius:4px">Not sent</span>';
+    return '<tr style="border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+      +'<td style="padding:10px 12px"><div style="font-family:monospace;font-size:12px;color:var(--teal)">'+(r.accession_number||'—')+'</div></td>'
+      +'<td style="padding:10px 12px"><div style="font-weight:600">'+name+'</div><div style="font-size:11px;color:rgba(240,250,247,0.4)">'+(r.mrn||'')+'</div></td>'
+      +'<td style="padding:10px 12px;font-size:13px;font-weight:600">'+r.test_name+'</td>'
+      +'<td style="padding:10px 12px;font-size:12px;color:rgba(240,250,247,0.6)">'+r.result_date+'</td>'
+      +'<td style="padding:10px 12px"><span style="font-size:12px;font-weight:700;color:'+statusColor+'">'+(r.overall_status||'done').toUpperCase()+'</span></td>'
+      +'<td style="padding:10px 12px">'+sentBadge+'</td>'
+      +'<td style="padding:10px 12px">'
+      +'<div style="display:flex;gap:5px">'
+      +'<button class="action-btn rep-print-btn" data-rid="'+r.id+'" style="font-size:11px;padding:4px 10px">Print</button>'
+      +'<button class="action-btn rep-send-btn" data-rid="'+r.id+'" data-phone="'+(r.phone||'')+'" style="font-size:11px;padding:4px 10px;background:rgba(37,211,102,0.1);border-color:rgba(37,211,102,0.4);color:#25d366">WA</button>'
+      +'</div>'
+      +'</td></tr>';
+  }).join('');
+  el.innerHTML='<table style="width:100%;border-collapse:collapse"><thead><tr style="border-bottom:0.5px solid rgba(0,196,154,0.2);background:rgba(0,196,154,0.03)">'
+    +['Accession','Patient','Test','Date','Status','Delivered','Action'].map(function(h){ return '<th style="padding:10px 12px;text-align:left;font-size:10px;color:rgba(240,250,247,0.5);text-transform:uppercase">'+h+'</th>'; }).join('')
+    +'</tr></thead><tbody>'+rows+'</tbody></table>';
+  el.querySelectorAll('.rep-print-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var r = approvedReportsData.find(function(x){ return String(x.id)===this.dataset.rid; }.bind(this));
+      if(r) printLabReportForResult(r);
+    });
+  });
+  el.querySelectorAll('.rep-send-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){
+      var phone = this.dataset.phone || prompt('WhatsApp number:');
+      if(phone) dispatchLabResult(this.dataset.rid, phone);
+    });
+  });
+}
+
+// Link lab reports to patient EMR
+function getLinkLabReports(patientId) {
+  return apiCall('/hospitals/'+mwHospitalId+'/investigations/patient/'+patientId+'/history').then(function(data){
+    return data.success ? data.data : { orders:[], results:[] };
+  }).catch(function(){ return { orders:[], results:[] }; });
+}
+
+
 </script>
 
 <!-- NEW BILL MODAL -->
