@@ -1,4 +1,4 @@
-<!-- MediWhats v40 BUILD:1774049687 -->
+<!-- MediWhats v40 BUILD:1774050810 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1356,6 +1356,10 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </select>
       <button onclick="openAddStockModal()" style="background:var(--teal);border:none;border-radius:8px;padding:8px 16px;color:#000;font-weight:700;cursor:pointer;font-size:13px">+ Add Stock</button>
       <button onclick="pharmGeneratePO()" style="background:rgba(0,196,154,0.1);border:0.5px solid var(--teal);border-radius:8px;padding:8px 14px;color:var(--teal);font-weight:600;cursor:pointer;font-size:13px">Generate PO</button>
+      <button onclick="pharmBulkUpload()" style="background:rgba(99,179,237,0.1);border:0.5px solid rgba(99,179,237,0.4);border-radius:8px;padding:8px 14px;color:#63B3ED;font-weight:600;cursor:pointer;font-size:13px">&#8679; Bulk Upload</button>
+      <button onclick="pharmExportStock()" style="background:rgba(99,179,237,0.1);border:0.5px solid rgba(99,179,237,0.4);border-radius:8px;padding:8px 14px;color:#63B3ED;font-weight:600;cursor:pointer;font-size:13px">&#8681; Export CSV</button>
+      <button onclick="pharmMedicineMaster()" style="background:rgba(159,122,234,0.1);border:0.5px solid rgba(159,122,234,0.4);border-radius:8px;padding:8px 14px;color:#9F7AEA;font-weight:600;cursor:pointer;font-size:13px">&#128269; Medicine Master</button>
+      <input id="bulk-upload-input" type="file" accept=".csv" style="display:none" onchange="pharmProcessBulkUpload(this)">
     </div>
     <div id="pharma-inv-list" style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:14px;overflow:hidden;min-height:120px">
       <div style="padding:40px;text-align:center;color:rgba(240,250,247,0.4)">Loading inventory...</div>
@@ -1378,6 +1382,12 @@ tr:hover td{background:rgba(255,255,255,0.02)}
       </div>
       <div style="background:#111A18;border:0.5px solid rgba(0,196,154,0.15);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
         <div style="font-weight:700;font-size:14px">Bill Summary</div>
+        <div>
+          <div style="font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:5px">Patient (optional)</div>
+          <input id="pos-patient" type="text" placeholder="Search patient by name or UHID..." oninput="posPatientSearch(this.value)"
+            style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:9px 12px;color:var(--white);font-size:13px;outline:none">
+          <div id="pos-patient-suggestions" style="display:none;background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:8px;margin-top:3px;max-height:150px;overflow-y:auto;position:relative;z-index:20"></div>
+        </div>
         <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(240,250,247,0.55)">Subtotal</span><span id="pos-subtotal">&#8377;0.00</span></div>
         <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
           <span style="color:rgba(240,250,247,0.55)">Discount</span>
@@ -3072,10 +3082,18 @@ async function loadPharmacy() {
   var el=document.getElementById('pharma-orders-list'); if(!el)return;
   el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">Loading...</div>';
   try {
-    var data=await apiCall('/hospitals/'+mwHospitalId+'/visits?has_prescription=true&limit=50');
-    _pharmRxData=(data.data||data.visits||[]);
+    // Try visits with prescription first, fall back to all recent visits
+    var data = await apiCall('/hospitals/'+mwHospitalId+'/visits?limit=100');
+    var all = data.data || data.visits || [];
+    // Filter visits that have prescription data
+    _pharmRxData = all.filter(function(v){
+      return v.prescription_json || v.drugs_prescribed || v.diagnosis_primary;
+    });
+    if (!_pharmRxData.length) _pharmRxData = all; // show all if none match
     pharmRxRender();
-  } catch(e) { el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">No prescription orders yet.</div>'; }
+  } catch(e) {
+    el.innerHTML='<div style="padding:30px;text-align:center;color:rgba(240,250,247,0.4)">No visits found. Prescriptions from EMR will appear here.</div>';
+  }
 }
 
 function pharmRxRender() {
