@@ -1,4 +1,4 @@
-<!-- MediWhats v39 BUILD:1774044297 -->
+<!-- MediWhats v39 BUILD:1774045510 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -2925,8 +2925,8 @@ function showScreen(name, navEl) {
   if (name === 'settings') loadSettings();
   if (name === 'teledoc') loadTeleDoc();
   if (navEl) navEl.classList.add('active');
-  var titles = {dashboard:'Dashboard',patients:'Patients',appointments:'Appointments',ipd:'IPD & Bed Management',billing:'Billing',staff:'Staff Management'};
-  var actions = {dashboard:'New appointment',patients:'Register patient',appointments:'Book appointment',ipd:'Admit patient',billing:'New bill',staff:'Add staff'};
+  var titles = {dashboard:'Dashboard',patients:'Patients',appointments:'Appointments',ipd:'IPD & Bed Management',billing:'Billing',staff:'Staff Management',teledoc:'AI TeleDoc Queue',teleconsult:'Teleconsult',investigations:'Investigations',pharmacy:'Pharmacy',settings:'Settings'};
+  var actions = {dashboard:'New appointment',patients:'Register patient',teledoc:'Refresh',teleconsult:'New consult',investigations:'New order',pharmacy:'Dispense',settings:'Save',appointments:'Book appointment',ipd:'Admit patient',billing:'New bill',staff:'Add staff'};
   if (name === 'staff') loadStaff();
   document.getElementById('topbarTitle').textContent = titles[name] || name;
   document.getElementById('topbarActionBtn').innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> ${actions[name] || 'New'}`;
