@@ -33,6 +33,13 @@ body.light{
 .retry-bar-note{font-size:11.5px;color:rgba(251,191,36,0.6);line-height:1.5}
 .retry-track{height:4px;background:rgba(245,158,11,0.15);border-radius:4px;overflow:hidden}
 .retry-fill{height:100%;background:#f59e0b;border-radius:4px;width:0%;transition:width 1s linear}
+.signup-step-dot{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--gray);flex-shrink:0;transition:all .2s}
+.signup-step-dot.active{border-color:var(--teal);background:var(--teal);color:#000}
+.signup-step-dot.done{border-color:var(--teal);background:rgba(0,196,154,0.15);color:var(--teal)}
+.signup-step-line{flex:1;height:1.5px;background:var(--border);margin:0 4px;transition:background .2s;max-width:60px}
+.signup-step-line.done{background:var(--teal)}
+.plan-opt-row{display:flex;align-items:center;gap:12px;padding:11px 13px;border-radius:10px;border:0.5px solid var(--border);background:transparent;cursor:pointer;transition:border-color .15s}
+.plan-opt-row.selected{border-color:var(--teal);background:rgba(0,196,154,0.06)}
 .login-card{background:transparent;border:none;border-radius:0;padding:0;width:100%;position:relative;z-index:1}
 .login-logo{display:flex;align-items:center;gap:10px;margin-bottom:24px;justify-content:center}
 .login-logo-icon{width:44px;height:44px;background:var(--teal);border-radius:12px;display:flex;align-items:center;justify-content:center;font-family:'Clash Display',sans-serif;font-weight:800;font-size:17px;color:#000}
@@ -256,29 +263,104 @@ tr:hover td{background:rgba(255,255,255,0.02)}
   <div class="login-card" id="authSignup" style="display:none">
     <div class="login-logo"><div class="login-logo-icon">MW</div><div class="login-logo-name">Medi<span>Whats</span></div></div>
     <div class="login-title">Start free trial</div>
-    <div class="login-sub">30 days free &#183; No credit card &#183; Live in 5 minutes</div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px">
-      <div class="form-group" style="margin:0"><label class="form-label">First name</label><input class="form-input" type="text" id="signupFirst" placeholder="Dr. Sai"></div>
-      <div class="form-group" style="margin:0"><label class="form-label">Last name</label><input class="form-input" type="text" id="signupLast" placeholder="Charan"></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;flex-wrap:wrap">
+      <span style="background:rgba(0,196,154,0.12);border:0.5px solid rgba(0,196,154,0.3);color:var(--teal);font-size:12px;font-weight:700;padding:4px 10px;border-radius:20px">7 days free</span>
+      <span style="background:rgba(255,255,255,0.04);border:0.5px solid var(--border);color:var(--gray);font-size:12px;padding:4px 10px;border-radius:20px">No credit card</span>
+      <span style="background:rgba(255,255,255,0.04);border:0.5px solid var(--border);color:var(--gray);font-size:12px;padding:4px 10px;border-radius:20px">Live in 5 minutes</span>
     </div>
-    <div class="form-group"><label class="form-label">Clinic / Hospital name</label><input class="form-input" type="text" id="signupClinic" placeholder="City Clinic, Hyderabad"></div>
-    <div class="form-group"><label class="form-label">Work email</label><input class="form-input" type="email" id="signupEmail" placeholder="you@clinic.in"></div>
-    <div class="form-group"><label class="form-label">WhatsApp number</label><input class="form-input" type="tel" id="signupPhone" placeholder="+91 99999 99999"></div>
-    <div class="form-group">
-      <label class="form-label">Plan</label>
-      <select id="signupPlan" class="form-select" style="width:100%">
-        <option value="clinic">MediWhats Clinic &#8212; &#8377;999/month</option>
-        <option value="hospital">MediWhats Hospital &#8212; &#8377;2,499/month</option>
-        <option value="lis">MediWhats LIS &#8212; &#8377;1,499/month</option>
-      </select>
+
+    <!-- Step indicator -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:0;margin-bottom:24px" id="signupStepBar">
+      <div class="signup-step-dot active" id="sdot1">1</div>
+      <div class="signup-step-line" id="sline1"></div>
+      <div class="signup-step-dot" id="sdot2">2</div>
+      <div class="signup-step-line" id="sline2"></div>
+      <div class="signup-step-dot" id="sdot3">3</div>
     </div>
-    <div class="form-group"><label class="form-label">Password (min 8 chars)</label><input class="form-input" type="password" id="signupPassword" placeholder="&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;&#8226;"></div>
-    <div id="signupError" style="display:none;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.4);border-radius:8px;padding:10px 12px;font-size:13px;color:#fca5a5;margin-bottom:14px"></div>
-    <div id="signupSuccess" style="display:none;background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.4);border-radius:8px;padding:12px 14px;font-size:13px;color:var(--teal);margin-bottom:14px;line-height:1.6"></div>
-    <button class="login-btn" id="signupBtn" onclick="doSignup()">Create free account &#8594;</button>
+
+    <!-- STEP 1: About you -->
+    <div id="signupStep1">
+      <div style="font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Step 1 — About you</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+        <div class="form-group" style="margin:0"><label class="form-label">First name *</label><input class="form-input" type="text" id="signupFirst" placeholder="Ravi" autocomplete="off"></div>
+        <div class="form-group" style="margin:0"><label class="form-label">Last name</label><input class="form-input" type="text" id="signupLast" placeholder="Kumar" autocomplete="off"></div>
+      </div>
+      <div class="form-group"><label class="form-label">Clinic / Hospital name *</label><input class="form-input" type="text" id="signupClinic" placeholder="City Care Clinic, Hyderabad" autocomplete="off"></div>
+      <div class="form-group" style="margin-bottom:8px"><label class="form-label">Your role</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+          <button class="role-btn active" onclick="selectSignupRole(this,'admin')" id="srole_admin">⚙️ Admin / Owner</button>
+          <button class="role-btn" onclick="selectSignupRole(this,'doctor')" id="srole_doctor">👨‍⚕️ Doctor</button>
+        </div>
+      </div>
+      <div id="signupErr1" style="display:none;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.35);border-radius:8px;padding:10px 12px;font-size:13px;color:#fca5a5;margin-bottom:12px"></div>
+      <button class="login-btn" onclick="signupNext(1)">Continue →</button>
+    </div>
+
+    <!-- STEP 2: Contact + Plan -->
+    <div id="signupStep2" style="display:none">
+      <div style="font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Step 2 — Contact & plan</div>
+      <div class="form-group"><label class="form-label">Work email *</label><input class="form-input" type="email" id="signupEmail" placeholder="you@clinic.in" autocomplete="off"></div>
+      <div class="form-group">
+        <label class="form-label">WhatsApp number * <span style="color:rgba(240,250,247,0.35);font-weight:400;text-transform:none">(you'll receive setup guide here)</span></label>
+        <div style="display:flex;align-items:center;gap:0">
+          <span style="background:rgba(255,255,255,0.04);border:0.5px solid var(--border);border-right:none;border-radius:10px 0 0 10px;padding:13px 12px;font-size:14px;color:var(--gray);white-space:nowrap">+91</span>
+          <input class="form-input" type="tel" id="signupPhone" placeholder="98765 43210" maxlength="10" style="border-radius:0 10px 10px 0;border-left:none" autocomplete="off" oninput="this.value=this.value.replace(/\D/g,'')">
+        </div>
+      </div>
+      <div class="form-group" style="margin-bottom:8px">
+        <label class="form-label">Choose plan</label>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label class="plan-opt-row selected" onclick="selectPlanOpt(this,'clinic')">
+            <input type="radio" name="signupPlanR" value="clinic" checked style="accent-color:var(--teal)">
+            <div style="flex:1"><div style="font-size:13.5px;font-weight:600;color:var(--white)">Clinic</div><div style="font-size:12px;color:var(--gray)">OPD, EMR, Billing, WhatsApp AI</div></div>
+            <span style="font-size:14px;font-weight:700;color:var(--teal)">₹999<span style="font-size:11px;font-weight:400;color:var(--gray)">/mo</span></span>
+          </label>
+          <label class="plan-opt-row" onclick="selectPlanOpt(this,'lis')">
+            <input type="radio" name="signupPlanR" value="lis" style="accent-color:var(--teal)">
+            <div style="flex:1"><div style="font-size:13.5px;font-weight:600;color:var(--white)">Clinic + LIS</div><div style="font-size:12px;color:var(--gray)">Everything + Lab, reports on WhatsApp</div></div>
+            <span style="font-size:14px;font-weight:700;color:var(--teal)">₹1,499<span style="font-size:11px;font-weight:400;color:var(--gray)">/mo</span></span>
+          </label>
+          <label class="plan-opt-row" onclick="selectPlanOpt(this,'hospital')">
+            <input type="radio" name="signupPlanR" value="hospital" style="accent-color:var(--teal)">
+            <div style="flex:1"><div style="font-size:13.5px;font-weight:600;color:var(--white)">Hospital</div><div style="font-size:12px;color:var(--gray)">LIS + IPD, Pharmacy, Analytics</div></div>
+            <span style="font-size:14px;font-weight:700;color:var(--teal)">₹2,499<span style="font-size:11px;font-weight:400;color:var(--gray)">/mo</span></span>
+          </label>
+        </div>
+      </div>
+      <div id="signupErr2" style="display:none;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.35);border-radius:8px;padding:10px 12px;font-size:13px;color:#fca5a5;margin-bottom:12px"></div>
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px">
+        <button class="login-btn" onclick="signupBack(2)" style="background:rgba(255,255,255,0.06);color:var(--gray)">← Back</button>
+        <button class="login-btn" onclick="signupNext(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: Password + Submit -->
+    <div id="signupStep3" style="display:none">
+      <div style="font-size:12px;font-weight:700;color:var(--gray);text-transform:uppercase;letter-spacing:.5px;margin-bottom:14px">Step 3 — Set password</div>
+      <div class="form-group">
+        <label class="form-label">Password * <span style="color:rgba(240,250,247,0.35);font-weight:400;text-transform:none">(min 8 characters)</span></label>
+        <div style="position:relative">
+          <input class="form-input" type="password" id="signupPassword" placeholder="••••••••" autocomplete="new-password" style="padding-right:44px">
+          <button onclick="togglePwd('signupPassword',this)" type="button" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--gray);font-size:16px">👁</button>
+        </div>
+      </div>
+      <div style="background:rgba(0,196,154,0.06);border:0.5px solid rgba(0,196,154,0.2);border-radius:10px;padding:12px 14px;margin-bottom:16px;font-size:12.5px;color:var(--gray);line-height:1.7">
+        ✓ 7-day free trial, no charge now<br>
+        ✓ WhatsApp setup guide sent to your number<br>
+        ✓ Cancel anytime before trial ends
+      </div>
+      <div id="signupErr3" style="display:none;background:rgba(239,68,68,0.1);border:0.5px solid rgba(239,68,68,0.35);border-radius:8px;padding:10px 12px;font-size:13px;color:#fca5a5;margin-bottom:12px"></div>
+      <div id="signupSuccess" style="display:none;background:rgba(0,196,154,0.1);border:0.5px solid rgba(0,196,154,0.35);border-radius:10px;padding:14px;font-size:13.5px;color:var(--teal);margin-bottom:14px;line-height:1.7"></div>
+      <div style="display:grid;grid-template-columns:1fr 2fr;gap:8px">
+        <button class="login-btn" onclick="signupBack(3)" style="background:rgba(255,255,255,0.06);color:var(--gray)">← Back</button>
+        <button class="login-btn" id="signupBtn" onclick="doSignup()">🚀 Create free account</button>
+      </div>
+    </div>
+
     <div style="text-align:center;margin-top:18px;font-size:13px;color:var(--gray)">Already have an account? <span onclick="showAuth('login')" style="color:var(--teal);cursor:pointer;font-weight:700;margin-left:4px">Sign in</span></div>
-    <div style="text-align:center;margin-top:8px;font-size:11px;color:rgba(240,250,247,0.3)"><a href="/cdn-cgi/l/email-protection#6801060e0728050d0c011f00091c1b460106" style="color:var(--teal);text-decoration:none"><span class="__cf_email__" data-cfemail="a4cdcac2cbe4c9c1c0cdd3ccc5d0d78acdca">[email&#160;protected]</span></a> &#183; +91-7993135689</div>
+    <div style="text-align:center;margin-top:8px;font-size:11px;color:rgba(240,250,247,0.3)">info@mediwhats.in &nbsp;·&nbsp; +91-7993135689</div>
   </div>
+
 
   <!-- FORGOT PASSWORD PANEL -->
   <div class="login-card" id="authForgot" style="display:none">
@@ -1734,41 +1816,96 @@ function togglePwd(inputId, btn) {
 }
 
 // ── SIGNUP ────────────────────────────────────────────────────────
+// ── SIGNUP — 3-step wizard ────────────────────────────────────────
+
+var _signupRole = 'admin';
+var _signupPlan = 'clinic';
+
+function selectSignupRole(btn, role) {
+  _signupRole = role;
+  document.querySelectorAll('#signupStep1 .role-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+}
+
+function selectPlanOpt(label, plan) {
+  _signupPlan = plan;
+  document.querySelectorAll('.plan-opt-row').forEach(function(l){ l.classList.remove('selected'); });
+  label.classList.add('selected');
+}
+
+function signupNext(step) {
+  if (step === 1) {
+    var first = (document.getElementById('signupFirst')||{}).value||'';
+    var clinic = (document.getElementById('signupClinic')||{}).value||'';
+    var err = document.getElementById('signupErr1');
+    if (!first.trim()) { if(err){err.textContent='Please enter your first name';err.style.display='block';} return; }
+    if (!clinic.trim()) { if(err){err.textContent='Please enter your clinic/hospital name';err.style.display='block';} return; }
+    if (err) err.style.display='none';
+    document.getElementById('signupStep1').style.display='none';
+    document.getElementById('signupStep2').style.display='block';
+    var d1=document.getElementById('sdot1'); if(d1){d1.classList.remove('active');d1.classList.add('done');d1.textContent='✓';}
+    var l1=document.getElementById('sline1'); if(l1) l1.classList.add('done');
+    var d2=document.getElementById('sdot2'); if(d2) d2.classList.add('active');
+  } else if (step === 2) {
+    var email = (document.getElementById('signupEmail')||{}).value||'';
+    var phone = (document.getElementById('signupPhone')||{}).value||'';
+    var err2 = document.getElementById('signupErr2');
+    if (!email || !email.includes('@')) { if(err2){err2.textContent='Please enter a valid email address';err2.style.display='block';} return; }
+    if (!phone || phone.replace(/\D/g,'').length < 10) { if(err2){err2.textContent='Please enter a valid 10-digit WhatsApp number';err2.style.display='block';} return; }
+    if (err2) err2.style.display='none';
+    document.getElementById('signupStep2').style.display='none';
+    document.getElementById('signupStep3').style.display='block';
+    var d2b=document.getElementById('sdot2'); if(d2b){d2b.classList.remove('active');d2b.classList.add('done');d2b.textContent='✓';}
+    var l2=document.getElementById('sline2'); if(l2) l2.classList.add('done');
+    var d3=document.getElementById('sdot3'); if(d3) d3.classList.add('active');
+  }
+}
+
+function signupBack(step) {
+  if (step === 2) {
+    document.getElementById('signupStep2').style.display='none';
+    document.getElementById('signupStep1').style.display='block';
+    var d1=document.getElementById('sdot1'); if(d1){d1.classList.remove('done');d1.classList.add('active');d1.textContent='1';}
+    var l1=document.getElementById('sline1'); if(l1) l1.classList.remove('done');
+    var d2=document.getElementById('sdot2'); if(d2){d2.classList.remove('active');d2.textContent='2';}
+  } else if (step === 3) {
+    document.getElementById('signupStep3').style.display='none';
+    document.getElementById('signupStep2').style.display='block';
+    var d2b=document.getElementById('sdot2'); if(d2b){d2b.classList.remove('done');d2b.classList.add('active');d2b.textContent='2';}
+    var l2=document.getElementById('sline2'); if(l2) l2.classList.remove('done');
+    var d3=document.getElementById('sdot3'); if(d3){d3.classList.remove('active');d3.textContent='3';}
+  }
+}
+
 async function doSignup() {
-  var first   = document.getElementById('signupFirst')?.value?.trim();
-  var last    = document.getElementById('signupLast')?.value?.trim();
-  var clinic  = document.getElementById('signupClinic')?.value?.trim();
-  var email   = document.getElementById('signupEmail')?.value?.trim();
-  var phone   = document.getElementById('signupPhone')?.value?.trim();
-  var plan    = document.getElementById('signupPlan')?.value;
-  var pwd     = document.getElementById('signupPassword')?.value;
-  var errEl   = document.getElementById('signupError');
+  var first   = (document.getElementById('signupFirst')||{}).value||'';
+  var last    = (document.getElementById('signupLast')||{}).value||'';
+  var clinic  = (document.getElementById('signupClinic')||{}).value||'';
+  var email   = (document.getElementById('signupEmail')||{}).value||'';
+  var phone   = (document.getElementById('signupPhone')||{}).value||'';
+  var pwd     = (document.getElementById('signupPassword')||{}).value||'';
   var sucEl   = document.getElementById('signupSuccess');
+  var errEl   = document.getElementById('signupErr3');
   var btn     = document.getElementById('signupBtn');
 
-  if (errEl) { errEl.style.display='none'; errEl.textContent=''; }
-  if (sucEl) { sucEl.style.display='none'; }
+  if (errEl) errEl.style.display='none';
+  if (sucEl) sucEl.style.display='none';
+  if (!pwd || pwd.length < 8) { if(errEl){errEl.textContent='Password must be at least 8 characters';errEl.style.display='block';} return; }
+  if (btn) { btn.textContent='Creating your account...'; btn.disabled=true; }
 
-  // Validation
-  if (!first) { showSignupError('Please enter your first name'); return; }
-  if (!clinic) { showSignupError('Please enter your clinic/hospital name'); return; }
-  if (!email || !email.includes('@')) { showSignupError('Please enter a valid email address'); return; }
-  if (!phone) { showSignupError('Please enter your WhatsApp number'); return; }
-  if (!pwd || pwd.length < 8) { showSignupError('Password must be at least 8 characters'); return; }
-
-  if (btn) { btn.textContent = 'Creating account...'; btn.disabled = true; }
+  var phoneClean = '+91' + phone.replace(/\D/g,'').slice(-10);
 
   try {
     var res = await fetch('https://smartgumastha-backend-production.up.railway.app/api/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        first_name:    first,
-        last_name:     last || '',
-        hospital_name: clinic,
-        email:         email,
-        phone:         phone,
-        plan:          plan,
+        first_name:    first.trim(),
+        last_name:     last.trim(),
+        hospital_name: clinic.trim(),
+        email:         email.trim().toLowerCase(),
+        phone:         phoneClean,
+        plan:          _signupPlan,
         password:      pwd,
         role:          'HOSPITAL_ADMIN'
       })
@@ -1776,33 +1913,55 @@ async function doSignup() {
     var data = await res.json();
     if (data.success) {
       if (sucEl) {
+        sucEl.innerHTML = '&#10003; Account created!<br>'
+          + 'Check <strong>' + email + '</strong> for your login details.<br>'
+          + 'Your WhatsApp setup guide is being sent to ' + phoneClean + '.';
         sucEl.style.display = 'block';
-        sucEl.textContent = 'Account created! Check email ' + email + ' for login details.';
       }
-      if (btn) { btn.textContent = '✓ Account created'; btn.style.background='rgba(0,196,154,0.3)'; }
-
-      // Auto-fill login and switch after 3 sec
+      if (btn) { btn.textContent='✓ Account created!'; btn.style.background='rgba(0,196,154,0.3)'; }
       setTimeout(function(){
-        var le = document.getElementById('loginEmail'); if(le) le.value = email;
+        var le = document.getElementById('loginEmail'); if(le) le.value = email.trim().toLowerCase();
         showAuth('login');
-        if(btn){ btn.textContent='Create free account →'; btn.disabled=false; btn.style.background=''; }
+        if(btn){ btn.textContent='🚀 Create free account'; btn.disabled=false; btn.style.background=''; }
+        // Reset steps
+        signupReset();
       }, 4000);
     } else {
-      showSignupError(data.message || 'Signup failed. Please try again or WhatsApp us at +91-7993135689');
-      if (btn) { btn.textContent = 'Create free account →'; btn.disabled = false; }
+      if (errEl) { errEl.textContent = data.message || 'Signup failed. Please try again.'; errEl.style.display='block'; }
+      if (btn) { btn.textContent='🚀 Create free account'; btn.disabled=false; }
     }
   } catch(e) {
-    // If API doesn't have signup endpoint yet, show contact message
+    // Backend may be sleeping or signup endpoint not deployed yet
+    // Still collect the lead — show WhatsApp fallback
     if (sucEl) {
-      sucEl.style.display = 'block';
-        sucEl.textContent = 'Request received! We will contact you on ' + phone + ' within 2 hours. WhatsApp +91-7993135689 now.';
+      sucEl.innerHTML = '&#10003; Request received!<br>'
+        + 'We will set up your account and contact you on <strong>' + phoneClean + '</strong> within 2 hours.<br>'
+        + '<a href="https://wa.me/917993135689?text=Hi%2C%20I%20just%20signed%20up%20for%20MediWhats%20%E2%80%94%20' + encodeURIComponent(clinic.trim()) + '" target="_blank" style="color:var(--teal)">WhatsApp us now to confirm →</a>';
+      sucEl.style.display='block';
     }
-    if (btn) { btn.textContent = 'Create free account →'; btn.disabled = false; }
+    if (btn) { btn.textContent='🚀 Create free account'; btn.disabled=false; }
   }
 }
 
+function signupReset() {
+  ['signupFirst','signupLast','signupClinic','signupEmail','signupPhone','signupPassword'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('signupStep1').style.display='block';
+  document.getElementById('signupStep2').style.display='none';
+  document.getElementById('signupStep3').style.display='none';
+  ['sdot1','sdot2','sdot3'].forEach(function(id,i){
+    var d=document.getElementById(id);
+    if(d){d.classList.remove('active','done');d.textContent=i+1;}
+  });
+  ['sline1','sline2'].forEach(function(id){var l=document.getElementById(id);if(l)l.classList.remove('done');});
+  var d1=document.getElementById('sdot1'); if(d1) d1.classList.add('active');
+  _signupRole='admin'; _signupPlan='clinic';
+}
+
 function showSignupError(msg) {
-  var el = document.getElementById('signupError');
+  var el = document.getElementById('signupErr3');
+  if (!el) el = document.getElementById('signupErr1');
   if (el) { el.textContent = msg; el.style.display = 'block'; }
 }
 
