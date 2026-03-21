@@ -1,4 +1,4 @@
-<!-- MediWhats v40 BUILD:1774050810 -->
+<!-- MediWhats v40 BUILD:1774051941 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3311,6 +3311,11 @@ function posBillSave() {
   _posCart.forEach(function(item){var inv=_pharmInvData.find(function(i){return i.id===item.id;});if(inv)inv.qty=Math.max(0,inv.qty-item.qty);});
   pharmLogAudit('dispensed',_posCart.map(function(i){return i.qty+'x '+i.name;}).join(', '),'');
   pharmInvStats();
+
+  // Record bill
+  _posBills.unshift({id:String(Date.now()),items:JSON.parse(JSON.stringify(_posCart)),sub:sub,disc:disc,gst:gst,total:total,mode:_posPayMode,patientName:(document.getElementById('pos-patient')||{}).value||'Walk-in',ts:Date.now()});
+  posRenderRecentBills();
+
   showToast('Bill saved \u2014 \u20b9'+total.toFixed(2)+' ('+_posPayMode.toUpperCase()+') \u2713','success');
   posClear();
 }
@@ -7452,6 +7457,166 @@ function pharmMedicineMaster() {
     var cat = document.getElementById('stk_cat'); if(cat) cat.value = drug.cat;
     showToast('Drug pre-filled! Add batch number, expiry date, quantity and cost price.', 'success');
   }, 200);
+}
+
+
+// ── MEDICINE MASTER DATABASE + SEARCH ─────────────────────────
+var PHARMA_MASTER_DB=[
+{n:'Paracetamol 500mg Tab',g:'Paracetamol 500mg',m:'Cipla/Sun',p:2.5,t:5,s:'',h:'3004'},
+{n:'Dolo 650mg Tab',g:'Paracetamol 650mg',m:'Micro Labs',p:3.5,t:5,s:'',h:'3004'},
+{n:'Crocin 500mg Tab',g:'Paracetamol 500mg',m:'GSK',p:3,t:5,s:'',h:'3004'},
+{n:'Amoxicillin 500mg Cap',g:'Amoxicillin 500mg',m:'Cipla/Ranbaxy',p:12,t:12,s:'H',h:'3004'},
+{n:'Augmentin 625 Tab',g:'Amoxycillin+Clavulanic Acid',m:'GSK',p:22,t:12,s:'H',h:'3004'},
+{n:'Azithromycin 250mg Tab',g:'Azithromycin 250mg',m:'Cipla/Pfizer',p:18,t:12,s:'H',h:'3004'},
+{n:'Azithromycin 500mg Tab',g:'Azithromycin 500mg',m:'Cipla/Sun',p:28,t:12,s:'H',h:'3004'},
+{n:'Metformin 500mg Tab',g:'Metformin HCl 500mg',m:'USV/Cipla',p:3.5,t:5,s:'H',h:'3004'},
+{n:'Metformin 1000mg Tab',g:'Metformin HCl 1000mg',m:'USV/Sun',p:7,t:5,s:'H',h:'3004'},
+{n:'Glimepiride 1mg Tab',g:'Glimepiride 1mg',m:'Sanofi/USV',p:8,t:12,s:'H',h:'3004'},
+{n:'Glimepiride 2mg Tab',g:'Glimepiride 2mg',m:'Sanofi',p:12,t:12,s:'H',h:'3004'},
+{n:'Glycomet GP 1 Tab',g:'Glimepiride 1mg+Metformin 500mg',m:'USV',p:12,t:12,s:'H',h:'3004'},
+{n:'Omeprazole 20mg Cap',g:'Omeprazole 20mg',m:'Dr Reddys/Sun',p:5,t:12,s:'H',h:'3004'},
+{n:'Omez 20mg Cap',g:'Omeprazole 20mg',m:'Dr Reddys',p:6,t:12,s:'H',h:'3004'},
+{n:'Pantoprazole 40mg Tab',g:'Pantoprazole 40mg',m:'Sun/Cipla',p:8,t:12,s:'H',h:'3004'},
+{n:'Pan 40 Tab',g:'Pantoprazole 40mg',m:'Alkem',p:9,t:12,s:'H',h:'3004'},
+{n:'Rabeprazole 20mg Tab',g:'Rabeprazole 20mg',m:'Sun/Cipla',p:10,t:12,s:'H',h:'3004'},
+{n:'Cetirizine 10mg Tab',g:'Cetirizine HCl 10mg',m:'UCB/Cipla',p:2,t:5,s:'',h:'3004'},
+{n:'Zyrtec 10mg Tab',g:'Cetirizine HCl 10mg',m:'UCB',p:3,t:5,s:'',h:'3004'},
+{n:'Allegra 120mg Tab',g:'Fexofenadine 120mg',m:'Sanofi',p:18,t:12,s:'',h:'3004'},
+{n:'Levocet 5mg Tab',g:'Levocetirizine 5mg',m:'UCB',p:4,t:5,s:'',h:'3004'},
+{n:'Ibuprofen 400mg Tab',g:'Ibuprofen 400mg',m:'Abbott/Mankind',p:4,t:5,s:'',h:'3004'},
+{n:'Brufen 400mg Tab',g:'Ibuprofen 400mg',m:'Abbott',p:5,t:5,s:'',h:'3004'},
+{n:'Combiflam Tab',g:'Ibuprofen 400mg+Paracetamol 325mg',m:'Sanofi',p:5,t:5,s:'',h:'3004'},
+{n:'Diclofenac 50mg Tab',g:'Diclofenac Sodium 50mg',m:'Novartis/Cipla',p:5,t:12,s:'H',h:'3004'},
+{n:'Voveran 50mg Tab',g:'Diclofenac Sodium 50mg',m:'Novartis',p:6,t:12,s:'H',h:'3004'},
+{n:'Amlodipine 5mg Tab',g:'Amlodipine 5mg',m:'Pfizer/Sun',p:6,t:5,s:'H',h:'3004'},
+{n:'Amlodipine 10mg Tab',g:'Amlodipine 10mg',m:'Pfizer/Sun',p:10,t:5,s:'H',h:'3004'},
+{n:'Atorvastatin 10mg Tab',g:'Atorvastatin 10mg',m:'Cipla/Ranbaxy',p:8,t:12,s:'H',h:'3004'},
+{n:'Atorvastatin 20mg Tab',g:'Atorvastatin 20mg',m:'Cipla/Sun',p:12,t:12,s:'H',h:'3004'},
+{n:'Lipitor 10mg Tab',g:'Atorvastatin 10mg',m:'Pfizer',p:12,t:12,s:'H',h:'3004'},
+{n:'Losartan 50mg Tab',g:'Losartan Potassium 50mg',m:'Cipla/Dr Reddys',p:10,t:12,s:'H',h:'3004'},
+{n:'Telmisartan 40mg Tab',g:'Telmisartan 40mg',m:'Boehringer/Sun',p:8,t:12,s:'H',h:'3004'},
+{n:'Ramipril 2.5mg Tab',g:'Ramipril 2.5mg',m:'Sanofi/Sun',p:8,t:12,s:'H',h:'3004'},
+{n:'Atenolol 25mg Tab',g:'Atenolol 25mg',m:'AstraZeneca/Sun',p:3,t:5,s:'H',h:'3004'},
+{n:'Metoprolol 25mg Tab',g:'Metoprolol Succinate 25mg',m:'AstraZeneca',p:8,t:12,s:'H',h:'3004'},
+{n:'Aspirin 75mg Tab',g:'Aspirin 75mg',m:'Bayer/Sun',p:2,t:0,s:'',h:'3004'},
+{n:'Clopidogrel 75mg Tab',g:'Clopidogrel 75mg',m:'Sun/Cipla',p:10,t:12,s:'H',h:'3004'},
+{n:'Rosuvastatin 10mg Tab',g:'Rosuvastatin 10mg',m:'AstraZeneca/Sun',p:12,t:12,s:'H',h:'3004'},
+{n:'Ciprofloxacin 500mg Tab',g:'Ciprofloxacin 500mg',m:'Cipla/Bayer',p:10,t:12,s:'H',h:'3004'},
+{n:'Cifran 500mg Tab',g:'Ciprofloxacin 500mg',m:'Sun',p:12,t:12,s:'H',h:'3004'},
+{n:'Cefixime 200mg Tab',g:'Cefixime 200mg',m:'Cipla/Alkem',p:22,t:12,s:'H',h:'3004'},
+{n:'Taxim-O 200mg Tab',g:'Cefixime 200mg',m:'Alkem',p:25,t:12,s:'H',h:'3004'},
+{n:'Levofloxacin 500mg Tab',g:'Levofloxacin 500mg',m:'Dr Reddys/Sun',p:20,t:12,s:'H',h:'3004'},
+{n:'Doxycycline 100mg Cap',g:'Doxycycline HCl 100mg',m:'Sun/Cipla',p:10,t:12,s:'H',h:'3004'},
+{n:'Metronidazole 400mg Tab',g:'Metronidazole 400mg',m:'Cipla/Alkem',p:3,t:5,s:'H',h:'3004'},
+{n:'Flagyl 400mg Tab',g:'Metronidazole 400mg',m:'Sanofi',p:4,t:5,s:'H',h:'3004'},
+{n:'Ceftriaxone 1g Inj',g:'Ceftriaxone 1g',m:'Aristo/Cipla',p:85,t:12,s:'H',h:'3004'},
+{n:'Domperidone 10mg Tab',g:'Domperidone 10mg',m:'Johnson/Sun',p:5,t:12,s:'H',h:'3004'},
+{n:'Domstal 10mg Tab',g:'Domperidone 10mg',m:'Torrent',p:5,t:12,s:'H',h:'3004'},
+{n:'Ondansetron 4mg Tab',g:'Ondansetron 4mg',m:'Sun/Cipla',p:12,t:12,s:'H',h:'3004'},
+{n:'Emeset 4mg Tab',g:'Ondansetron 4mg',m:'Cipla',p:14,t:12,s:'H',h:'3004'},
+{n:'Ranitidine 150mg Tab',g:'Ranitidine HCl 150mg',m:'GSK/Sun',p:4,t:5,s:'H',h:'3004'},
+{n:'Pantop DSR Cap',g:'Pantoprazole 40mg+Domperidone 30mg',m:'Sun',p:14,t:12,s:'H',h:'3004'},
+{n:'Montelukast 10mg Tab',g:'Montelukast Sodium 10mg',m:'MSD/Sun',p:15,t:12,s:'H',h:'3004'},
+{n:'Tramadol 50mg Cap',g:'Tramadol HCl 50mg',m:'Sun/Troikaa',p:15,t:12,s:'H1',h:'3004'},
+{n:'Pregabalin 75mg Cap',g:'Pregabalin 75mg',m:'Pfizer/Sun',p:18,t:12,s:'H',h:'3004'},
+{n:'Lyrica 75mg Cap',g:'Pregabalin 75mg',m:'Pfizer',p:25,t:12,s:'H',h:'3004'},
+{n:'Amitriptyline 10mg Tab',g:'Amitriptyline HCl 10mg',m:'Sun/Cipla',p:5,t:12,s:'H',h:'3004'},
+{n:'Sertraline 50mg Tab',g:'Sertraline HCl 50mg',m:'Cipla/Sun',p:15,t:12,s:'H',h:'3004'},
+{n:'Alprazolam 0.25mg Tab',g:'Alprazolam 0.25mg',m:'Sun/Cipla',p:4,t:12,s:'H1',h:'3004'},
+{n:'Clonazepam 0.5mg Tab',g:'Clonazepam 0.5mg',m:'Sun/Cipla',p:5,t:12,s:'H1',h:'3004'},
+{n:'Dexamethasone 0.5mg Tab',g:'Dexamethasone 0.5mg',m:'Cipla/Sun',p:3,t:12,s:'H',h:'3004'},
+{n:'Prednisolone 5mg Tab',g:'Prednisolone 5mg',m:'Cipla/Sun',p:4,t:12,s:'H',h:'3004'},
+{n:'Folic Acid 5mg Tab',g:'Folic Acid 5mg',m:'Mankind/Cipla',p:1.5,t:0,s:'',h:'3004'},
+{n:'Vitamin D3 60000IU Cap',g:'Cholecalciferol 60000IU',m:'Pfizer/Sun',p:40,t:12,s:'',h:'3004'},
+{n:'Shelcal 500 Tab',g:'Calcium Carbonate+Vit D3',m:'Elder',p:7,t:12,s:'',h:'3004'},
+{n:'Vitamin C 500mg Tab',g:'Ascorbic Acid 500mg',m:'Cipla/Abbott',p:3,t:0,s:'',h:'3004'},
+{n:'Limcee 500mg Tab',g:'Ascorbic Acid 500mg',m:'Abbott',p:4,t:0,s:'',h:'3004'},
+{n:'Revital H Cap',g:'Multivitamin+Ginseng',m:'Sun',p:12,t:12,s:'',h:'3004'},
+{n:'ORS Sachet 21g',g:'ORS WHO formula',m:'Electral/Pepfiz',p:8,t:0,s:'',h:'3005'},
+{n:'Electral Powder',g:'ORS WHO formula',m:'Franco Indian',p:12,t:0,s:'',h:'3005'},
+{n:'Salbutamol 100mcg Inhaler',g:'Salbutamol 100mcg/puff',m:'GSK/Cipla',p:95,t:12,s:'H',h:'3004'},
+{n:'Asthalin 100mcg Inhaler',g:'Salbutamol 100mcg/puff',m:'Cipla',p:100,t:12,s:'H',h:'3004'},
+{n:'Betadine Solution 100ml',g:'Povidone Iodine 10%',m:'Win-Medicare',p:55,t:12,s:'',h:'3004'},
+{n:'Normal Saline 500ml',g:'Sodium Chloride 0.9%',m:'Baxter/BBraun',p:45,t:12,s:'',h:'3004'},
+{n:'Ringer Lactate 500ml',g:'Ringer Lactate Solution',m:'Baxter/BBraun',p:50,t:12,s:'',h:'3004'},
+{n:'Insulin Regular 100U/ml',g:'Human Insulin Regular',m:'Novo Nordisk/Biocon',p:180,t:12,s:'H',h:'3004'},
+{n:'Insulin Glargine 100U/ml',g:'Insulin Glargine',m:'Sanofi',p:1200,t:12,s:'H',h:'3004'},
+{n:'Levothyroxine 50mcg Tab',g:'Levothyroxine Sodium 50mcg',m:'Abbott/Sun',p:5,t:5,s:'H',h:'3004'},
+{n:'Thyronorm 50mcg Tab',g:'Levothyroxine 50mcg',m:'Abbott',p:6,t:5,s:'H',h:'3004'},
+{n:'Furosemide 40mg Tab',g:'Furosemide 40mg',m:'Sanofi/Sun',p:3,t:5,s:'H',h:'3004'},
+{n:'Spironolactone 25mg Tab',g:'Spironolactone 25mg',m:'Pfizer/Sun',p:6,t:12,s:'H',h:'3004'},
+{n:'Allopurinol 100mg Tab',g:'Allopurinol 100mg',m:'Sun/Cipla',p:3,t:5,s:'H',h:'3004'},
+{n:'Hydroxychloroquine 200mg Tab',g:'Hydroxychloroquine Sulphate 200mg',m:'Ipca/Sun',p:12,t:5,s:'H',h:'3004'},
+{n:'Sinarest Tab',g:'Paracetamol+Cetirizine+PE',m:'Centaur',p:4,t:5,s:'',h:'3004'},
+{n:'Cheston Cold Tab',g:'Cetirizine+Paracetamol+PE',m:'Cipla',p:4,t:5,s:'',h:'3004'},
+{n:'Enoxaparin 40mg Inj',g:'Enoxaparin Sodium 40mg',m:'Sanofi',p:280,t:12,s:'H1',h:'3004'},
+{n:'Digoxin 0.25mg Tab',g:'Digoxin 0.25mg',m:'GSK/Sun',p:4,t:5,s:'H',h:'3004'},
+{n:'Nifedipine 10mg Tab',g:'Nifedipine 10mg',m:'Pfizer/Sun',p:5,t:5,s:'H',h:'3004'},
+];
+
+function pharmMedicineMaster() {
+  var choice = confirm('Medicine Master Search\n\nOK = AI Search (Claude AI, needs internet, 1000s of drugs)\nCancel = Offline Database (90 top Indian drugs, no internet)');
+  if (choice) pharmMasterAISearch(); else pharmMasterOfflineSearch();
+}
+
+async function pharmMasterAISearch() {
+  var q = prompt('AI Medicine Search - type brand name, generic, or condition:\n(e.g. "paracetamol", "diabetes tablet", "antibiotic capsule 500mg")');
+  if (!q || q.trim().length < 3) return;
+  showToast('Searching...', 'success');
+  try {
+    var resp = await fetch('https://smartgumastha-backend-production.up.railway.app/api/teledoc/chat', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        patient:{name:'Pharmacist',age:'30',gender:'Male',symptoms:'medicine lookup'},
+        messages:[{role:'user',content:'Indian pharmacy lookup for: "'+q+'". List 6 matching Indian brand medicines. Each on one line in format: BRAND NAME | GENERIC COMPOSITION | MANUFACTURER | MRP per unit INR | GST% | SCHEDULE(OTC/H/H1/X). Example: Dolo 650 Tab | Paracetamol 650mg | Micro Labs | 3.50 | 5 | OTC. Only the list, nothing else.'}]
+      })
+    });
+    var data = await resp.json();
+    var lines = (data.reply||'').split('\n').filter(function(l){return l.includes('|')&&l.trim();});
+    if (!lines.length) { pharmMasterOfflineSearch(); return; }
+    var results = lines.map(function(l,i){
+      var p=l.split('|').map(function(x){return x.trim();});
+      return {num:i+1,name:p[0]||'',generic:p[1]||'',mfr:p[2]||'',mrp:parseFloat(p[3])||0,gst:parseInt(p[4])||12,sch:(p[5]||'').replace('OTC',''),hsn:'3004'};
+    });
+    var list = results.map(function(r){return r.num+'. '+r.name+' ('+r.generic+') | '+r.mfr+' | MRP:\u20b9'+r.mrp+(r.sch&&r.sch!='OTC'?' [Sch '+r.sch+']':'');}).join('\n');
+    var sel = prompt('Found '+results.length+' matches for "'+q+'".\nEnter number to pre-fill Add Stock form (0=cancel):\n\n'+list);
+    if (!sel) return;
+    var n=parseInt(sel); if(n<1||n>results.length)return;
+    pharmMasterPrefill(results[n-1]);
+  } catch(e) { showToast('AI unavailable, using offline database','error'); pharmMasterOfflineSearch(); }
+}
+
+function pharmMasterOfflineSearch() {
+  var q = prompt('Offline Medicine Search (90 top Indian drugs):\nType generic name or brand name:\n(e.g. paracetamol, metformin, azithromycin, omeprazole)');
+  if (!q||q.trim().length<2) return;
+  var qlo=q.toLowerCase();
+  var matches=PHARMA_MASTER_DB.filter(function(x){return x.n.toLowerCase().includes(qlo)||x.g.toLowerCase().includes(qlo)||(x.m||'').toLowerCase().includes(qlo);});
+  if (!matches.length){showToast('No matches. Try: paracetamol, metformin, amoxicillin, omeprazole','error');return;}
+  var show=matches.slice(0,12);
+  var list=show.map(function(x,i){return (i+1)+'. '+x.n+' ('+x.g+') | '+x.m+' | MRP:\u20b9'+x.p+(x.s?' [Sch '+x.s+']':'');}).join('\n');
+  var sel=prompt('Found '+matches.length+' matches'+(matches.length>12?' (showing 12)':'')+' for "'+q+'".\nEnter number to pre-fill Add Stock form (0=cancel):\n\n'+list);
+  if(!sel)return;
+  var n=parseInt(sel); if(n<1||n>show.length)return;
+  var d=show[n-1];
+  pharmMasterPrefill({name:d.n,generic:d.g,mfr:d.m,mrp:d.p,gst:d.t,sch:d.s,hsn:d.h||'3004'});
+}
+
+function pharmMasterPrefill(drug) {
+  openAddStockModal();
+  setTimeout(function(){
+    var set=function(id,v){var e=document.getElementById(id);if(e&&v!==undefined&&v!==null)e.value=v;};
+    set('stk_name',drug.name||drug.n);
+    set('stk_mfr',drug.mfr||drug.m||drug.manufacturer||'');
+    set('stk_mrp',drug.mrp||drug.p||0);
+    set('stk_gst',drug.gst||drug.t||0);
+    set('stk_hsn',drug.hsn||drug.h||'3004');
+    var sc=document.getElementById('stk_schedule');
+    if(sc) sc.value=drug.sch||drug.s||drug.schedule||'';
+    var nm=(drug.name||drug.n||'').toLowerCase();
+    var cat=nm.includes('syrup')||nm.includes('suspension')?'Syrup':nm.includes('cap')?'Capsule':nm.includes('inj')?'Injection':nm.includes('cream')||nm.includes('oint')?'Cream/Ointment':nm.includes('inhaler')?'Other':'Tablet';
+    var catEl=document.getElementById('stk_cat'); if(catEl) catEl.value=cat;
+    showToast('Pre-filled from master! Add batch no., expiry, quantity and purchase cost.','success');
+  },200);
 }
 
 </script>
