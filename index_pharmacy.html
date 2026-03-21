@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>MediWhats Pharmacy — Smart pharmacy management for Indian chemists</title>
+<meta name="description" content="Manage inventory, billing, prescriptions and expiry alerts — all from your browser. Built for standalone chemists and hospital pharmacies.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --teal: #16a34a;
+  --teal-dark: #15803d;
+  --teal-light: rgba(15,163,127,0.1);
+  --teal-border: rgba(15,163,127,0.25);
+  --wa: #25D366;
+  --bg: #050F0C;
+  --bg2: #081410;
+  --card: #0D1F1A;
+  --card2: #112219;
+  --border: rgba(15,163,127,0.12);
+  --border2: rgba(255,255,255,0.06);
+  --white: #EDFAF5;
+  --gray: rgba(237,250,245,0.55);
+  --gray2: rgba(237,250,245,0.3);
+  --amber: #F59E0B;
+  --blue: #3B82F6;
+  --red: #EF4444;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--white);overflow-x:hidden;line-height:1.6}
+
+/* ── GRID TEXTURE ── */
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:60px 60px;pointer-events:none;z-index:0;opacity:0.3}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 48px;height:68px;display:flex;align-items:center;justify-content:space-between;background:rgba(5,15,12,0.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--border)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-icon{width:36px;height:36px;background:var(--teal);border-radius:10px;display:flex;align-items:center;justify-content:center}
+.logo-icon svg{width:20px;height:20px}
+.logo-text{font-family:'Sora',sans-serif;font-weight:700;font-size:17px;color:var(--white);letter-spacing:-0.3px}
+.logo-text span{color:var(--teal)}
+.nav-links{display:flex;align-items:center;gap:32px}
+.nav-links a{font-size:13.5px;color:var(--gray);text-decoration:none;font-weight:500;transition:color 0.2s;letter-spacing:0.1px}
+.nav-links a:hover{color:var(--white)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.nav-login{font-size:13.5px;color:var(--gray);text-decoration:none;font-weight:500;padding:8px 16px;border:1px solid var(--border2);border-radius:8px;transition:all 0.2s}
+.nav-login:hover{color:var(--white);border-color:var(--teal-border)}
+.nav-cta{background:var(--teal);color:#000;padding:9px 20px;border-radius:8px;font-size:13.5px;font-weight:700;text-decoration:none;transition:all 0.2s;font-family:'Sora',sans-serif}
+.nav-cta:hover{background:var(--teal-dark)}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:140px 48px 80px;text-align:center;position:relative;overflow:hidden}
+.hero-glow{position:absolute;width:900px;height:900px;border-radius:50%;background:radial-gradient(circle,rgba(15,163,127,0.07) 0%,transparent 65%);top:50%;left:50%;transform:translate(-50%,-55%);pointer-events:none;z-index:1}
+.badge{display:inline-flex;align-items:center;gap:8px;background:rgba(15,163,127,0.08);border:1px solid var(--teal-border);border-radius:100px;padding:6px 16px;font-size:12px;color:var(--teal);margin-bottom:32px;font-weight:600;letter-spacing:0.5px;text-transform:uppercase;position:relative;z-index:2}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:var(--wa);animation:blink 1.8s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(0.8)}}
+.hero h1{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(44px,7vw,88px);line-height:1.0;letter-spacing:-3px;margin-bottom:24px;position:relative;z-index:2}
+.hero h1 em{font-style:normal;color:var(--teal)}
+.hero h1 .wa{color:var(--wa)}
+.hero-sub{font-size:clamp(15px,1.8vw,19px);color:var(--gray);max-width:560px;line-height:1.7;margin-bottom:48px;font-weight:400;position:relative;z-index:2}
+.hero-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:72px;position:relative;z-index:2}
+.btn-primary{display:inline-flex;align-items:center;gap:10px;background:var(--teal);color:#000;padding:14px 28px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;transition:all 0.25s;font-family:'Sora',sans-serif}
+.btn-primary:hover{background:var(--teal-dark);transform:translateY(-2px);box-shadow:0 12px 40px rgba(15,163,127,0.3)}
+.btn-secondary{display:inline-flex;align-items:center;gap:8px;background:transparent;color:var(--white);padding:14px 28px;border-radius:10px;font-size:15px;font-weight:500;text-decoration:none;border:1px solid var(--border2);transition:all 0.25s}
+.btn-secondary:hover{border-color:var(--teal-border);background:var(--teal-light)}
+.hero-stats{display:flex;gap:0;border:1px solid var(--border);border-radius:16px;overflow:hidden;position:relative;z-index:2}
+.hstat{padding:20px 36px;text-align:center;border-right:1px solid var(--border)}
+.hstat:last-child{border-right:none}
+.hstat-num{font-family:'Sora',sans-serif;font-weight:700;font-size:28px;color:var(--teal);letter-spacing:-1px}
+.hstat-label{font-size:11px;color:var(--gray2);margin-top:3px;text-transform:uppercase;letter-spacing:0.8px}
+
+/* ── PRODUCT TABS ── */
+.products{padding:100px 48px;position:relative;z-index:2}
+.products-inner{max-width:1140px;margin:0 auto}
+.section-label{font-size:11px;font-weight:700;color:var(--teal);letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.section-title{font-family:'Sora',sans-serif;font-weight:700;font-size:clamp(32px,4vw,52px);line-height:1.1;letter-spacing:-1.5px;margin-bottom:16px}
+.section-sub{font-size:16px;color:var(--gray);line-height:1.7;max-width:560px;margin-bottom:56px}
+.product-tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:48px;width:fit-content}
+.ptab{padding:10px 24px;border-radius:9px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;color:var(--gray);font-family:'Sora',sans-serif;border:none;background:none}
+.ptab.active{background:var(--teal);color:#000}
+.product-content{display:none}
+.product-content.active{display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center}
+.product-info h3{font-family:'Sora',sans-serif;font-weight:700;font-size:clamp(28px,3vw,40px);letter-spacing:-1px;margin-bottom:12px;line-height:1.15}
+.product-info .tagline{font-size:16px;color:var(--teal);font-weight:600;margin-bottom:20px}
+.product-info p{font-size:15px;color:var(--gray);line-height:1.75;margin-bottom:32px}
+.product-price-badge{display:inline-flex;align-items:baseline;gap:6px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 20px;margin-bottom:32px}
+.ppb-amount{font-family:'Sora',sans-serif;font-size:32px;font-weight:800;color:var(--teal)}
+.ppb-per{font-size:13px;color:var(--gray)}
+.feat-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
+.feat-list li{display:flex;align-items:flex-start;gap:12px;font-size:14px;color:var(--gray);line-height:1.5}
+.feat-check{width:20px;height:20px;min-width:20px;border-radius:50%;background:rgba(15,163,127,0.15);border:1px solid var(--teal-border);display:flex;align-items:center;justify-content:center;margin-top:1px}
+.feat-check svg{width:10px;height:10px}
+.product-visual{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;position:relative}
+.pv-header{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+.pv-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;background:var(--teal-light);border:1px solid var(--teal-border)}
+.pv-title{font-family:'Sora',sans-serif;font-weight:700;font-size:15px}
+.pv-sub{font-size:11px;color:var(--teal)}
+.module-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.module-chip{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;align-items:center;gap:8px}
+.module-chip.active{border-color:var(--teal-border);background:rgba(15,163,127,0.06)}
+.mc-icon{font-size:16px}
+.mc-name{font-size:12px;font-weight:600;color:var(--white)}
+.mc-status{font-size:10px;color:var(--teal);margin-top:1px}
+.mc-status.off{color:var(--gray2)}
+
+/* ── FEATURES ── */
+.features{padding:100px 48px;background:var(--bg2);position:relative;z-index:2}
+.features-inner{max-width:1140px;margin:0 auto}
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-top:56px}
+.feature-card{background:var(--bg2);padding:36px;transition:background 0.3s}
+.feature-card:hover{background:var(--card)}
+.fc-num{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--teal);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:16px}
+.fc-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:16px;background:var(--teal-light);border:1px solid var(--teal-border)}
+.fc-title{font-family:'Sora',sans-serif;font-weight:700;font-size:17px;margin-bottom:10px;letter-spacing:-0.3px}
+.fc-desc{font-size:13.5px;color:var(--gray);line-height:1.65}
+
+/* ── COMPLIANCE SECTION ── */
+.compliance{padding:100px 48px;position:relative;z-index:2}
+.compliance-inner{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.compliance-badges{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.cbadge{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:20px;transition:border-color 0.2s}
+.cbadge:hover{border-color:var(--teal-border)}
+.cbadge-icon{font-size:24px;margin-bottom:10px}
+.cbadge-title{font-family:'Sora',sans-serif;font-weight:700;font-size:14px;margin-bottom:4px}
+.cbadge-desc{font-size:12px;color:var(--gray);line-height:1.5}
+
+/* ── HOW IT WORKS ── */
+.how{padding:100px 48px;background:var(--bg2);position:relative;z-index:2}
+.how-inner{max-width:900px;margin:0 auto}
+.steps-list{margin-top:56px;display:flex;flex-direction:column;gap:0}
+.step-item{display:grid;grid-template-columns:56px 1fr;gap:20px;position:relative}
+.step-item:not(:last-child)::after{content:'';position:absolute;left:27px;top:56px;bottom:0;width:1px;background:linear-gradient(to bottom,var(--teal-border),transparent)}
+.step-circle{width:56px;height:56px;border-radius:50%;background:var(--teal-light);border:1px solid var(--teal-border);display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:18px;color:var(--teal);flex-shrink:0}
+.step-body{padding-bottom:48px}
+.step-title{font-family:'Sora',sans-serif;font-weight:700;font-size:19px;margin-bottom:8px;letter-spacing:-0.3px}
+.step-desc{font-size:14px;color:var(--gray);line-height:1.7}
+.step-pill{display:inline-block;background:var(--teal-light);border:1px solid var(--teal-border);color:var(--teal);font-size:11px;font-weight:600;padding:3px 12px;border-radius:100px;margin-top:10px;letter-spacing:0.3px}
+
+/* ── PRICING ── */
+.pricing{padding:100px 48px;position:relative;z-index:2}
+.pricing-inner{max-width:1140px;margin:0 auto}
+.pricing-toggle{display:flex;align-items:center;gap:16px;margin-bottom:48px;font-size:14px;color:var(--gray)}
+.pricing-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:0}
+.plan-card{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px;position:relative;transition:transform 0.3s,border-color 0.3s}
+.plan-card:hover{transform:translateY(-4px);border-color:var(--teal-border)}
+.plan-card.featured{border-color:var(--teal);background:linear-gradient(160deg,rgba(15,163,127,0.08),var(--card))}
+.plan-featured-badge{position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--teal);color:#000;font-size:10px;font-weight:800;padding:4px 16px;border-radius:0 0 10px 10px;letter-spacing:0.5px;white-space:nowrap;font-family:'Sora',sans-serif}
+.plan-name{font-family:'Sora',sans-serif;font-weight:700;font-size:16px;margin-bottom:4px}
+.plan-target{font-size:12px;color:var(--gray);margin-bottom:20px}
+.plan-price{font-family:'Sora',sans-serif;font-weight:800;font-size:38px;color:var(--teal);letter-spacing:-1.5px;line-height:1;margin-bottom:4px}
+.plan-price sup{font-size:18px;vertical-align:top;margin-top:6px}
+.plan-price sub{font-size:13px;color:var(--gray);font-weight:400}
+.plan-gst{font-size:11px;color:var(--gray2);margin-bottom:24px}
+.plan-divider{height:1px;background:var(--border);margin-bottom:20px}
+.plan-features{list-style:none;display:flex;flex-direction:column;gap:10px;margin-bottom:28px}
+.plan-features li{font-size:12.5px;color:var(--gray);display:flex;align-items:flex-start;gap:8px;line-height:1.4}
+.plan-features li::before{content:'✓';color:var(--teal);font-weight:700;font-size:12px;margin-top:1px;flex-shrink:0}
+.plan-btn{display:block;text-align:center;padding:12px;border-radius:10px;font-size:14px;font-weight:700;text-decoration:none;transition:all 0.2s;font-family:'Sora',sans-serif}
+.plan-btn-teal{background:var(--teal);color:#000}
+.plan-btn-teal:hover{background:var(--teal-dark)}
+.plan-btn-outline{border:1px solid var(--border2);color:var(--white)}
+.plan-btn-outline:hover{border-color:var(--teal-border);color:var(--teal)}
+
+/* ── TESTIMONIALS ── */
+.testimonials{padding:100px 48px;background:var(--bg2);position:relative;z-index:2}
+.testimonials-inner{max-width:1140px;margin:0 auto}
+.testimonials-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:56px}
+.tcard{background:var(--card);border:1px solid var(--border);border-radius:20px;padding:28px;transition:border-color 0.3s}
+.tcard:hover{border-color:var(--teal-border)}
+.tcard-stars{color:var(--amber);font-size:14px;margin-bottom:14px;letter-spacing:2px}
+.tcard-quote{font-size:14px;color:var(--gray);line-height:1.75;margin-bottom:20px;font-style:italic}
+.tcard-author{font-size:14px;font-weight:600;color:var(--white);font-family:'Sora',sans-serif}
+.tcard-role{font-size:12px;color:var(--teal);margin-top:2px}
+
+/* ── CTA ── */
+.cta-section{padding:120px 48px;text-align:center;position:relative;z-index:2;overflow:hidden}
+.cta-glow{position:absolute;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(15,163,127,0.08) 0%,transparent 65%);top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none}
+.cta-section h2{font-family:'Sora',sans-serif;font-weight:800;font-size:clamp(36px,6vw,68px);letter-spacing:-2.5px;line-height:1.0;margin-bottom:20px;position:relative;z-index:1}
+.cta-section p{font-size:17px;color:var(--gray);margin-bottom:48px;position:relative;z-index:1;line-height:1.65}
+.cta-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;position:relative;z-index:1}
+.btn-wa{display:inline-flex;align-items:center;gap:10px;background:var(--wa);color:#000;padding:14px 28px;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;transition:all 0.25s;font-family:'Sora',sans-serif}
+.btn-wa:hover{transform:translateY(-2px);box-shadow:0 12px 40px rgba(37,211,102,0.25)}
+
+/* ── FOOTER ── */
+footer{padding:56px 48px 36px;border-top:1px solid var(--border);position:relative;z-index:2}
+.footer-top{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:48px;margin-bottom:48px}
+.footer-brand-text{font-family:'Sora',sans-serif;font-weight:700;font-size:20px;color:var(--white);margin-bottom:12px}
+.footer-brand-text span{color:var(--teal)}
+.footer-tagline{font-size:13px;color:var(--gray);line-height:1.65;max-width:260px;margin-bottom:20px}
+.footer-col-title{font-family:'Sora',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:1.5px;color:var(--gray2);margin-bottom:16px}
+.footer-links-list{list-style:none;display:flex;flex-direction:column;gap:10px}
+.footer-links-list a{font-size:13.5px;color:var(--gray);text-decoration:none;transition:color 0.2s}
+.footer-links-list a:hover{color:var(--teal)}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;padding-top:28px;border-top:1px solid var(--border);flex-wrap:wrap;gap:12px}
+.footer-copy{font-size:12px;color:var(--gray2)}
+.footer-social{display:flex;gap:12px}
+.social-btn{width:32px;height:32px;border-radius:8px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;transition:all 0.2s;text-decoration:none;color:var(--gray)}
+.social-btn:hover{border-color:var(--teal-border);color:var(--teal)}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.fadein{animation:fadeUp 0.6s ease both}
+
+@media(max-width:1024px){
+  .pricing-grid{grid-template-columns:1fr 1fr}
+  .footer-top{grid-template-columns:1fr 1fr}
+}
+@media(max-width:768px){
+  nav{padding:0 20px}
+  .nav-links{display:none}
+  .hero{padding:100px 20px 60px}
+  .hero-stats{flex-direction:column;width:100%}
+  .hstat{border-right:none;border-bottom:1px solid var(--border)}
+  .hstat:last-child{border-bottom:none}
+  .products,.features,.compliance,.how,.pricing,.testimonials,.cta-section{padding:72px 20px}
+  .product-content.active{grid-template-columns:1fr}
+  .compliance-inner{grid-template-columns:1fr}
+  .features-grid{grid-template-columns:1fr}
+  .pricing-grid{grid-template-columns:1fr}
+  .testimonials-grid{grid-template-columns:1fr}
+  footer{padding:40px 20px 24px}
+  .footer-top{grid-template-columns:1fr}
+  .footer-bottom{flex-direction:column;text-align:center}
+}
+
+
+/* ── PRODUCT-SPECIFIC ── */
+.feat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px;margin-top:48px}
+.feat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:28px 24px;transition:border-color .2s}
+.feat-card:hover{border-color:var(--teal-border)}
+.feat-icon{font-size:28px;margin-bottom:14px}
+.feat-title{font-family:'Sora',sans-serif;font-size:16px;font-weight:700;color:var(--white);margin-bottom:8px}
+.feat-desc{font-size:14px;color:var(--gray);line-height:1.6}
+.bullets{list-style:none;display:flex;flex-direction:column;gap:10px;margin-top:24px}
+.bullets li{display:flex;align-items:center;gap:10px;font-size:15px;color:var(--gray)}
+.bullets li::before{content:'✓';color:var(--teal);font-weight:700;font-size:14px;flex-shrink:0}
+.what-is{max-width:680px;margin:0 auto;text-align:center;padding:80px 48px}
+.features-section{padding:80px 48px;max-width:1100px;margin:0 auto}
+.section-label{font-size:11px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:14px}
+.section-title{font-family:'Sora',sans-serif;font-size:clamp(26px,4vw,38px);font-weight:800;color:var(--white);line-height:1.2;margin-bottom:16px}
+.cta-band{background:linear-gradient(135deg,rgba(15,163,127,0.08),rgba(15,163,127,0.03));border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:80px 48px;text-align:center}
+.price-block{display:inline-block;margin:24px 0}
+.price-amt{font-family:'Sora',sans-serif;font-size:56px;font-weight:800;color:var(--teal)}
+.price-period{font-size:15px;color:var(--gray);margin-top:4px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;padding:80px 48px;max-width:1100px;margin:0 auto}
+@media(max-width:768px){
+  .split{grid-template-columns:1fr;padding:48px 24px}
+  .feat-grid{grid-template-columns:1fr}
+  .features-section,.what-is,.cta-band{padding:60px 24px}
+  nav{padding:0 20px}
+  .nav-links{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="/" class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.4 11.61 19.79 19.79 0 01.34 3.05 2 2 0 012.31 1h3a2 2 0 012 1.72 12.84 12.84 0 00.7 2.81 2 2 0 01-.45 2.11L6.91 8.37a16 16 0 006.72 6.72l.77-.77a2 2 0 012.11-.45 12.84 12.84 0 002.81.7A2 2 0 0122 16.92z"/></svg>
+    </div>
+    <div class="logo-text">Medi<span>Whats</span> <span style="font-size:12px;font-weight:500;opacity:0.6">Pharmacy</span></div>
+  </a>
+  <div class="nav-links">
+    <a href="#products">Products</a>
+    <a href="#features">Features</a>
+    <a href="#compliance">Compliance</a>
+    <a href="#pricing">Pricing</a>
+    <a href="#contact">Contact</a>
+  </div>
+  <div class="nav-right">
+    <a href="/login.html" class="nav-login">Login</a>
+    <a href="/signup.html?plan=pharmacy" class="nav-cta">Start Free Trial →</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-glow"></div>
+  <div class="badge fadein"><div class="badge-dot"></div>Trusted by pharmacies across India</div>
+  <h1 class="fadein" style="font-family:'Sora',sans-serif;font-size:clamp(36px,6vw,64px);font-weight:800;line-height:1.1;letter-spacing:-1px;margin-bottom:24px;position:relative;z-index:2">
+    MediWhats<br><em style="font-style:normal;color:var(--teal)">Pharmacy</em>
+  </h1>
+  <p class="hero-sub fadein" style="position:relative;z-index:2;max-width:600px;font-size:clamp(16px,2vw,20px);color:var(--gray);margin-bottom:40px;line-height:1.6">Manage inventory, billing, prescriptions and expiry alerts — all from your browser. Built for standalone chemists and hospital pharmacies.</p>
+  <div class="fadein" style="display:flex;gap:14px;flex-wrap:wrap;justify-content:center;position:relative;z-index:2">
+    <a href="/signup.html?plan=pharmacy" class="btn-primary">Start 14-day free trial →</a>
+    <a href="https://wa.me/917993135689?text=Hi%2C%20I%20want%20MediWhats%20Pharmacy%20for%20my%20chemist%20shop" class="btn-secondary" target="_blank">&#128172; WhatsApp us</a>
+  </div>
+  <p class="fadein" style="margin-top:18px;font-size:12px;color:var(--gray2);position:relative;z-index:2">No credit card needed · Setup in 5 minutes · Cancel anytime</p>
+</section>
+
+<!-- WHAT IS IT -->
+<div class="what-is">
+  <div class="section-label">Pharmacy</div>
+  <h2 class="section-title">Smart pharmacy management for Indian chemists</h2>
+  <p style="font-size:16px;color:var(--gray);line-height:1.8">MediWhats Pharmacy is a complete point-of-sale and inventory management system built specifically for Indian pharmacies. From barcode billing and GST invoices to expiry alerts and purchase orders — everything you need to run a modern chemist shop, at a price that makes sense.</p>
+</div>
+
+<!-- FEATURES -->
+<section class="features-section">
+  <div class="section-label">Everything included</div>
+  <h2 class="section-title">Built for Indian pharmacies & chemist shops</h2>
+  <div class="feat-grid">
+    
+      <div class="feat-card">
+        <div class="feat-icon">🧾</div>
+        <div class="feat-title">GST-Ready POS Billing</div>
+        <div class="feat-desc">Barcode or name search. Auto GST calculation with HSN codes. Cash, UPI, card payments. WhatsApp receipt in one tap.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📦</div>
+        <div class="feat-title">Inventory & Expiry Alerts</div>
+        <div class="feat-desc">Real-time stock levels with batch tracking. Near-expiry and low-stock alerts. Auto purchase order generation.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">💊</div>
+        <div class="feat-title">Medicine Master Database</div>
+        <div class="feat-desc">Search from 1,000+ Indian branded drugs pre-loaded. Pre-fills name, MRP, GST%, HSN, Schedule H automatically.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📋</div>
+        <div class="feat-title">Prescription Management</div>
+        <div class="feat-desc">View doctor prescriptions from linked clinics. Dispense with one click. Refill history and patient drug allergies.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Audit Log & Reports</div>
+        <div class="feat-desc">Every dispense, stock adjustment and return logged with timestamp. Export CSV for drug inspector visits.</div>
+      </div>
+      <div class="feat-card">
+        <div class="feat-icon">⬆️</div>
+        <div class="feat-title">Bulk Upload & Export</div>
+        <div class="feat-desc">Upload your existing stock via CSV. Download complete inventory for backup or branch transfer.</div>
+      </div>
+  </div>
+</section>
+
+<!-- SPLIT: bullets + pricing -->
+<div class="split">
+  <div>
+    <div class="section-label">Why MediWhats Pharmacy</div>
+    <h2 class="section-title" style="font-size:clamp(22px,3vw,32px)">Everything you need.<br>Nothing you don't.</h2>
+    <ul class="bullets"><li>No hardware needed — works on any browser</li><li>Schedule H / H1 / X drug tracking built in</li><li>WhatsApp bill receipt to patient directly</li><li>Links to clinic EMR when you upgrade</li><li>Daily sales summary on WhatsApp every night</li><li>Upgrade to full hospital plan anytime — data stays</li></ul>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:20px;padding:36px;text-align:center">
+    <div style="font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--teal);margin-bottom:8px">Simple pricing</div>
+    <div class="price-block">
+      <div class="price-amt">₹1,499</div>
+      <div class="price-period">per month · billed monthly</div>
+    </div>
+    <ul style="list-style:none;text-align:left;margin:20px 0;display:flex;flex-direction:column;gap:8px">
+      <li>No hardware needed — works on any browser</li><li>Schedule H / H1 / X drug tracking built in</li><li>WhatsApp bill receipt to patient directly</li><li>Links to clinic EMR when you upgrade</li><li>Daily sales summary on WhatsApp every night</li><li>Upgrade to full hospital plan anytime — data stays</li>
+    </ul>
+    <a href="/signup.html?plan=pharmacy" style="display:block;background:var(--teal);color:#000;padding:14px 24px;border-radius:10px;font-weight:700;font-size:15px;text-decoration:none;margin-top:8px">Start Free Trial →</a>
+    <p style="font-size:12px;color:var(--gray2);margin-top:12px">14-day free trial · No card needed</p>
+  </div>
+</div>
+
+<!-- CTA BAND -->
+<div class="cta-band">
+  <div style="font-family:'Sora',sans-serif;font-size:clamp(26px,4vw,42px);font-weight:800;margin-bottom:16px">Ready to modernise your pharmacy?</div>
+  <p style="color:var(--gray);font-size:16px;margin-bottom:32px">Join hundreds of Indian pharmacys already using MediWhats Pharmacy</p>
+  <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+    <a href="/signup.html?plan=pharmacy" class="btn-primary">Start free — no card needed</a>
+    <a href="https://wa.me/917993135689?text=Hi%2C%20I%20want%20MediWhats%20Pharmacy%20for%20my%20chemist%20shop" class="btn-secondary" target="_blank">Talk to us first</a>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-top">
+    <div>
+      <div class="footer-brand-text">Medi<span>Whats</span></div>
+      <div class="footer-tagline">AI-powered hospital and clinic management on WhatsApp. Built for Indian healthcare. No software. Just WhatsApp.</div>
+      <div style="font-size:12px;color:var(--gray2)"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4821262e2708252d2c213f20293c3b662126">[email&#160;protected]</a> · +91 7993135689</div>
+    </div>
+    <div>
+      <div class="footer-col-title">Product</div>
+      <ul class="footer-links-list">
+        <li><a href="#products">MediWhats Clinic</a></li>
+        <li><a href="#products">MediWhats Hospital</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#pricing">Pricing</a></li>
+        <li><a href="#compliance">Compliance</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Quick access</div>
+      <ul class="footer-links-list">
+        <li><a href="/login.html">Login</a></li>
+        <li><a href="/signup.html">Start free trial</a></li>
+        <li><a href="/admin.html">Admin panel</a></li>
+        <li><a href="https://wa.me/917993135689" target="_blank">WhatsApp support</a></li>
+      </ul>
+    </div>
+    <div>
+      <div class="footer-col-title">Company</div>
+      <ul class="footer-links-list">
+        <li><a href="#">About MediWhats</a></li>
+        <li><a href="#">Privacy policy</a></li>
+        <li><a href="#">Terms of service</a></li>
+        <li><a href="#">Contact us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2026 MediWhats. Built in Hyderabad 🇮🇳 for Indian healthcare.</div>
+    <div class="footer-social">
+      <a href="https://wa.me/917993135689" class="social-btn" target="_blank" title="WhatsApp">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      </a>
+      <a href="/cdn-cgi/l/email-protection#eb82858d84ab868e8f829c838a9f98c58285" class="social-btn" title="Email">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// Fade in on scroll
+const obs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); });
+}, {threshold: 0.1});
+document.querySelectorAll('.fadein').forEach(el => obs.observe(el));
+
+// Sticky nav shadow on scroll
+window.addEventListener('scroll', () => {
+  document.querySelector('nav').style.boxShadow = 
+    window.scrollY > 20 ? '0 4px 30px rgba(0,0,0,0.4)' : 'none';
+});
+
+// Add ?plan to signup links
+(function() {
+  var plan = 'pharmacy';
+  document.querySelectorAll('a[href*="signup.html"]').forEach(function(a) {
+    if (!a.href.includes('plan=')) a.href += (a.href.includes('?') ? '&' : '?') + 'plan=' + plan;
+  });
+})();
+</script>
+</body>
+</html>
