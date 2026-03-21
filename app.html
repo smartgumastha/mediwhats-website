@@ -1,4 +1,4 @@
-<!-- MediWhats v40 BUILD:1774053168 -->
+<!-- MediWhats v40 BUILD:1774054067 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -3053,14 +3053,16 @@ function esc(t) {
 // ═══════════════════════════════════════════════════════════════
 //  PHARMACY MODULE v2 — Full Inventory, POS, Prescriptions, Audit
 // ═══════════════════════════════════════════════════════════════
-var _pharmRxData=[], _pharmInvData=[], _posCart=[], _posPayMode='cash', _pharmRxFilter='pending', _pharmAuditLog=[];
+var _pharmRxData=[], _pharmInvData=[], _posCart=[], _posPayMode='cash', _pharmRxFilter='pending', _pharmAuditLog=[], _posBills=[], _posSelectedPatient=null, _posPatientId=null;
 
 function pharmTab(tab) {
   ['rx','inventory','billing','audit'].forEach(function(t){
-    var el=document.getElementById('ph-'+t); if(el) el.style.display=t===tab?'':'none';
-    var btn=document.getElementById('ptab-'+t); if(btn) btn.classList.toggle('ptab-on',t===tab);
+    var el=document.getElementById('ph-'+t);
+    if(el) el.style.display=t===tab?'':'none';
+    var btn=document.getElementById('ptab-'+t);
+    if(btn) btn.classList.toggle('ptab-on',t===tab);
   });
-  if(tab==='rx'){_pharmRxFilter='pending';pharmRxFilter('pending');loadPharmacy();}
+  if(tab==='rx'){_pharmRxFilter='pending';pharmRxFilter('pending');setTimeout(function(){loadPharmacy();},50);}
   if(tab==='inventory') pharmLoadInventory();
   if(tab==='billing'){posLoadRecent();if(!_pharmInvData.length)pharmLoadInventory();}
   if(tab==='audit') pharmLoadAudit();
@@ -3350,6 +3352,7 @@ function posBillSave() {
     ts:          Date.now()
   };
 
+  if(!_posBills) _posBills=[];
   _posBills.unshift(bill);
   posRenderRecentBills();
   pharmInvStats();
@@ -7710,9 +7713,6 @@ function posHidePatientCard() {
   var card = document.getElementById('pos-patient-card');
   if (card) card.style.display = 'none';
 }
-
-// Ensure _posSelectedPatient is declared
-if (typeof _posSelectedPatient === 'undefined') { var _posSelectedPatient = null; }
 
 </script>
 
