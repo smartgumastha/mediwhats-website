@@ -1,1 +1,63 @@
-{"cleanUrls": true} 
+{
+  "rewrites": [
+    {
+      "has": [
+        {
+          "type": "host",
+          "value": "pharmacy.mediwhats.in"
+        }
+      ],
+      "source": "/",
+      "destination": "/index_pharmacy.html"
+    },
+    {
+      "has": [
+        {
+          "type": "host",
+          "value": "lis.mediwhats.in"
+        }
+      ],
+      "source": "/",
+      "destination": "/index_lis.html"
+    },
+    {
+      "has": [
+        {
+          "type": "host",
+          "value": "wa.mediwhats.in"
+        }
+      ],
+      "source": "/",
+      "destination": "/index_wa.html"
+    },
+    {
+      "has": [
+        {
+          "type": "host",
+          "value": "teledoc.mediwhats.in"
+        }
+      ],
+      "source": "/",
+      "destination": "/index_teledoc.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ]
+}
