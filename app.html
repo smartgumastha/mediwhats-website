@@ -1,4 +1,4 @@
-<!-- MediWhats v40 BUILD:1774054067 -->
+<!-- MediWhats v40 BUILD:1774055216 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1401,11 +1401,15 @@ tr:hover td{background:rgba(255,255,255,0.02)}
         <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(240,250,247,0.55)">GST</span><span id="pos-gst">&#8377;0.00</span></div>
         <div style="display:flex;justify-content:space-between;font-size:17px;font-weight:800;padding-top:8px;border-top:0.5px solid rgba(0,196,154,0.2)"><span>Total</span><span id="pos-total" style="color:var(--teal)">&#8377;0.00</span></div>
         <div>
-          <div style="font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Payment</div>
-          <div style="display:flex;gap:5px">
+          <div style="font-size:10px;color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Payment Mode</div>
+          <div style="display:flex;gap:5px;margin-bottom:8px">
             <button class="pos-pay-btn pos-pay-on" id="pp-cash" onclick="posSetPay('cash',this)">Cash</button>
             <button class="pos-pay-btn" id="pp-upi" onclick="posSetPay('upi',this)">UPI</button>
             <button class="pos-pay-btn" id="pp-card" onclick="posSetPay('card',this)">Card</button>
+            <button class="pos-pay-btn" id="pp-credit" onclick="posSetPay('credit',this)">Credit</button>
+          </div>
+          <div id="pos-ref-row" style="display:none">
+            <input id="pos-ref-no" type="text" placeholder="UPI/Card reference number..." style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(99,179,237,0.4);border-radius:8px;padding:8px 12px;color:var(--white);font-size:12px;outline:none">
           </div>
         </div>
         <button onclick="posBillSave()" id="pos-bill-btn" style="width:100%;padding:13px;background:var(--teal);border:none;border-radius:10px;color:#000;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:0.3px">&#9654; Generate Bill &amp; Receipt</button>
@@ -3302,7 +3306,22 @@ function posRecalc() {
   set('pos-subtotal','\u20b9'+sub.toFixed(2)); set('pos-gst','\u20b9'+gst.toFixed(2)); set('pos-total','\u20b9'+total.toFixed(2));
 }
 
-function posSetPay(mode,btn){_posPayMode=mode;document.querySelectorAll('.pos-pay-btn').forEach(function(b){b.classList.remove('pos-pay-on');});if(btn)btn.classList.add('pos-pay-on');}
+function posSetPay(mode, btn) {
+  _posPayMode = mode;
+  document.querySelectorAll('.pos-pay-btn').forEach(function(b){ b.classList.remove('pos-pay-on'); });
+  if (btn) btn.classList.add('pos-pay-on');
+  // Show reference field for UPI/card/credit
+  var refRow = document.getElementById('pos-ref-row');
+  var refInp = document.getElementById('pos-ref-no');
+  if (refRow) {
+    var needRef = mode === 'upi' || mode === 'card' || mode === 'credit';
+    refRow.style.display = needRef ? 'block' : 'none';
+    if (refInp) {
+      refInp.placeholder = mode==='upi' ? 'UPI Transaction ID (e.g. 123456789012)' : mode==='card' ? 'Card last 4 digits or approval code' : 'Credit note / reference number';
+      if (!needRef) refInp.value = '';
+    }
+  }
+}
 
 function posBillSave() {
   if (!_posCart.length) { showToast('Add at least one medicine to the bill', 'error'); return; }
@@ -3349,6 +3368,7 @@ function posBillSave() {
     patientSex:  ptData ? ptData.gender || '' : '',
     patientUhid: ptData ? ptData.mrn || '' : '',
     patientPhone:ptData ? ptData.phone || '' : '',
+    refNo:       (document.getElementById('pos-ref-no')||{}).value||'',
     ts:          Date.now()
   };
 
@@ -7712,6 +7732,143 @@ function pharmMasterPrefill(drug) {
 function posHidePatientCard() {
   var card = document.getElementById('pos-patient-card');
   if (card) card.style.display = 'none';
+}
+
+
+// ── BILLS: RENDER, REPRINT, PDF, WHATSAPP ─────────────────────
+function posRenderRecentBills() {
+  var el = document.getElementById('pos-recent-bills');
+  if (!el) return;
+  if (!_posBills || !_posBills.length) {
+    el.innerHTML = '<div style="padding:16px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">No bills yet. Generate a bill above.</div>';
+    return;
+  }
+  el.innerHTML = _posBills.slice(0,30).map(function(b){
+    var dt = new Date(b.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+    var items = (b.items||[]).map(function(i){ return i.qty+'x '+i.name.split(' ').slice(0,3).join(' '); }).join(', ');
+    var modeColor = b.mode==='cash' ? 'rgba(240,250,247,0.5)' : b.mode==='upi' ? '#68D391' : '#63B3ED';
+    return '<div style="display:flex;align-items:center;gap:10px;padding:11px 14px;border-bottom:0.5px solid rgba(0,196,154,0.06)">'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<span style="font-size:10px;font-family:monospace;color:var(--teal);font-weight:700">'+esc(b.billNo||'—')+'</span>'
+      +'<span style="font-size:12px;font-weight:600">'+esc(b.patientName||'Walk-in')+'</span>'
+      +(b.patientUhid?'<span style="font-size:10px;color:rgba(240,250,247,0.4)">'+esc(b.patientUhid)+'</span>':'')
+      +'</div>'
+      +'<div style="font-size:11px;color:rgba(240,250,247,0.4);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(items.substring(0,60))+'</div>'
+      +(b.refNo?'<div style="font-size:10px;color:#68D391;margin-top:1px">Ref: '+esc(b.refNo)+'</div>':'')
+      +'</div>'
+      +'<div style="text-align:right;flex-shrink:0">'
+      +'<div style="font-weight:800;font-size:14px;color:var(--teal)">\u20b9'+b.total.toFixed(2)+'</div>'
+      +'<div style="font-size:10px;color:'+modeColor+';text-transform:uppercase;font-weight:600">'+b.mode+'</div>'
+      +'<div style="font-size:10px;color:rgba(240,250,247,0.35)">'+dt+'</div>'
+      +'</div>'
+      +'<div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">'
+      +'<button class="pos-reprint-btn action-btn" data-bid="'+b.id+'" style="font-size:10px;padding:4px 8px">WA</button>'
+      +'<button class="pos-pdf-btn action-btn" data-bid="'+b.id+'" style="font-size:10px;padding:4px 8px;background:rgba(99,179,237,0.1);border-color:rgba(99,179,237,0.4);color:#63B3ED">PDF</button>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+
+  el.querySelectorAll('.pos-reprint-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ posSendBillWA(this.dataset.bid); });
+  });
+  el.querySelectorAll('.pos-pdf-btn').forEach(function(btn){
+    btn.addEventListener('click', function(){ posDownloadBillPDF(this.dataset.bid); });
+  });
+}
+
+function posBuildBillHTML(bill) {
+  var clinic = (hospitalSettings||{}).name || 'MediWhats Clinic';
+  var addr   = (hospitalSettings||{}).address || '';
+  var phone  = (hospitalSettings||{}).phone || '';
+  var rows = (bill.items||[]).map(function(i){
+    var amt = (i.qty * (i.mrp||0)).toFixed(2);
+    var gstAmt = (i.qty * (i.mrp||0) * ((i.gst||0)/100)).toFixed(2);
+    return '<tr><td style="padding:7px 10px;border-bottom:1px solid #eee">'+i.name+'</td>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:center">'+i.qty+'</td>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:right">\u20b9'+parseFloat(i.mrp||0).toFixed(2)+'</td>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:center">'+i.gst+'%</td>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:right">\u20b9'+gstAmt+'</td>'
+      +'<td style="padding:7px 10px;border-bottom:1px solid #eee;text-align:right;font-weight:600">\u20b9'+amt+'</td>'
+      +'</tr>';
+  }).join('');
+
+  return '<!DOCTYPE html><html><head><meta charset="utf-8">'
+    +'<style>body{font-family:Arial,sans-serif;font-size:13px;color:#222;margin:0;padding:20px}'
+    +'.header{text-align:center;border-bottom:2px solid #00C49A;padding-bottom:12px;margin-bottom:14px}'
+    +'.clinic{font-size:20px;font-weight:700;color:#00C49A}'
+    +'.bill-no{background:#f0fdf8;border:1px solid #00C49A;border-radius:6px;padding:8px 14px;margin-bottom:14px;display:flex;justify-content:space-between}'
+    +'.pt-box{background:#f8f8f8;border-radius:6px;padding:10px 14px;margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr;gap:4px}'
+    +'table{width:100%;border-collapse:collapse}'
+    +'thead tr{background:#00C49A;color:#fff}'
+    +'th{padding:8px 10px;text-align:left;font-size:12px}'
+    +'.totals td{padding:5px 10px;font-size:13px}'
+    +'.grand{font-size:16px;font-weight:700;color:#00C49A}'
+    +'.footer{text-align:center;margin-top:20px;font-size:11px;color:#888;border-top:1px solid #eee;padding-top:10px}'
+    +'</style></head><body>'
+    +'<div class="header"><div class="clinic">'+clinic+'</div>'
+    +(addr?'<div style="font-size:12px;color:#555">'+addr+'</div>':'')
+    +(phone?'<div style="font-size:12px;color:#555">Ph: '+phone+'</div>':'')
+    +'</div>'
+    +'<div class="bill-no">'
+    +'<span><b>Bill No:</b> '+(bill.billNo||'—')+'</span>'
+    +'<span><b>Date:</b> '+new Date(bill.ts).toLocaleDateString('en-IN')+'</span>'
+    +'<span><b>Time:</b> '+new Date(bill.ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})+'</span>'
+    +'</div>'
+    +'<div class="pt-box">'
+    +'<div><b>Patient:</b> '+(bill.patientName||'Walk-in')+'</div>'
+    +(bill.patientUhid?'<div><b>UHID:</b> '+bill.patientUhid+'</div>':'<div></div>')
+    +(bill.patientAge?'<div><b>Age:</b> '+bill.patientAge+'</div>':'<div></div>')
+    +(bill.patientSex?'<div><b>Sex:</b> '+bill.patientSex+'</div>':'<div></div>')
+    +(bill.patientPhone?'<div><b>Phone:</b> '+bill.patientPhone+'</div>':'<div></div>')
+    +'</div>'
+    +'<table><thead><tr><th>Medicine</th><th>Qty</th><th>MRP</th><th>GST%</th><th>GST Amt</th><th>Amount</th></tr></thead><tbody>'
+    +rows+'</tbody></table>'
+    +'<table class="totals" style="margin-top:10px;width:60%;margin-left:auto">'
+    +(bill.disc>0?'<tr><td>Discount</td><td style="text-align:right;color:#e63946">- \u20b9'+bill.disc.toFixed(2)+'</td></tr>':'')
+    +'<tr><td>Sub-total</td><td style="text-align:right">\u20b9'+bill.sub.toFixed(2)+'</td></tr>'
+    +'<tr><td>GST</td><td style="text-align:right">\u20b9'+bill.gst.toFixed(2)+'</td></tr>'
+    +'<tr class="grand"><td><b>TOTAL</b></td><td style="text-align:right"><b>\u20b9'+bill.total.toFixed(2)+'</b></td></tr>'
+    +'<tr><td style="font-size:12px;color:#888">Payment</td><td style="text-align:right;font-size:12px;color:#888">'+(bill.mode||'').toUpperCase()+(bill.refNo?' | Ref: '+bill.refNo:'')+'</td></tr>'
+    +'</table>'
+    +'<div class="footer">Thank you for visiting '+clinic+'<br>Powered by MediWhats &mdash; mediwhats.in</div>'
+    +'</body></html>';
+}
+
+function posDownloadBillPDF(id) {
+  var bill = _posBills.find(function(b){ return String(b.id)===String(id); });
+  if (!bill) { showToast('Bill not found','error'); return; }
+  var html = posBuildBillHTML(bill);
+  // Open in new tab for printing/saving as PDF
+  var win = window.open('','_blank','width=800,height=900');
+  if (!win) { showToast('Allow popups to view bill','error'); return; }
+  win.document.write(html);
+  win.document.close();
+  setTimeout(function(){ win.print(); }, 500);
+}
+
+function posSendBillWA(id) {
+  var bill = _posBills.find(function(b){ return String(b.id)===String(id); });
+  if (!bill) { showToast('Bill not found','error'); return; }
+  var ph = bill.patientPhone || prompt('WhatsApp number (10 digits):');
+  if (!ph) return;
+  ph = ph.replace(/\D/g,'').replace(/^91/,'');
+  // Build compact WhatsApp message — no download link possible without server hosting
+  var clinic = (hospitalSettings||{}).name || 'MediWhats Clinic';
+  var items = (bill.items||[]).map(function(i){ return i.qty+'x '+i.name.split(' ').slice(0,3).join(' ')+' \u20b9'+(i.qty*i.mrp).toFixed(0); }).join('\n');
+  var msg = '\ud83d\udcca *'+clinic+' \u2014 Pharmacy Bill*\n'
+    +'Bill No: *'+bill.billNo+'*\n'
+    +'Date: '+new Date(bill.ts).toLocaleDateString('en-IN')+'\n'
+    +'Patient: *'+(bill.patientName||'Walk-in')+'*'
+    +(bill.patientUhid?' | UHID: '+bill.patientUhid:'')+'\n\n'
+    +items+'\n\n'
+    +'Sub-total: \u20b9'+bill.sub.toFixed(2)+'\n'
+    +(bill.disc>0?'Discount: -\u20b9'+bill.disc.toFixed(2)+'\n':'')
+    +(bill.gst>0?'GST: +\u20b9'+bill.gst.toFixed(2)+'\n':'')
+    +'*Total: \u20b9'+bill.total.toFixed(2)+'*\n'
+    +'Payment: '+(bill.mode||'').toUpperCase()+(bill.refNo?' | Ref: '+bill.refNo:'')+'\n\n'
+    +'_'+clinic+' \u2014 mediwhats.in_';
+  window.open('https://wa.me/91'+ph+'?text='+encodeURIComponent(msg),'_blank');
 }
 
 </script>
