@@ -1,4 +1,4 @@
-<!-- MediWhats v40 BUILD:1774051941 -->
+<!-- MediWhats v40 BUILD:1774053168 -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1387,7 +1387,9 @@ tr:hover td{background:rgba(255,255,255,0.02)}
           <input id="pos-patient" type="text" placeholder="Search patient by name or UHID..." oninput="posPatientSearch(this.value)"
             style="width:100%;background:rgba(255,255,255,0.05);border:0.5px solid rgba(0,196,154,0.2);border-radius:8px;padding:9px 12px;color:var(--white);font-size:13px;outline:none">
           <div id="pos-patient-suggestions" style="display:none;background:#0D1412;border:0.5px solid rgba(0,196,154,0.3);border-radius:8px;margin-top:3px;max-height:150px;overflow-y:auto;position:relative;z-index:20"></div>
+          <div id="pos-patient-card" style="display:none;background:rgba(0,196,154,0.06);border:0.5px solid rgba(0,196,154,0.25);border-radius:8px;padding:10px 12px;margin-top:6px"></div>
         </div>
+        <div id="pos-pt-uhid" style="display:none"></div><div id="pos-patient-card" style="display:none;background:rgba(0,196,154,0.06);border:0.5px solid rgba(0,196,154,0.25);border-radius:10px;padding:10px 12px;margin-top:2px"></div>
         <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:rgba(240,250,247,0.55)">Subtotal</span><span id="pos-subtotal">&#8377;0.00</span></div>
         <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px">
           <span style="color:rgba(240,250,247,0.55)">Discount</span>
@@ -1406,7 +1408,7 @@ tr:hover td{background:rgba(255,255,255,0.02)}
             <button class="pos-pay-btn" id="pp-card" onclick="posSetPay('card',this)">Card</button>
           </div>
         </div>
-        <button onclick="posBillSave()" style="width:100%;padding:12px;background:var(--teal);border:none;border-radius:10px;color:#000;font-size:14px;font-weight:800;cursor:pointer">Generate Bill</button>
+        <button onclick="posBillSave()" id="pos-bill-btn" style="width:100%;padding:13px;background:var(--teal);border:none;border-radius:10px;color:#000;font-size:14px;font-weight:800;cursor:pointer;letter-spacing:0.3px">&#9654; Generate Bill &amp; Receipt</button>
         <button onclick="posWAReceipt()" style="width:100%;padding:9px;background:rgba(37,211,102,0.1);border:0.5px solid rgba(37,211,102,0.35);border-radius:10px;color:#25d366;font-size:13px;font-weight:600;cursor:pointer">WhatsApp Receipt</button>
         <button onclick="posClear()" style="width:100%;padding:7px;background:transparent;border:0.5px solid rgba(240,250,247,0.1);border-radius:8px;color:rgba(240,250,247,0.4);font-size:12px;cursor:pointer">Clear</button>
       </div>
@@ -3060,7 +3062,7 @@ function pharmTab(tab) {
   });
   if(tab==='rx'){_pharmRxFilter='pending';pharmRxFilter('pending');loadPharmacy();}
   if(tab==='inventory') pharmLoadInventory();
-  if(tab==='billing'){posLoadRecent();pharmLoadInventory();}
+  if(tab==='billing'){posLoadRecent();if(!_pharmInvData.length)pharmLoadInventory();}
   if(tab==='audit') pharmLoadAudit();
 }
 
@@ -3301,23 +3303,61 @@ function posRecalc() {
 function posSetPay(mode,btn){_posPayMode=mode;document.querySelectorAll('.pos-pay-btn').forEach(function(b){b.classList.remove('pos-pay-on');});if(btn)btn.classList.add('pos-pay-on');}
 
 function posBillSave() {
-  if(!_posCart.length){showToast('Add medicines first','error');return;}
-  var sub=_posCart.reduce(function(s,i){return s+i.qty*i.mrp;},0);
-  var gst=_posCart.reduce(function(s,i){return s+i.qty*i.mrp*(i.gst/100);},0);
-  var discRaw=parseFloat((document.getElementById('pos-disc')||{}).value||0)||0;
-  var discType=(document.getElementById('pos-disc-type')||{}).value||'pct';
-  var disc=discType==='pct'?sub*(discRaw/100):Math.min(discRaw,sub);
-  var total=Math.max(0,sub-disc+gst);
-  _posCart.forEach(function(item){var inv=_pharmInvData.find(function(i){return i.id===item.id;});if(inv)inv.qty=Math.max(0,inv.qty-item.qty);});
-  pharmLogAudit('dispensed',_posCart.map(function(i){return i.qty+'x '+i.name;}).join(', '),'');
+  if (!_posCart.length) { showToast('Add at least one medicine to the bill', 'error'); return; }
+
+  var sub = 0, gst = 0;
+  _posCart.forEach(function(item) {
+    sub += item.qty * (item.mrp || 0);
+    gst += item.qty * (item.mrp || 0) * ((item.gst || 0) / 100);
+  });
+
+  var discEl   = document.getElementById('pos-disc');
+  var discType = (document.getElementById('pos-disc-type') || {}).value || 'pct';
+  var discRaw  = parseFloat((discEl || {}).value || 0) || 0;
+  var disc     = discType === 'pct' ? sub * (discRaw / 100) : Math.min(discRaw, sub);
+  var total    = Math.max(0, sub - disc + gst);
+
+  // Deduct from inventory (only if inv item exists)
+  _posCart.forEach(function(item) {
+    var inv = _pharmInvData.find(function(i) { return String(i.id) === String(item.id); });
+    if (inv) inv.qty = Math.max(0, (inv.qty || 0) - item.qty);
+  });
+
+  pharmLogAudit('dispensed', _posCart.map(function(i) { return i.qty + 'x ' + i.name; }).join(', '), '');
+  if (_pharmInvData.length) pharmInvStats();
+
+  // Get patient details
+  var ptName = (document.getElementById('pos-patient') || {}).value || 'Walk-in';
+  var ptData = _posSelectedPatient || null;
+
+  // Generate bill number
+  var billNo = 'PH' + new Date().getFullYear() + String(_posBills.length + 1).padStart(4, '0');
+
+  var bill = {
+    id:          String(Date.now()),
+    billNo:      billNo,
+    items:       JSON.parse(JSON.stringify(_posCart)),
+    sub:         sub,
+    disc:        disc,
+    gst:         gst,
+    total:       total,
+    mode:        _posPayMode,
+    patientName: ptName,
+    patientAge:  ptData ? ptData.age || ptData.dob || '' : '',
+    patientSex:  ptData ? ptData.gender || '' : '',
+    patientUhid: ptData ? ptData.mrn || '' : '',
+    patientPhone:ptData ? ptData.phone || '' : '',
+    ts:          Date.now()
+  };
+
+  _posBills.unshift(bill);
+  posRenderRecentBills();
   pharmInvStats();
 
-  // Record bill
-  _posBills.unshift({id:String(Date.now()),items:JSON.parse(JSON.stringify(_posCart)),sub:sub,disc:disc,gst:gst,total:total,mode:_posPayMode,patientName:(document.getElementById('pos-patient')||{}).value||'Walk-in',ts:Date.now()});
-  posRenderRecentBills();
-
-  showToast('Bill saved \u2014 \u20b9'+total.toFixed(2)+' ('+_posPayMode.toUpperCase()+') \u2713','success');
+  showToast('Bill ' + billNo + ' saved — ₹' + total.toFixed(2) + ' (' + _posPayMode.toUpperCase() + ') ✓', 'success');
   posClear();
+  // Switch to show recent bills
+  document.getElementById('pos-recent-bills') && document.getElementById('pos-recent-bills').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 
 function posWAReceipt() {
@@ -3336,6 +3376,7 @@ function posClear() {
   var e=document.getElementById('pp-cash');if(e)e.classList.add('pos-pay-on');
   var d=document.getElementById('pos-disc');if(d)d.value=0;
   posRenderCart();
+  posClearPatient();
 }
 
 function posLoadRecent(){var el=document.getElementById('pos-recent-bills');if(el)el.innerHTML='<div style="padding:14px;text-align:center;color:rgba(240,250,247,0.4);font-size:13px">Bills generated this session appear here.</div>';}
@@ -3413,18 +3454,62 @@ function posPatientSearch(val) {
   if (!matches.length) { sug.style.display='none'; return; }
   sug.innerHTML = matches.map(function(p){
     var name = ((p.first_name||'')+(p.last_name?' '+p.last_name:'')).trim();
-    return '<div class="pos-pt-opt" data-id="'+p.patient_id+'" data-name="'+esc(name)+'" style="padding:10px 14px;cursor:pointer;border-bottom:0.5px solid rgba(0,196,154,0.08);font-size:13px"><div style="font-weight:600">'+esc(name)+'</div><div style="font-size:11px;color:rgba(240,250,247,0.45)">'+(p.mrn||'')+' · '+(p.phone||'')+'</div></div>';
+    var age = p.dob ? Math.floor((Date.now()-new Date(p.dob))/(365.25*86400000)) : (p.age||'');
+    return '<div class="pos-pt-opt" data-pid="'+p.patient_id+'" style="padding:10px 14px;cursor:pointer;border-bottom:0.5px solid rgba(0,196,154,0.08)">'
+      +'<div style="font-weight:600;font-size:13px">'+esc(name)+'</div>'
+      +'<div style="font-size:11px;color:rgba(240,250,247,0.45)">'+(p.mrn||'—')+' · '+(age?age+'yr ':'')+((p.gender||'').charAt(0).toUpperCase())+' · '+(p.phone||'')+'</div>'
+      +'</div>';
   }).join('');
   sug.style.display='block';
   sug.querySelectorAll('.pos-pt-opt').forEach(function(el){
-    el.addEventListener('click',function(){
-      _posPatientId=this.dataset.id;
-      var inp=document.getElementById('pos-patient'); if(inp) inp.value=this.dataset.name;
+    el.addEventListener('click', function(){
+      var pid = this.dataset.pid;
+      var pt = (patientsData||[]).find(function(p){ return String(p.patient_id)===String(pid); });
+      if (!pt) return;
+      _posPatientId = pid;
+      _posSelectedPatient = pt;
+      // Fill search box
+      var name = ((pt.first_name||'')+(pt.last_name?' '+pt.last_name:'')).trim();
+      var inp = document.getElementById('pos-patient'); if(inp){ inp.value=name; inp.readOnly=true; inp.style.opacity='0.7'; }
       sug.style.display='none';
+      // Show patient info card
+      posShowPatientCard(pt);
     });
     el.addEventListener('mouseover',function(){this.style.background='rgba(0,196,154,0.08)';});
     el.addEventListener('mouseout',function(){this.style.background='';});
   });
+}
+
+function posShowPatientCard(pt) {
+  var card = document.getElementById('pos-patient-card');
+  if (!card) return;
+  var name = ((pt.first_name||'')+(pt.last_name?' '+pt.last_name:'')).trim();
+  var age  = pt.dob ? Math.floor((Date.now()-new Date(pt.dob))/(365.25*86400000)) : (pt.age||'—');
+  var sex  = pt.gender || '—';
+  var uhid = pt.mrn || pt.patient_id || '—';
+  var phone = pt.phone || '—';
+  card.style.display = 'block';
+  card.innerHTML =
+    '<div style="display:flex;justify-content:space-between;align-items:flex-start">'
+    +'<div>'
+    +'<div style="font-weight:700;font-size:14px;color:var(--teal)">'+esc(name)+'</div>'
+    +'<div style="display:flex;gap:14px;margin-top:6px;flex-wrap:wrap">'
+    +'<div style="font-size:11px"><span style="color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px">Age</span><br><span style="font-weight:700">'+age+' yrs</span></div>'
+    +'<div style="font-size:11px"><span style="color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px">Sex</span><br><span style="font-weight:700">'+esc(sex)+'</span></div>'
+    +'<div style="font-size:11px"><span style="color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px">UHID</span><br><span style="font-weight:700;font-family:monospace">'+esc(uhid)+'</span></div>'
+    +'<div style="font-size:11px"><span style="color:rgba(240,250,247,0.45);text-transform:uppercase;letter-spacing:.5px">Phone</span><br><span style="font-weight:700">'+esc(phone)+'</span></div>'
+    +'</div>'
+    +'</div>'
+    +'<button onclick="posClearPatient()" style="background:rgba(230,57,70,0.1);border:0.5px solid rgba(230,57,70,0.3);color:#e63946;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:11px;white-space:nowrap">× Clear</button>'
+    +'</div>';
+}
+
+function posClearPatient() {
+  _posPatientId = null; _posSelectedPatient = null;
+  var inp = document.getElementById('pos-patient');
+  if (inp) { inp.value=''; inp.readOnly=false; inp.style.opacity='1'; }
+  var card = document.getElementById('pos-patient-card');
+  if (card) { card.style.display='none'; card.innerHTML=''; }
 }
 
 function applyRoleAccess(role) {
@@ -7618,6 +7703,16 @@ function pharmMasterPrefill(drug) {
     showToast('Pre-filled from master! Add batch no., expiry, quantity and purchase cost.','success');
   },200);
 }
+
+
+// POS patient helpers
+function posHidePatientCard() {
+  var card = document.getElementById('pos-patient-card');
+  if (card) card.style.display = 'none';
+}
+
+// Ensure _posSelectedPatient is declared
+if (typeof _posSelectedPatient === 'undefined') { var _posSelectedPatient = null; }
 
 </script>
 
